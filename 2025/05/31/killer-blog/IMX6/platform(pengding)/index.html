@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="platform框架platform框架是在字符设备驱动的基础上实现的，它的目的是实现了驱动和设备的自动匹配。也就是说platform核心层会通过字符串匹配的方式，为设备树中的设备节点找到对应的驱动程序，然后执行驱动程序。以led驱动为例子。 初始化platform框架有三个对象：  驱动程序：我们需要写的驱动代码 设备节点：描述设备的信息 框架自己：提供接口  如何做一个platform驱动？首">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/05/31/killer-blog/IMX6/platform(pengding)/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="platform框架platform框架是在字符设备驱动的基础上实现的，它的目的是实现了驱动和设备的自动匹配。也就是说platform核心层会通过字符串匹配的方式，为设备树中的设备节点找到对应的驱动程序，然后执行驱动程序。以led驱动为例子。 初始化platform框架有三个对象：  驱动程序：我们需要写的驱动代码 设备节点：描述设备的信息 框架自己：提供接口  如何做一个platform驱动？首">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-31T02:36:45.802Z">
+<meta property="article:modified_time" content="2025-06-01T00:19:46.346Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/IMX6/platform(pengding)" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/05/31/killer-blog/IMX6/platform(pengding)/" class="article-date">
+  <time class="dt-published" datetime="2025-05-31T02:36:45.802Z" itemprop="datePublished">2025-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="platform框架"><a href="#platform框架" class="headerlink" title="platform框架"></a>platform框架</h2><p>platform框架是在字符设备驱动的基础上实现的，它的目的是实现了驱动和设备的自动匹配。也就是说platform核心层会通过字符串匹配的方式，为设备树中的设备节点找到对应的驱动程序，然后执行驱动程序。以led驱动为例子。</p>
+<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>platform框架有三个对象：</p>
+<ul>
+<li>驱动程序：我们需要写的驱动代码</li>
+<li>设备节点：描述设备的信息</li>
+<li>框架自己：提供接口</li>
+</ul>
+<p>如何做一个platform驱动？首先需要准备好驱动程序和设备节点，写好驱动的底层代码（和字符驱动程序一样），然后分别注册到platform框架中，就可以了。</p>
+<h4 id="驱动程序"><a href="#驱动程序" class="headerlink" title="驱动程序"></a>驱动程序</h4><p>驱动程序的重点在于实现 <code>platform_driver</code>对象，例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">platform_driver</span> <span class="title">led_driver</span> =</span> &#123;</span><br><span class="line">    .driver = &#123;</span><br><span class="line">        .name = <span class="string">&quot;imx6ull-led&quot;</span>,</span><br><span class="line">        .of_match_table = led_of_match,</span><br><span class="line">    &#125;,</span><br><span class="line">    .probe = led_probe,</span><br><span class="line">    .remove = led_remove,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>其中的of_match_table 表示支持的设备，是一个字符串数组：里面的字符串要和设备树里设备的compatible属性相同。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">of_device_id</span> <span class="title">led_of_match</span>[] =</span>&#123;</span><br><span class="line">    &#123; .compatible = <span class="string">&quot;atkalpha-gpioled&quot;</span> &#125;,</span><br><span class="line">    &#123;&#125;  <span class="comment">//最后一个必须是空的</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>probe 函数会在驱动和设备匹配成功的时候被执行，一般会在其中进行初始化，如创建字符设备节点、注册字符设备。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">led_probe</span><span class="params">(<span class="keyword">struct</span> platform_device *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">    printk(<span class="string">&quot;led driver and device was matched!\r\n&quot;</span>);</span><br><span class="line">    <span class="comment">//获取设备号</span></span><br><span class="line">	<span class="keyword">if</span> (leddev.major) &#123;</span><br><span class="line">		leddev.devid = MKDEV(leddev.major, <span class="number">0</span>);</span><br><span class="line">		register_chrdev_region(leddev.devid, <span class="number">1</span>, <span class="string">&quot;dtsplatled&quot;</span>);</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		alloc_chrdev_region(&amp;leddev.devid, <span class="number">0</span>, <span class="number">1</span>, <span class="string">&quot;dtsplatled&quot;</span>);</span><br><span class="line">		leddev.major = MAJOR(leddev.devid);</span><br><span class="line">	&#125;</span><br><span class="line">    <span class="comment">//初始化字符设备</span></span><br><span class="line">    leddev.cdev.owner = THIS_MODULE;</span><br><span class="line">    cdev_init(&amp;leddev.cdev,&amp;leddev_fops);</span><br><span class="line">    cdev_add(&amp;leddev.cdev,leddev.devid,<span class="number">1</span>);</span><br><span class="line">    <span class="comment">//设置设备节点</span></span><br><span class="line">    leddev.class = class_create(THIS_MODULE, <span class="string">&quot;dtsplatled&quot;</span>);</span><br><span class="line">    leddev.device = device_create(leddev.class, <span class="literal">NULL</span>, leddev.devid, <span class="literal">NULL</span>, <span class="string">&quot;dtsplatled&quot;</span>);</span><br><span class="line">    <span class="comment">//初始化gpio</span></span><br><span class="line">    leddev.nd = of_find_node_by_path(<span class="string">&quot;/gpioled&quot;</span>);</span><br><span class="line">    leddev.gpio = of_get_named_gpio(leddev.nd,<span class="string">&quot;led-gpio&quot;</span>,<span class="number">0</span>);</span><br><span class="line">    gpio_request(leddev.gpio,<span class="string">&quot;led0&quot;</span>);</span><br><span class="line">    gpio_direction_output(leddev.gpio,<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完成驱动的实现后就要注册到platform框架中去：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">leddriver_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> platform_driver_register(&amp;led_driver);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> __exit <span class="title function_">leddriver_exit</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	platform_driver_unregister(&amp;led_driver);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module_init(leddriver_init);</span><br><span class="line">module_exit(leddriver_exit);</span><br></pre></td></tr></table></figure>
+
+
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/05/31/killer-blog/IMX6/platform(pengding)/" data-id="cmbcy7rhd001yt8mt8xg57mch" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/05/31/killer-blog/Linux/VFS/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/05/31/killer-blog/IMX6/sync_io/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

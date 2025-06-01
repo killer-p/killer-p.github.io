@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="@[toc]  cJSON系列：  零基础学习cJSON 源码详解与应用（一）如何学习cJSON 零基础学习cJSON 源码详解与应用（二）创建json数据 零基础学习cJSON 源码详解与应用 （三）cJSON_Print()；打印json  零基础学习cJSON 源码详解与应用 （四）cJSON_Parse()；解析json字符串零基础学习cJSON 源码详解与应用 （五）修改，复制，比较cj">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/cJSON/5.modify_copy_compare_cjson/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="@[toc]  cJSON系列：  零基础学习cJSON 源码详解与应用（一）如何学习cJSON 零基础学习cJSON 源码详解与应用（二）创建json数据 零基础学习cJSON 源码详解与应用 （三）cJSON_Print()；打印json  零基础学习cJSON 源码详解与应用 （四）cJSON_Parse()；解析json字符串零基础学习cJSON 源码详解与应用 （五）修改，复制，比较cj">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-06-01T00:23:34.675Z">
+<meta property="article:modified_time" content="2025-06-01T00:23:34.675Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/cJSON/5.modify_copy_compare_cjson" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/cJSON/5.modify_copy_compare_cjson/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:23:34.675Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>@[toc]</p>
+<blockquote>
+<p>cJSON系列：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/110395913">零基础学习cJSON 源码详解与应用（一）如何学习cJSON</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/110406265">零基础学习cJSON 源码详解与应用（二）创建json数据</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/110475966">零基础学习cJSON 源码详解与应用 （三）cJSON_Print()；打印json
+</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/110481533">零基础学习cJSON 源码详解与应用 （四）cJSON_Parse()；解析json字符串</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/110499109">零基础学习cJSON 源码详解与应用 （五）修改，复制，比较cjson</a></li>
+</ul>
+</blockquote>
+<h2 id="一，cjson的其他函数"><a href="#一，cjson的其他函数" class="headerlink" title="一，cjson的其他函数"></a>一，cjson的其他函数</h2><p><strong>1,将新的item插入数组.</strong></p>
+<blockquote>
+<p>CJSON_PUBLIC(void) cJSON_InsertItemInArray(cJSON *array, int which, cJSON *newitem)</p>
+</blockquote>
+<p><strong>2,将item从cjson链表中的节点脱离，成功则返回脱离的item指针,注意脱离后的item的内存不会被释放，使用完后要记得释放内存。</strong></p>
+<blockquote>
+<p>CJSON_PUBLIC(cJSON *) cJSON_DetachItemViaPointer(cJSON *parent, cJSON * const item);</p>
+</blockquote>
+<p><strong>3，使用replacement替换parent中的子节点中的item</strong></p>
+<blockquote>
+<p>CJSON_PUBLIC(cJSON_bool) cJSON_ReplaceItemViaPointer(cJSON * const parent, cJSON * const item, cJSON * replacement);</p>
+<p><strong>4,复制船新一个item，recurse表示是否有递归json对象，返回复制的新的item</strong><br>CJSON_PUBLIC(cJSON *) cJSON_Duplicate(const cJSON *item, cJSON_bool recurse);</p>
+<p><strong>5，比较两个json是否相同。case_sensitive表示是否大小写敏感</strong><br>CJSON_PUBLIC(cJSON_bool) cJSON_Compare(const cJSON * const a, const cJSON * const b, const cJSON_bool case_sensitive);</p>
+</blockquote>
+<p><strong>6，将json字符串最小化，删除一些没有意义的特殊字符。</strong></p>
+<blockquote>
+<p>CJSON_PUBLIC(void) cJSON_Minify(char *json);</p>
+</blockquote>
+<h2 id="二，学习cJSON的收获"><a href="#二，学习cJSON的收获" class="headerlink" title="二，学习cJSON的收获"></a>二，学习cJSON的收获</h2><p>cjson简单易学，是一个非常适合新手的开源c项目。</p>
+<h3 id="2-1-结构体的使用"><a href="#2-1-结构体的使用" class="headerlink" title="2.1 结构体的使用"></a>2.1 结构体的使用</h3><p>第一个想到的收获就是，如何构造一个结构体，可以灵活的表示他所对应的对象的特征。<br>在cjson中，以<code>键-值</code>对为最小单元来构造cjson结构体，体现了它的灵活性。一个优秀的数据结构能节省很多算法上的复杂度。</p>
+<h3 id="2-2-链表的使用"><a href="#2-2-链表的使用" class="headerlink" title="2.2 链表的使用"></a>2.2 链表的使用</h3><p>增强了对链表使用的认识。</p>
+<h3 id="2-3-字符串的处理"><a href="#2-3-字符串的处理" class="headerlink" title="2.3 字符串的处理"></a>2.3 字符串的处理</h3><p>是难点也是收获。特别是特殊字符，转义字符的转换，都是之前没考虑过的东西。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/cJSON/5.modify_copy_compare_cjson/" data-id="cmbcy7rhr002xt8mthzh397fy" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/lwip/lwip_guide/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/lwip/lwip_IP_data_in_1/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

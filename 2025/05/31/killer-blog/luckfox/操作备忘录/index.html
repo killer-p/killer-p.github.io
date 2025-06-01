@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="编译内核12345export ARCH&#x3D;armexport CROSS_COMPILE&#x3D;arm-rockchip830-linux-uclibcgnueabihf-export PATH&#x3D;&#x2F;home&#x2F;prx&#x2F;project&#x2F;luckfox-pico&#x2F;luckfox-pico&#x2F;tools&#x2F;linux&#x2F;toolchain&#x2F;arm-rockchip830-linux-uclibcgnueabihf&#x2F;b">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/05/31/killer-blog/luckfox/%E6%93%8D%E4%BD%9C%E5%A4%87%E5%BF%98%E5%BD%95/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="编译内核12345export ARCH&#x3D;armexport CROSS_COMPILE&#x3D;arm-rockchip830-linux-uclibcgnueabihf-export PATH&#x3D;&#x2F;home&#x2F;prx&#x2F;project&#x2F;luckfox-pico&#x2F;luckfox-pico&#x2F;tools&#x2F;linux&#x2F;toolchain&#x2F;arm-rockchip830-linux-uclibcgnueabihf&#x2F;b">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-31T17:16:20.240Z">
+<meta property="article:modified_time" content="2025-06-01T00:19:46.131Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/luckfox/操作备忘录" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/05/31/killer-blog/luckfox/%E6%93%8D%E4%BD%9C%E5%A4%87%E5%BF%98%E5%BD%95/" class="article-date">
+  <time class="dt-published" datetime="2025-05-31T17:16:20.240Z" itemprop="datePublished">2025-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="编译内核"><a href="#编译内核" class="headerlink" title="编译内核"></a>编译内核</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> ARCH=arm</span><br><span class="line"><span class="built_in">export</span> CROSS_COMPILE=arm-rockchip830-linux-uclibcgnueabihf-</span><br><span class="line"><span class="built_in">export</span> PATH=/home/prx/project/luckfox-pico/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclibcgnueabihf/bin:<span class="variable">$PATH</span></span><br><span class="line">make luckfox_rv1106_linux_defconfig</span><br><span class="line">make -j8</span><br></pre></td></tr></table></figure>
+
+<h2 id="adb-连接"><a href="#adb-连接" class="headerlink" title="adb 连接"></a>adb 连接</h2><h3 id="windows开启openssh-server"><a href="#windows开启openssh-server" class="headerlink" title="windows开启openssh server"></a>windows开启openssh server</h3><p>这里的目的是为了能在vscode 中使用window 的adb</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装 OpenSSH 服务器</span></span><br><span class="line">Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0</span><br><span class="line"><span class="comment"># 启动服务并设置开机自启</span></span><br><span class="line">Start-Service sshd</span><br><span class="line">Set-Service -Name sshd -StartupType Automatic</span><br><span class="line">New-NetFirewallRule -Name <span class="string">&quot;OpenSSH-Server&quot;</span> -DisplayName <span class="string">&quot;OpenSSH Server (SSHD)&quot;</span> -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22</span><br></pre></td></tr></table></figure>
+<h3 id="adb-调试"><a href="#adb-调试" class="headerlink" title="adb 调试"></a>adb 调试</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb shell</span><br></pre></td></tr></table></figure>
+<h2 id="在虚拟机中连接板子"><a href="#在虚拟机中连接板子" class="headerlink" title="在虚拟机中连接板子"></a>在虚拟机中连接板子</h2><p>官网wiki是在windows中使用RNDIS与板子进行网络连接。其实在虚拟机中也可以做到，具体步骤如下：</p>
+<ol>
+<li>将USB设备连接到vmware station：编辑-&gt;首选项-&gt;USB-&gt;将设备连接到前台虚拟机</li>
+<li>使用以下脚本进行连接：</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">    <span class="built_in">sudo</span> ip addr add 172.32.0.100/24 dev enx928af7795b4f</span><br><span class="line">    <span class="built_in">sudo</span> ip <span class="built_in">link</span> <span class="built_in">set</span> enx928af7795b4f up</span><br><span class="line">    ssh root@172.32.0.93</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>同样的也可以使用adb进行连接</li>
+</ol>
+<h3 id="脚本记录每次操作"><a href="#脚本记录每次操作" class="headerlink" title="脚本记录每次操作"></a>脚本记录每次操作</h3><p>使用脚本记录每次操作，以后使用过程中可以随时通过脚本快速进行。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/05/31/killer-blog/luckfox/%E6%93%8D%E4%BD%9C%E5%A4%87%E5%BF%98%E5%BD%95/" data-id="cmbcy7rhs002zt8mt8x6mcqxw" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/05/31/killer-blog/rust/rust%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/05/31/killer-blog/Linux/uboot_2/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

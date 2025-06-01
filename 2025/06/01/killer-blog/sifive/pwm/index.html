@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="risc-v Sifive learn inventor基础之硬件pwm@[toc] 系列文章 Sifive Learn Inventor 基础之gpio 按键中断 Sifive learn inventor基础之串口&amp;操作寄存器 Sifive learn inventor基础之硬件pwm&amp;寄存器 risc-v Sifive learn inventor基础之硬件i2c与LSM30">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/sifive/pwm/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="risc-v Sifive learn inventor基础之硬件pwm@[toc] 系列文章 Sifive Learn Inventor 基础之gpio 按键中断 Sifive learn inventor基础之串口&amp;操作寄存器 Sifive learn inventor基础之硬件pwm&amp;寄存器 risc-v Sifive learn inventor基础之硬件i2c与LSM30">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/sifive/pwm/2020060823454538.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/sifive/pwm/2020060823460562.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/sifive/pwm/2020060823500383.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/sifive/pwm/20200608235301136.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/sifive/pwm/20200609002818951.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/sifive/pwm/20200609091806437.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/sifive/pwm/20200614084559688.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.660Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:26.796Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/sifive/pwm/2020060823454538.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/sifive/pwm" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/sifive/pwm/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.660Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="risc-v-Sifive-learn-inventor基础之硬件pwm"><a href="#risc-v-Sifive-learn-inventor基础之硬件pwm" class="headerlink" title="risc-v Sifive learn inventor基础之硬件pwm"></a>risc-v Sifive learn inventor基础之硬件pwm</h2><p>@[toc]</p>
+<h2 id="系列文章"><a href="#系列文章" class="headerlink" title="系列文章"></a>系列文章</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106589242">Sifive Learn Inventor 基础之gpio 按键中断</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106603894">Sifive learn inventor基础之串口&amp;操作寄存器</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106631404">Sifive learn inventor基础之硬件pwm&amp;寄存器</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106796337">risc-v Sifive learn inventor基础之硬件i2c与LSM303AGR通信</a></li>
+</ol>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106603894">risc-v Sifive learn inventor基础之串口</a><br>继串口之后，继续来通过寄存器操作硬件pwm，熟悉操作寄存器的流程。<br>因为sifive官方没有提供pwm的库函数，所以必须根据芯片手册配置寄存器来开发pwm。这是练习操作寄存器的好机会！</p>
+</blockquote>
+<h2 id="错误修改"><a href="#错误修改" class="headerlink" title="错误修改"></a>错误修改</h2><p>2020.7.24<br>修改了示例应用中，pwm占空比为1&#x2F;5；多谢指正；<br>之前关于pwmcount，scale与pwms的关系搞错了，正确的关系是pwms&#x3D;pwmcount&#x2F;scale。耽误各位了</p>
+<h2 id="一，硬件连接"><a href="#一，硬件连接" class="headerlink" title="一，硬件连接"></a>一，硬件连接</h2><p>在入门手册中可以知道，在金手指上，gpio2接到小车上的右边电机且控制电机正转。在芯片手册的gpio章节，可以找到gpio2的复用功能1中对应的是pwm0_cmp2，所以要操作的就是pwmcmp2输出pwm波。<br><img src="/2025/05/30/hello-world/sifive/pwm/2020060823454538.png" alt="金手指"><br><img src="/2025/05/30/hello-world/sifive/pwm/2020060823460562.png" alt="gpio2"></p>
+<h2 id="二，pwm"><a href="#二，pwm" class="headerlink" title="二，pwm"></a>二，pwm</h2><p>e310有三个pwm控制器，我们需要操作的是pwm0。<br>一个pwm控制器的寄存器如下：</p>
+<blockquote>
+<p>pwmcfg：配置pwm<br>pwmcount：pwm计数寄存器<br>pwms：保存pwmcount经过放大后的值，这个寄存器用来与pwmcmpX寄存器比较，从而产生pwm波。</p>
+</blockquote>
+<p><img src="/2025/05/30/hello-world/sifive/pwm/2020060823500383.png" alt="pwm寄存器"><br><strong>1，pwmcfg</strong></p>
+<ul>
+<li><strong>pwmscale：pwmcount的扩大倍数 ；pwmscale∈（0-15）；扩大倍数：2^0—&gt;2^15;</strong></li>
+<li><strong>pwmsticky和pwmdeglitch：是与pwm中断相关的，是用来防止当改变cmpX的值时，中断再次触发。</strong></li>
+<li><strong>pwmzero ：为1时，当pwms&#x3D;&#x3D;cmp0时，pwmcount会重置。但是在开发过程中，我发现这个位无法被置一，当向bit 9写1时，bit 10置1，而bit 9保持0 最后发现这个不会影响pwmzero的功能。</strong></li>
+<li><strong>pwmcmpXcenter： 用来设置pwm的中央对齐模式</strong></li>
+<li><strong>pwmXgang： 设置pwm轮流产生信号。</strong> </li>
+<li><strong>pwmcmpXip:中断标志位</strong><br><img src="/2025/05/30/hello-world/sifive/pwm/20200608235301136.png" alt="在这里插入图片描述"></li>
+</ul>
+<p><strong>2，pwms与pwmcmpx</strong><br><em><strong>pwms的值就是pwmcount的值缩小2^n倍，n&#x3D;scale，n∈【0，15】。缩放后的值与pwmcmpX寄存器里的值比较，产生pwm波。当pwms&gt;pwmcmpX 时，gpioX输出高电平。</strong></em></p>
+<p><img src="/2025/05/30/hello-world/sifive/pwm/20200609002818951.png" alt="在这里插入图片描述"><br><strong>pwmcpmX的最大值与cmpwdith有关，如图不同pwm控制器有不一样的cmpwdith，如pwm0的cmpwdith&#x3D;8，pwmcmpX寄存器就只能设置8位，也就是0-&gt;255，pwm1的cmpwdith&#x3D;16,pwmcmpX范围0-&gt;2^16-1。这一点在编程时需要注意传递的参数不能超出范围。</strong><br><img src="/2025/05/30/hello-world/sifive/pwm/20200609091806437.png" alt="在这里插入图片描述"></p>
+<h2 id="二，代码编写"><a href="#二，代码编写" class="headerlink" title="二，代码编写"></a>二，代码编写</h2><p><strong>了解了寄存器的功能后，就可以通过代码来操作寄存器实现所需的功能了。可见，通过scale可以设置pwms的时钟频率（pwm时钟频率是16MHZ），设置pwmcmp0可以设置pwm的周期，再通过设置pwmcmpX调节pwm的占空比。</strong><br><strong>首先设置gpio2，输出使能，复用功能1，配置pwmcfg寄存器，保险起见，先清零，再设置scale<br><em>注意，pwmenalways必须在pwmzerocmp之前置位，若pwmzerocmp先置位，则pwmenalways设置为1时，pwmzerocmp会被清零!</em><br>最后清零所有cmp寄存器，然后设置cmp0的值，这样初始化了周期，cmp1-cmp3的输出全是高电平。</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#include &quot;pwm.h&quot;</span></span><br><span class="line">/*</span><br><span class="line"> * 设置pwm0占空比 </span><br><span class="line"> * cmp_num :0-&gt;3</span><br><span class="line"> * 通过设置pwmcmp0可以设置周期,cmpx&gt;pwms 低电平</span><br><span class="line"> * cmp 【0，155】这是由于pwmdwith=8</span><br><span class="line"> */</span><br><span class="line">int pwm0_setcmp(int cmp_num,char cmp)&#123;</span><br><span class="line">	<span class="keyword">if</span>(cmp_num==0)&#123;</span><br><span class="line">		PWM0_CMP0 &amp;=0;</span><br><span class="line">		PWM0_CMP0|=cmp;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span>(cmp_num==1)&#123;</span><br><span class="line">		PWM0_CMP1 &amp;=0;</span><br><span class="line">		PWM0_CMP1|=cmp;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span>(cmp_num==2)&#123;</span><br><span class="line">		PWM0_CMP2 &amp;=0;</span><br><span class="line">		PWM0_CMP2|=cmp;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span>(cmp_num==3)&#123;</span><br><span class="line">		PWM0_CMP3 &amp;=0;</span><br><span class="line">		PWM0_CMP3|=cmp;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">/*</span><br><span class="line"> * pwm初始化</span><br><span class="line"> *  假设时钟周期设为64M</span><br><span class="line"> * 周期 = (250*2^scale)/64 us=2^scale*3.90625</span><br><span class="line"> *int scale (0-15)时钟分频系数 scale=7时，T=500us</span><br><span class="line"> */</span><br><span class="line">void pwm_init(int scale)&#123;</span><br><span class="line"></span><br><span class="line">	//GPIO2-&gt;PWM0CMP2</span><br><span class="line">	GPIO0_IOF_EN |=(1&lt;&lt;<span class="string">2);//enable gpio2 iof</span></span><br><span class="line"><span class="string">	GPIO0_IOF_SEL |=(1&lt;&lt;2</span>); //select iof 1</span><br><span class="line"></span><br><span class="line">	//配置cfg寄存器</span><br><span class="line">	PWM0_CFG &amp;=0;//clear cfg</span><br><span class="line">	PWM0_CFG |=scale;//set scale=0</span><br><span class="line">	PWM0_CFG |=(1&lt;&lt;<span class="string">12);//set pwmenalways 1 ;note:this must be done before pwmzeorcmp</span></span><br><span class="line"><span class="string">	PWM0_CFG |=(1&lt;&lt;9);//set pwmzero 1</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">	//init the cmpx value</span></span><br><span class="line"><span class="string">	pwm0_setcmp(0,250); </span></span><br><span class="line"><span class="string">	pwm0_setcmp(1,250); </span></span><br><span class="line"><span class="string">	pwm0_setcmp(2,250); </span></span><br><span class="line"><span class="string">	pwm0_setcmp(3,250); </span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>寄存器相关宏定义</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> PWM0_CFG (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_PWM0_0_BASE_ADDRESS + METAL_SIFIVE_PWM0_PWMCFG)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PWM0_CMP0 (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_PWM0_0_BASE_ADDRESS + METAL_SIFIVE_PWM0_PWMCMP0)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PWM0_CMP1 (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_PWM0_0_BASE_ADDRESS + METAL_SIFIVE_PWM0_PWMCMP1)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PWM0_CMP2 (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_PWM0_0_BASE_ADDRESS + METAL_SIFIVE_PWM0_PWMCMP2)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PWM0_CMP3 (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_PWM0_0_BASE_ADDRESS + METAL_SIFIVE_PWM0_PWMCMP3)))</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><em><strong>示例应用</strong></em><br>设置pwm周期500us 占空比1&#x2F;5</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">__metal_driver_sifive_fe310_g000_pll_init(&amp;__metal_dt_clock_4);<span class="comment">//clock 64mhz</span></span><br><span class="line">metal_clock_set_rate_hz(&amp;__metal_dt_clock_4.clock,<span class="number">64000000</span>);</span><br><span class="line"><span class="comment">//当scale=7 PWM周期500us</span></span><br><span class="line">pwm_init(<span class="number">7</span>);</span><br><span class="line">pwm0_setcmp(<span class="number">2</span>,<span class="number">200</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="三，小结"><a href="#三，小结" class="headerlink" title="三，小结"></a>三，小结</h2><p>以pwm0为例，其他的pwm也大致可以依样画葫芦。这次用逻辑分析仪，能明显清晰的看到pwm的周期和占空比，通过不断调试pwmcfg，最后找到规律。同时实践了操作寄存器的方法。编写了reg.h，方便操作寄存器。<br>作者学识短浅，如有错误的地方，望不吝赐教，如果我的博客对你有帮助，记得点赞收藏哦！<br><img src="/2025/05/30/hello-world/sifive/pwm/20200614084559688.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/sifive/pwm/" data-id="cmbcy7ri1003tt8mt9ch25t3e" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2025/06/01/killer-blog/sifive/uart/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

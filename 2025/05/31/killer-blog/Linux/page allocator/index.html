@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="一、背景物理内存管理最大的难题就是处理内存碎片，在Linux内核中，页面是管理物理内存的基本单位。内存碎片有两种：  空闲内存离散的分布在内存各个角落，虽然总的空闲内存大小足够，但无法凑出一块足够大的内存 用户申请3个page的页面，但实际上分配了4个page，导致一个page没有被使用，浪费。  Linux必须使用一套算法来减少页面的碎片问题，同时在实现上也要尽量快速高效，因为页面的申请释放在操">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/05/31/killer-blog/Linux/page%20allocator/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="一、背景物理内存管理最大的难题就是处理内存碎片，在Linux内核中，页面是管理物理内存的基本单位。内存碎片有两种：  空闲内存离散的分布在内存各个角落，虽然总的空闲内存大小足够，但无法凑出一块足够大的内存 用户申请3个page的页面，但实际上分配了4个page，导致一个page没有被使用，浪费。  Linux必须使用一套算法来减少页面的碎片问题，同时在实现上也要尽量快速高效，因为页面的申请释放在操">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-31T17:16:20.236Z">
+<meta property="article:modified_time" content="2025-06-01T00:19:46.399Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/Linux/page allocator" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/05/31/killer-blog/Linux/page%20allocator/" class="article-date">
+  <time class="dt-published" datetime="2025-05-31T17:16:20.236Z" itemprop="datePublished">2025-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h2><p>物理内存管理最大的难题就是处理内存碎片，在Linux内核中，页面是管理物理内存的基本单位。<br>内存碎片有两种：</p>
+<ol>
+<li>空闲内存离散的分布在内存各个角落，虽然总的空闲内存大小足够，但无法凑出一块足够大的内存</li>
+<li>用户申请3个page的页面，但实际上分配了4个page，导致一个page没有被使用，浪费。</li>
+</ol>
+<p>Linux必须使用一套算法来减少页面的碎片问题，同时在实现上也要尽量快速高效，因为页面的申请释放在操作系统中的使用频率非常高，会非常影响性能。</p>
+<h2 id="二、解决方案"><a href="#二、解决方案" class="headerlink" title="二、解决方案"></a>二、解决方案</h2><p>在解决内存碎片问题上，Linux主要采用以下思路：</p>
+<ul>
+<li>伙伴系统算法</li>
+<li>内存规整</li>
+<li>内存回收</li>
+<li>OOM 机制<br>通过上述方式减缓内存碎片的效应。</li>
+</ul>
+<h3 id="2-1、伙伴系统算法"><a href="#2-1、伙伴系统算法" class="headerlink" title="2.1、伙伴系统算法"></a>2.1、伙伴系统算法</h3><p>伙伴系统算法核心的思想是：维护若干个内存池，内存池的大小为2^n。</p>
+<p>用户申请page时，只能从这些内存池中申请固定大小的page。虽然会有一定内存的浪费，但是这个算法的优点是在释放page时，能较容易的找到 ”伙伴“页面，从而将小内存合并到大内存。</p>
+<p>例如用户申请3个page，那么会page allocator实际上会分配4个page，有一个page被浪费掉了。但是只要用户释放了page，且”伙伴页面“也在空闲链表，那么立刻就可以合并。<br>内存合并的条件很容易达成，所以能高效避免内存碎片化。</p>
+<p>n的取值为：0,1,2,3,4,5,6,7,8,9,10。<br>对应的page数量为：1,2,4,8,16,32,64,128,256,512,1024；<br>即最大1024个page，最小1个page。</p>
+<h3 id="2-2-2、内存规整"><a href="#2-2-2、内存规整" class="headerlink" title="2.2.2、内存规整"></a>2.2.2、内存规整</h3><p>伙伴系统算法有一个缺陷就是要求必须两个伙伴都处于空闲，但是当内存紧张且又需要大块内存时，可能无法合并成一个大内存。<br>例如，用户申请8个page，但是伙伴系统里只有4个连续空闲page，而且其伙伴不在空闲链表，虽然其他地方有空闲页面，但是因为隔离太远，无法合并，最终申请失败。</p>
+<p>内存规整可以解决这个问题，利用页面迁移的机制，将伙伴page的内容复制到其他空闲页面，并更新页面，tlb，将伙伴page 释放会空闲链表，以支持合并成8个连续空闲page。</p>
+<h3 id="2-2-3、内存回收"><a href="#2-2-3、内存回收" class="headerlink" title="2.2.3、内存回收"></a>2.2.3、内存回收</h3><p>当空闲页面不足够时，会将一些不重要的页面进行回收。例如文件缓存页面，这些页面是在读文件&#x2F;写文件时产生的，将这些不常用的页面回收，可以增加空闲页面数量，以满足页面申请。</p>
+<h3 id="2-2、page分类"><a href="#2-2、page分类" class="headerlink" title="2.2、page分类"></a>2.2、page分类</h3><p>通过将不同用途的page进行分类，可以尽量减少内存碎片。<br>具体的page 迁移类型有以下几种：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">enum</span> <span class="title">migratetype</span> &#123;</span></span><br><span class="line">	<span class="comment">// 不可以移动的page，例如kmalloc申请的内存</span></span><br><span class="line">	MIGRATE_UNMOVABLE,</span><br><span class="line">	<span class="comment">//可移动的page，如文件page，用户进程的堆栈</span></span><br><span class="line">	MIGRATE_MOVABLE,</span><br><span class="line">	<span class="comment">//可回收的page，如文件page</span></span><br><span class="line">	MIGRATE_RECLAIMABLE,</span><br><span class="line">	<span class="comment">//cma page是预留一块连续物理内存，当没有连续物理内存需求时，可以从这里申请，但是当有需求时，需要使用page 迁移，将cma page恢复</span></span><br><span class="line">	MIGRATE_CMA,</span><br><span class="line">	<span class="comment">//在per pcu page缓存的page，大小固定是1个page</span></span><br><span class="line">	MIGRATE_PCPTYPES,</span><br><span class="line">	<span class="comment">//高优先级、不可睡眠等待的page</span></span><br><span class="line">	MIGRATE_HIGHATOMIC = MIGRATE_PCPTYPES,</span><br><span class="line">	MIGRATE_TYPES</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>例如将 MIGRATE_MOVABLE 的page 都集中放在一起，在内存规整时，就可以很方便的迁移这些page。若在 MIGRATE_MOVABLE 的page中混入几个 MIGRATE_UNMOVABLE 的page，那么这些钉子户就会死死的钉在那些page，无法移动，使得最终的page无法凑成一个大的连续内存。</p>
+<h2 id="三、API接口"><a href="#三、API接口" class="headerlink" title="三、API接口"></a>三、API接口</h2><p>接下来分析page allocator 里的初始化、申请、释放接口。<br>page allocator里的page 最开始是哪里来的，申请的时候会如何考虑优化性能，释放的时候如何尽量合并。</p>
+<h3 id="3-1、初始化page-allocator"><a href="#3-1、初始化page-allocator" class="headerlink" title="3.1、初始化page allocator"></a>3.1、初始化page allocator</h3><p>内核在start_kernel() 里完成页表的建立后，就开始初始化page allocator。<br>首先我们要了解管理page 的比较重要的数据结构：<code>pg_data_t、zone、page</code>.<br>这些数据结构的关系如图所示：<br>![[page_allocator.drawio.png]]</p>
+<p>这些数据结构在start_kernel()的时候就首先初始化完成了。</p>
+<p>在start_kernel() 的paging_init()阶段里，通过调用 free_area_init() 初始化上述数据结构。<br>![[Pasted image 20250405223406.png]]</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> __init <span class="title function_">free_area_init</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> *max_zone_pfn)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> start_pfn, end_pfn;</span><br><span class="line">	<span class="type">int</span> i, nid, zone;</span><br><span class="line">	<span class="type">bool</span> descending;</span><br><span class="line"></span><br><span class="line">	start_pfn = find_min_pfn_with_active_regions();</span><br><span class="line">	descending = arch_has_descending_max_zone_pfns();</span><br><span class="line"></span><br><span class="line">	<span class="comment">//打印一些ZONE的地址信息到uart，我们经常可以看到</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//初始化每一个内存节点，对于UMA系统来说，只有一个内存节点</span></span><br><span class="line">	for_each_online_node(nid) &#123;</span><br><span class="line">		<span class="type">pg_data_t</span> *pgdat = NODE_DATA(nid);</span><br><span class="line">		<span class="comment">//这里会初始化上述所有数据结构体，包括mem_map[]数组，该数组的成员是struct page，物理内存的每一个页面都有一个struct page记录其状态信息</span></span><br><span class="line">		free_area_init_node(nid);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//在这里初始化mem_map里的每一个struct page</span></span><br><span class="line">	memmap_init();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里有一个问题，当前slub allocator还未初始化，我们不能使用kmalloc() 去申请内存，所以这里的pg_data_t 对象是一个全局变量。而mem_map[]数组的内存是使用memblock 接口申请的内存。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> __init <span class="title function_">free_area_init_node</span><span class="params">(<span class="type">int</span> nid)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//获取全局pg_data_t 变量</span></span><br><span class="line">	<span class="type">pg_data_t</span> *pgdat = NODE_DATA(nid);</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> start_pfn = <span class="number">0</span>;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> end_pfn = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//遍历memblock里所有memory类型的内存，得到pfn范围</span></span><br><span class="line">	get_pfn_range_for_nid(nid, &amp;start_pfn, &amp;end_pfn);</span><br><span class="line"></span><br><span class="line">	pgdat-&gt;node_id = nid;</span><br><span class="line">	pgdat-&gt;node_start_pfn = start_pfn;</span><br><span class="line">	pgdat-&gt;per_cpu_nodestats = <span class="literal">NULL</span>;</span><br><span class="line">	<span class="comment">//通过pfn计算得到该内存节点所有的page数量</span></span><br><span class="line">	calculate_node_totalpages(pgdat, start_pfn, end_pfn);</span><br><span class="line"></span><br><span class="line">	<span class="comment">//通过memblock申请mem_map[]数组，假如有64M,64M / 4k = 16 * 1024个page，那么就需要申请 16 * 1024 * sizeof(struct page)的数组</span></span><br><span class="line">	alloc_node_mem_map(pgdat);</span><br><span class="line"></span><br><span class="line">	<span class="comment">//初始化zone对象</span></span><br><span class="line">	free_area_init_core(pgdat);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>最后还需要在 memmap_init()中，会遍历所有页面，初始化每一个struct page对象</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> __meminit <span class="title function_">memmap_init_zone</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> size, <span class="type">int</span> nid, <span class="type">unsigned</span> <span class="type">long</span> zone,</span></span><br><span class="line"><span class="params">		<span class="type">unsigned</span> <span class="type">long</span> start_pfn, <span class="type">unsigned</span> <span class="type">long</span> zone_end_pfn,</span></span><br><span class="line"><span class="params">		<span class="keyword">enum</span> meminit_context context,</span></span><br><span class="line"><span class="params">		<span class="keyword">struct</span> vmem_altmap *altmap, <span class="type">int</span> migratetype)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//遍历所有pfn</span></span><br><span class="line">	<span class="keyword">for</span> (pfn = start_pfn; pfn &lt; end_pfn; ) &#123;</span><br><span class="line">		<span class="comment">//拿到mem_map[]对应的struct page</span></span><br><span class="line">		page = pfn_to_page(pfn);</span><br><span class="line">		<span class="comment">//初始化一些变量</span></span><br><span class="line">		__init_single_page(page, pfn, zone, nid, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">		<span class="comment">//将所有page初始化为MIGRATE_MOVABLE</span></span><br><span class="line">		<span class="comment">//这样可以避免MIGRATE_UNMOVABLE的page 分布在内存各个地方</span></span><br><span class="line">		<span class="comment">//后续申请时，可以将page的类型转换成MIGRATE_UNMOVABLE</span></span><br><span class="line">		<span class="keyword">if</span> (IS_ALIGNED(pfn, pageblock_nr_pages)) &#123;</span><br><span class="line">			set_pageblock_migratetype(page, migratetype);</span><br><span class="line">			cond_resched();</span><br><span class="line">		&#125;</span><br><span class="line">		pfn++;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>OK、数据结构初始化完成后，就可以往page allocator里添加pages，后续的内存申请就从page allocator里进行。这里内核使用__free_pages_memory() 将page 从memblock 移交给page allocator。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> __init __free_pages_memory(<span class="type">unsigned</span> <span class="type">long</span> start, <span class="type">unsigned</span> <span class="type">long</span> end)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> order;</span><br><span class="line">	<span class="comment">//遍历所有pfn</span></span><br><span class="line">	<span class="keyword">while</span> (start &lt; end) &#123;</span><br><span class="line">		<span class="comment">//确保order不会超过 MAX_ORDER - 1</span></span><br><span class="line">		order = min(MAX_ORDER - <span class="number">1UL</span>, __ffs(start));</span><br><span class="line"></span><br><span class="line">		<span class="comment">//确保order 也不要超过end</span></span><br><span class="line">		<span class="keyword">while</span> (start + (<span class="number">1UL</span> &lt;&lt; order) &gt; end)</span><br><span class="line">			order--;</span><br><span class="line">		<span class="comment">//释放start-&gt; start + 2^order 的内存到page allocator</span></span><br><span class="line">		<span class="comment">//初始化完成后，大部分page 都在order比较大的链表里</span></span><br><span class="line">		memblock_free_pages(pfn_to_page(start), start, order);</span><br><span class="line">		<span class="comment">//移动start 直到遍历完所有pfn</span></span><br><span class="line">		start += (<span class="number">1UL</span> &lt;&lt; order);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>memblock_free_pages 会调用 __free_pages_ok() 将page 释放到page allocator里。这里先不关心 __free_pages_ok的实现。</p>
+<p>现在page allocator 里已经有page管理，可以提供申请服务了。</p>
+<h3 id="3-2、申请page"><a href="#3-2、申请page" class="headerlink" title="3.2、申请page"></a>3.2、申请page</h3><p>在内核中，申请page 的地方有很多，需要确保性能，同时又要避免碎片化。所以申请page需要区别使用场景，需求。<br>但总得来说，申请page 的思路主要是：如果有空闲的page，就直接申请。否则，通过内存规整、页面回收、OOM机制增加可用页面，再重新进行申请。</p>
+<p>page alloc 的实现入口在 <code>__alloc_pages_nodemask()</code>，根据上述思路可将page alloc 分为两个部分：快车道和慢车道。<br>![[page_allocator.alloc.drawio.png]]</p>
+<h4 id="3-2-1、快车道"><a href="#3-2-1、快车道" class="headerlink" title="3.2.1、快车道"></a>3.2.1、快车道</h4><p>即当前free area里有足够的空闲页面可供申请，直接从free area里拿到所需的page。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">page</span> *</span></span><br><span class="line"><span class="class">__<span class="title">alloc_pages_nodemask</span>(<span class="title">gfp_t</span> <span class="title">gfp_mask</span>, <span class="title">unsigned</span> <span class="title">int</span> <span class="title">order</span>, <span class="title">int</span> <span class="title">preferred_nid</span>,</span></span><br><span class="line"><span class="class">							<span class="title">nodemask_t</span> *<span class="title">nodemask</span>)</span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">page</span> *<span class="title">page</span>;</span></span><br><span class="line">	<span class="comment">//默认 watermark 标志为low，</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> alloc_flags = ALLOC_WMARK_LOW;</span><br><span class="line">	<span class="type">gfp_t</span> alloc_mask; <span class="comment">/* The gfp_t that was actually used for allocation */</span></span><br><span class="line">	<span class="comment">//保存申请的一些上下文信息</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">alloc_context</span> <span class="title">ac</span> =</span> &#123; &#125;;</span><br><span class="line"></span><br><span class="line">	gfp_mask &amp;= gfp_allowed_mask;</span><br><span class="line">	alloc_mask = gfp_mask;</span><br><span class="line">	<span class="comment">//初始化申请上下文，包括zone、migratetye等</span></span><br><span class="line">	<span class="keyword">if</span> (!prepare_alloc_pages(gfp_mask, order, preferred_nid, nodemask, &amp;ac, &amp;alloc_mask, &amp;alloc_flags))</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//一开始，我们需要避免碎片化申请，若申请失败，我们再消除ALLOC_NOFRAGMENT</span></span><br><span class="line">	alloc_flags |= alloc_flags_nofragment(ac.preferred_zoneref-&gt;zone, gfp_mask);</span><br><span class="line"></span><br><span class="line">	<span class="comment">//快车道：从free area中获取page，若获取成功就直接返回</span></span><br><span class="line">	page = get_page_from_freelist(alloc_mask, order, alloc_flags, &amp;ac);</span><br><span class="line">	<span class="keyword">if</span> (likely(page))</span><br><span class="line">		<span class="keyword">goto</span> out;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//慢车道：做内存规整、内存回收等来获取新的空闲页面，再分配page</span></span><br><span class="line">	page = __alloc_pages_slowpath(alloc_mask, order, &amp;ac);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> page;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>快车道的实现在<code>get_page_from_freelist()</code>，会从指定的zone-&gt;free_area 里申请page。<br>同时为了避免碎片化，会尽量在同一类型的migrate type里申请page，只有在申请不到page的情况下，才会跨migrate type申请page。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">struct</span> page *</span><br><span class="line"><span class="title function_">get_page_from_freelist</span><span class="params">(<span class="type">gfp_t</span> gfp_mask, <span class="type">unsigned</span> <span class="type">int</span> order, <span class="type">int</span> alloc_flags,</span></span><br><span class="line"><span class="params">						<span class="type">const</span> <span class="keyword">struct</span> alloc_context *ac)</span></span><br><span class="line">&#123;</span><br><span class="line">retry:</span><br><span class="line">	<span class="comment">//ALLOC_NOFRAGMENT 表示尽量避免碎片化申请</span></span><br><span class="line">	no_fallback = alloc_flags &amp; ALLOC_NOFRAGMENT;</span><br><span class="line">	<span class="comment">//preferred_zoneref 表示最希望从哪个zone申请</span></span><br><span class="line">	z = ac-&gt;preferred_zoneref;</span><br><span class="line">	<span class="comment">//遍历所有的zone，找到最佳的一个zone来进行分配</span></span><br><span class="line">	for_next_zone_zonelist_nodemask(zone, z, ac-&gt;highest_zoneidx,</span><br><span class="line">					ac-&gt;nodemask) &#123;</span><br><span class="line">		<span class="class"><span class="keyword">struct</span> <span class="title">page</span> *<span class="title">page</span>;</span></span><br><span class="line">		<span class="type">unsigned</span> <span class="type">long</span> mark;</span><br><span class="line"></span><br><span class="line">		<span class="comment">//比较order和zone水位线，来判断zone 是否有足够的页面进行申请</span></span><br><span class="line">		mark = wmark_pages(zone, alloc_flags &amp; ALLOC_WMARK_MASK);</span><br><span class="line">		<span class="keyword">if</span> (!zone_watermark_fast(zone, order, mark,</span><br><span class="line">				       ac-&gt;highest_zoneidx, alloc_flags,</span><br><span class="line">				       gfp_mask)) &#123;</span><br><span class="line">			<span class="comment">//触发直接回收内存、在这里我的arm32 没有实现这个函数，返回NODE_RECLAIM_NOSCAN</span></span><br><span class="line">			ret = node_reclaim(zone-&gt;zone_pgdat, gfp_mask, order);</span><br><span class="line">			<span class="keyword">continue</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">try_this_zone:</span><br><span class="line">		<span class="comment">//找到合适的zone后，使用rmqueue从伙伴系统申请page</span></span><br><span class="line">		page = rmqueue(ac-&gt;preferred_zoneref-&gt;zone, zone, order,</span><br><span class="line">				gfp_mask, alloc_flags, ac-&gt;migratetype);</span><br><span class="line">		<span class="keyword">if</span> (page) &#123;</span><br><span class="line">			prep_new_page(page, order, gfp_mask, alloc_flags);</span><br><span class="line">			<span class="keyword">return</span> page;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//实在没有分配到，那么我们就不关心碎片化的影响，重新申请</span></span><br><span class="line">	<span class="keyword">if</span> (no_fallback) &#123;</span><br><span class="line">		alloc_flags &amp;= ~ALLOC_NOFRAGMENT;</span><br><span class="line">		<span class="keyword">goto</span> retry;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>rmqueue() 会真正从page allocator 里返回page。由于大部分申请都是一个page，所以在这里有做一个优化：<br>page allocator 为每一个cpu 都设置一个缓存池，每个缓存池里page都是1页大小。<br>当申请1个page时，会从per cpu page里申请，这样可以避免访问全局的free_area，造成竞争繁忙。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span></span><br><span class="line"><span class="keyword">struct</span> page *<span class="title function_">rmqueue</span><span class="params">(<span class="keyword">struct</span> zone *preferred_zone,</span></span><br><span class="line"><span class="params">			<span class="keyword">struct</span> zone *zone, <span class="type">unsigned</span> <span class="type">int</span> order,</span></span><br><span class="line"><span class="params">			<span class="type">gfp_t</span> gfp_flags, <span class="type">unsigned</span> <span class="type">int</span> alloc_flags,</span></span><br><span class="line"><span class="params">			<span class="type">int</span> migratetype)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//若申请一个page则从per cpu page 缓存里快速申请一个page</span></span><br><span class="line">	<span class="keyword">if</span> (likely(order == <span class="number">0</span>)) &#123;</span><br><span class="line">		page = rmqueue_pcplist(preferred_zone, zone, gfp_flags,</span><br><span class="line">				       migratetype, alloc_flags);</span><br><span class="line">		<span class="keyword">goto</span> out;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//否则需要从全局的zone里申请page，故需要关闭本地中断，锁住zone</span></span><br><span class="line">	spin_lock_irqsave(&amp;zone-&gt;lock, flags);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">do</span> &#123;</span><br><span class="line">		<span class="comment">//从zone的对应migrate type里申请page，大部分情况会走到__rmqueue()</span></span><br><span class="line">		<span class="keyword">if</span> (order &gt; <span class="number">0</span> &amp;&amp; alloc_flags &amp; ALLOC_HARDER) &#123;</span><br><span class="line">			page = __rmqueue_smallest(zone, order, MIGRATE_HIGHATOMIC);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (!page) &#123;</span><br><span class="line">			<span class="keyword">if</span> (migratetype == MIGRATE_MOVABLE &amp;&amp; alloc_flags &amp; ALLOC_CMA)</span><br><span class="line">				page = __rmqueue_cma(zone, order, migratetype,</span><br><span class="line">						     alloc_flags);</span><br><span class="line">			<span class="keyword">if</span> (!page)</span><br><span class="line">				page = __rmqueue(zone, order, migratetype,</span><br><span class="line">						 alloc_flags);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; <span class="keyword">while</span> (page &amp;&amp; check_new_pages(page, order));</span><br><span class="line">	spin_unlock(&amp;zone-&gt;lock);</span><br><span class="line">	<span class="keyword">if</span> (!page)</span><br><span class="line">		<span class="keyword">goto</span> failed;</span><br><span class="line">	local_irq_restore(flags);</span><br><span class="line"></span><br><span class="line">out:</span><br><span class="line">	<span class="keyword">return</span> page;</span><br><span class="line"></span><br><span class="line">failed:</span><br><span class="line">	local_irq_restore(flags);</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在就分析最常见的情况：</p>
+<ol>
+<li>从指定migrate type 申请page失败后，会尝试从其他migrate type 申请</li>
+<li>从其他migrate type 申请时，为避免碎片化，会申请最大order的page block。然后将page block移动到所需的migrate type 链表。</li>
+<li>例如：我们初始化时所有page 都是 MIGRATE_MOVABLE 类型。当需要MIGRATE_UNMOVABLE 类型的page时，就需要从MIGRATE_MOVABLE 链表里偷过来。为了避免碎片化，当然要从order&#x3D;9 里偷。</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> __always_inline <span class="class"><span class="keyword">struct</span> <span class="title">page</span> *</span></span><br><span class="line"><span class="class">__<span class="title">rmqueue</span>(<span class="keyword">struct</span> <span class="title">zone</span> *<span class="title">zone</span>, <span class="title">unsigned</span> <span class="title">int</span> <span class="title">order</span>, <span class="title">int</span> <span class="title">migratetype</span>,</span></span><br><span class="line"><span class="class">						<span class="title">unsigned</span> <span class="title">int</span> <span class="title">alloc_flags</span>)</span></span><br><span class="line"><span class="class">&#123;</span>	</span><br><span class="line">retry:</span><br><span class="line">	<span class="comment">//先尝试从指定migrate type中申请page</span></span><br><span class="line">	page = __rmqueue_smallest(zone, order, migratetype);</span><br><span class="line"></span><br><span class="line">	<span class="comment">//若申请失败，则从zone里其他type 的free area中申请</span></span><br><span class="line">	<span class="keyword">if</span> (unlikely(!page) &amp;&amp; __rmqueue_fallback(zone, order, migratetype,</span><br><span class="line">						  alloc_flags))</span><br><span class="line">		<span class="keyword">goto</span> retry;</span><br><span class="line">	<span class="keyword">return</span> page;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//从其他migrate type 中申请page</span></span><br><span class="line"><span class="type">static</span> __always_inline <span class="type">bool</span></span><br><span class="line">__rmqueue_fallback(<span class="keyword">struct</span> zone *zone, <span class="type">int</span> order, <span class="type">int</span> start_migratetype,</span><br><span class="line">						<span class="type">unsigned</span> <span class="type">int</span> alloc_flags)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> min_order = order;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//为了避免碎片化，将min_order设为MAX_ORDER - 1。</span></span><br><span class="line">	<span class="comment">//从其他migrate type中申请page时，越大的order越能避免碎片化，因为小内存往往是导致碎片化的凶手。</span></span><br><span class="line">	<span class="keyword">if</span> (alloc_flags &amp; ALLOC_NOFRAGMENT)</span><br><span class="line">		min_order = pageblock_order;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//从MAX_ORDER - 1开始到min_order，遍历其他migrate type的free_list</span></span><br><span class="line">	<span class="keyword">for</span> (current_order = MAX_ORDER - <span class="number">1</span>; current_order &gt;= min_order;</span><br><span class="line">				--current_order) &#123;</span><br><span class="line">		area = &amp;(zone-&gt;free_area[current_order]);</span><br><span class="line">		fallback_mt = find_suitable_fallback(area, current_order,</span><br><span class="line">				start_migratetype, <span class="literal">false</span>, &amp;can_steal);</span><br><span class="line">		<span class="keyword">if</span> (fallback_mt == <span class="number">-1</span>)</span><br><span class="line">			<span class="keyword">continue</span>;</span><br><span class="line">		<span class="comment">//若有空闲的page block，我们就去找一个最合适的page block</span></span><br><span class="line">		<span class="keyword">if</span> (!can_steal &amp;&amp; start_migratetype == MIGRATE_MOVABLE</span><br><span class="line">					&amp;&amp; current_order &gt; order)</span><br><span class="line">			<span class="keyword">goto</span> find_smallest;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">goto</span> do_steal;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//现在我们已经确定其他migrate type 链表可以满足我们的需求</span></span><br><span class="line">	<span class="comment">//所以现在重新遍历free area，找到最合适的migrate type链表</span></span><br><span class="line">find_smallest:</span><br><span class="line">	<span class="keyword">for</span> (current_order = order; current_order &lt; MAX_ORDER;</span><br><span class="line">							current_order++) &#123;</span><br><span class="line">		area = &amp;(zone-&gt;free_area[current_order]);</span><br><span class="line">		fallback_mt = find_suitable_fallback(area, current_order,</span><br><span class="line">				start_migratetype, <span class="literal">false</span>, &amp;can_steal);</span><br><span class="line">		<span class="keyword">if</span> (fallback_mt != <span class="number">-1</span>)</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">do_steal:</span><br><span class="line">	<span class="comment">//确定了要从fallback_mt 里“偷”page，现在开始偷</span></span><br><span class="line">	page = get_page_from_free_area(area, fallback_mt);</span><br><span class="line">	<span class="comment">//偷的代码：</span></span><br><span class="line">	steal_suitable_fallback(zone, page, alloc_flags, start_migratetype,</span><br><span class="line">								can_steal);</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结下快车道的申请逻辑就是：尽量从指定的migrate type list里申请，若申请不到，再考虑从其他type list里申请。</p>
+<p>假如其他type list 也没有空闲的page了，那么就只能走慢车道去申请page。</p>
+<h4 id="3-2-2、慢车道"><a href="#3-2-2、慢车道" class="headerlink" title="3.2.2、慢车道"></a>3.2.2、慢车道</h4><p>进入慢车道大概率是以下原因：</p>
+<ol>
+<li>空闲page 不足了</li>
+<li>空闲page虽然满足，但由于碎片化，凑不出所需要的连续内存</li>
+</ol>
+<p>慢车道主要是通过内存规整和内存回收机制，来把蛋糕做大。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="class"><span class="keyword">struct</span> <span class="title">page</span> *</span></span><br><span class="line"><span class="class">__<span class="title">alloc_pages_slowpath</span>(<span class="title">gfp_t</span> <span class="title">gfp_mask</span>, <span class="title">unsigned</span> <span class="title">int</span> <span class="title">order</span>,</span></span><br><span class="line"><span class="class">						<span class="keyword">struct</span> <span class="title">alloc_context</span> *<span class="title">ac</span>)</span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">restart:</span><br><span class="line">	<span class="comment">//唤醒kswap线程去异步的做内存回收</span></span><br><span class="line">	<span class="keyword">if</span> (alloc_flags &amp; ALLOC_KSWAPD)</span><br><span class="line">		wake_all_kswapds(order, gfp_mask, ac);</span><br><span class="line"></span><br><span class="line">	<span class="comment">//第一次尝试申请page</span></span><br><span class="line">	page = get_page_from_freelist(gfp_mask, order, alloc_flags, ac);</span><br><span class="line">	<span class="keyword">if</span> (page)</span><br><span class="line">		<span class="keyword">goto</span> got_pg;</span><br><span class="line"></span><br><span class="line">retry:</span><br><span class="line">	<span class="keyword">if</span> (alloc_flags &amp; ALLOC_KSWAPD)</span><br><span class="line">		wake_all_kswapds(order, gfp_mask, ac);</span><br><span class="line"></span><br><span class="line">	page = get_page_from_freelist(gfp_mask, order, alloc_flags, ac);</span><br><span class="line">	<span class="keyword">if</span> (page)</span><br><span class="line">		<span class="keyword">goto</span> got_pg;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//若不能直接回收，直接返回失败</span></span><br><span class="line">	<span class="keyword">if</span> (!can_direct_reclaim)</span><br><span class="line">		<span class="keyword">goto</span> nopage;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (page)</span><br><span class="line">		<span class="keyword">goto</span> got_pg;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//直接进行内存回收</span></span><br><span class="line">	page = __alloc_pages_direct_reclaim(gfp_mask, order, alloc_flags, ac,</span><br><span class="line">							&amp;did_some_progress);</span><br><span class="line">	<span class="keyword">if</span> (page)</span><br><span class="line">		<span class="keyword">goto</span> got_pg;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//直接进行内存规整</span></span><br><span class="line">	page = __alloc_pages_direct_compact(gfp_mask, order, alloc_flags, ac,</span><br><span class="line">					compact_priority, &amp;compact_result);</span><br><span class="line">	<span class="keyword">if</span> (page)</span><br><span class="line">		<span class="keyword">goto</span> got_pg;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//触发oom 机制，kill 掉一个进程，成功释放内存会设置did_some_progress</span></span><br><span class="line">	page = __alloc_pages_may_oom(gfp_mask, order, ac, &amp;did_some_progress);</span><br><span class="line">	<span class="keyword">if</span> (page)</span><br><span class="line">		<span class="keyword">goto</span> got_pg;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//oom 成功释放了内存，重新尝试申请page</span></span><br><span class="line">	<span class="keyword">if</span> (did_some_progress) &#123;</span><br><span class="line">		no_progress_loops = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">goto</span> retry;</span><br><span class="line">	&#125;</span><br><span class="line">	......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3、释放page"><a href="#3-3、释放page" class="headerlink" title="3.3、释放page"></a>3.3、释放page</h3><p>释放page 主要通过 free_the_page() 函数进行。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">free_the_page</span><span class="params">(<span class="keyword">struct</span> page *page, <span class="type">unsigned</span> <span class="type">int</span> order)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span> (order == <span class="number">0</span>)		<span class="comment">//释放一个page时，先放回per pcu page</span></span><br><span class="line">		free_unref_page(page);</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		__free_pages_ok(page, order, FPI_NONE);  <span class="comment">//否则放回free list</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>![[Pasted image 20250405223506.png]]</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/05/31/killer-blog/Linux/page%20allocator/" data-id="cmbcy7rh6001bt8mtg7woai7e" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/05/31/killer-blog/Linux/kmalloc/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/05/31/killer-blog/Linux/slub%20allocator/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

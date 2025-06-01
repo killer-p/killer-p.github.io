@@ -1,0 +1,376 @@
+<mxfile host="Electron" modified="2025-04-14T00:04:05.837Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.2.8 Chrome/112.0.5615.165 Electron/24.2.0 Safari/537.36" etag="xjSMJ8c-MqiOJjNIKueA" version="21.2.8" type="device">
+  <diagram name="第 1 页" id="Ain4sRbgEfqQjP1qF_rd">
+    <mxGraphModel dx="956" dy="3857" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2339" pageHeight="3300" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-1" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="550" y="240" width="360" height="480" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-2" value="struct task" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="700" y="250" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-3" target="TPaQLXBtWYpYpvs7Lbnb-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-3" target="TPaQLXBtWYpYpvs7Lbnb-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-3" value="kernel_clone&lt;br&gt;创建新的task的入口" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1540" y="250" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=-0.007;entryY=0.4;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-4" target="TPaQLXBtWYpYpvs7Lbnb-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-4" target="TPaQLXBtWYpYpvs7Lbnb-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-48" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-4" target="TPaQLXBtWYpYpvs7Lbnb-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-4" target="TPaQLXBtWYpYpvs7Lbnb-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-51" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-4" target="TPaQLXBtWYpYpvs7Lbnb-50">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-58" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-4" target="TPaQLXBtWYpYpvs7Lbnb-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-4" value="copy_process&lt;br&gt;拷贝父进程" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1750" y="250" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-5" value="wake_up_new_task&lt;br&gt;唤醒新的进程" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1750" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-62" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-8" target="TPaQLXBtWYpYpvs7Lbnb-59">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-63" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-8" target="TPaQLXBtWYpYpvs7Lbnb-60">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-64" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-8" target="TPaQLXBtWYpYpvs7Lbnb-61">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-8" value="dup_task_struct" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1940" y="60" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-9" value="sched_fork&lt;br&gt;调度器sched_entity初始化，进程优先级继承父进程" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1940" y="220" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.077;entryY=0.475;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-10" target="TPaQLXBtWYpYpvs7Lbnb-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-10" value="copy_files&lt;br&gt;拷贝current-&amp;gt;files，即父进程打开的文件&lt;br&gt;若设置CLONE_FILES，则是引用父进程的文件，即共享打开的文件" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1940" y="310" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-11" target="TPaQLXBtWYpYpvs7Lbnb-25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-11" value="copy_fs&lt;br&gt;拷贝工作路径" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1940" y="420" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-14" target="TPaQLXBtWYpYpvs7Lbnb-32">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-14" value="copy_mm&lt;br&gt;拷贝进程地址空间" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1940" y="600" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-15" target="TPaQLXBtWYpYpvs7Lbnb-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-15" target="TPaQLXBtWYpYpvs7Lbnb-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-15" value="CLONE_FILES？" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2310" y="300" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-16" value="atomic_inc(&amp;amp;oldf-&amp;gt;count);" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2510" y="240" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-22" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-17" target="TPaQLXBtWYpYpvs7Lbnb-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-17" value="dup_fd&lt;br&gt;创建新的files_struct，以及对父进程打开的文件再次引用" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2510" y="340" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-21" value="相当于新进程有了自己的文件空间" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="2710" y="340" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-28" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-25" target="TPaQLXBtWYpYpvs7Lbnb-27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-29" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-25" target="TPaQLXBtWYpYpvs7Lbnb-27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-25" target="TPaQLXBtWYpYpvs7Lbnb-30">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-25" value="CLONE_FS?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2110" y="410" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-27" value="fs-&amp;gt;users++;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2330" y="390" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-30" value="copy_fs_struct(fs);&lt;br&gt;创建一个新的fs_struct" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2330" y="480" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-32" target="TPaQLXBtWYpYpvs7Lbnb-34">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-37" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-32" target="TPaQLXBtWYpYpvs7Lbnb-36">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-32" value="CLONE_VM?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2110" y="590" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-34" value="mmget(oldmm);&lt;br&gt;与父进程共享一个地址空间" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2240" y="570" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-36" target="TPaQLXBtWYpYpvs7Lbnb-38">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-41" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-36" target="TPaQLXBtWYpYpvs7Lbnb-40">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-36" value="dup_mm()&lt;br&gt;创建一个新的进程地址空间" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2240" y="660" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-38" value="mm_init&lt;br&gt;申请一个新的页全局目录&lt;br&gt;创建一个新的mm_struct" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2430" y="660" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-43" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-40" target="TPaQLXBtWYpYpvs7Lbnb-42">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-40" value="dup_mmap&lt;br&gt;遍历父进程所有VMA，并拷贝到子进程" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2430" y="750" width="210" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-46" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.008;entryY=0.4;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-42" target="TPaQLXBtWYpYpvs7Lbnb-44">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-47" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-42" target="TPaQLXBtWYpYpvs7Lbnb-45">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-42" value="VM_WIPEONFORK？&lt;br&gt;在fork时擦除内容" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2700" y="740" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-44" value="不拷贝匿名页" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2910" y="690" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-45" value="拷贝页表" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2910" y="810" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-55" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-50" target="TPaQLXBtWYpYpvs7Lbnb-52">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-56" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-50" target="TPaQLXBtWYpYpvs7Lbnb-53">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-57" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-50" target="TPaQLXBtWYpYpvs7Lbnb-54">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-50" value="copy_thread&lt;br&gt;初始化进程栈" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1940" y="930" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-52" value="复制父进程的寄存器" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2140" y="870" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-53" value="更新新进程SP" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2140" y="960" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-54" value="设置新进程PC=ret_from_fork&lt;br&gt;新进程会从这里开始执行" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2140" y="1050" width="190" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-59" value="alloc_task_struct_node&lt;br&gt;创建一个新的task_struct" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2110" y="-30" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-60" value="alloc_thread_stack_node&lt;br&gt;申请2个page作为内核栈" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2110" y="60" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-61" value="arch_dup_task_struct&lt;br&gt;复制父进程的task_struct" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2110" y="140" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-68" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-65" target="TPaQLXBtWYpYpvs7Lbnb-66">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-65" value="do_wait&lt;br&gt;wait()系统调用入口，等待子进程退出并清理资源" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1320" y="1390" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-69" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-66" target="TPaQLXBtWYpYpvs7Lbnb-67">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-66" value="do_wait_thread&lt;br&gt;遍历所有子进程并等待释放资源" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1540" y="1390" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-71" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-67" target="TPaQLXBtWYpYpvs7Lbnb-70">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-67" value="wait_consider_task&lt;br&gt;处理等待事件，这里只关注zombie" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1720" y="1390" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-74" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-70" target="TPaQLXBtWYpYpvs7Lbnb-73">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-76" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-70" target="TPaQLXBtWYpYpvs7Lbnb-72">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-70" value="wait_task_zombie" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1900" y="1390" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-72" value="设置task-&amp;gt;state=EXIT_DEAD" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="1300" width="190" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-78" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-73" target="TPaQLXBtWYpYpvs7Lbnb-75">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-80" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-73" target="TPaQLXBtWYpYpvs7Lbnb-79">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-82" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-73" target="TPaQLXBtWYpYpvs7Lbnb-81">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-73" value="release_task" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="1390" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-75" value="cgroup_release" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2315" y="1340" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-79" value="__exit_signal" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2315" y="1440" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-85" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-81" target="TPaQLXBtWYpYpvs7Lbnb-84">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-86" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-81" target="TPaQLXBtWYpYpvs7Lbnb-83">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-81" value="put_task_struct" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2320" y="1540" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-89" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-83" target="TPaQLXBtWYpYpvs7Lbnb-87">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-90" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-83" target="TPaQLXBtWYpYpvs7Lbnb-88">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-83" value="free_task" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2490" y="1600" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-84" value="cgroup_free" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2490" y="1500" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-87" value="release_task_stack&lt;br&gt;释放内核栈空间2page" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2670" y="1600" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-88" value="free_task_struct&lt;br&gt;释放task_struct" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2670" y="1700" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-124" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-91" target="TPaQLXBtWYpYpvs7Lbnb-92">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-125" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-91" target="TPaQLXBtWYpYpvs7Lbnb-93">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-126" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-91" target="TPaQLXBtWYpYpvs7Lbnb-94">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-127" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-91" target="TPaQLXBtWYpYpvs7Lbnb-95">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-128" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-91" target="TPaQLXBtWYpYpvs7Lbnb-97">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-129" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-91" target="TPaQLXBtWYpYpvs7Lbnb-98">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-91" value="do_exit&lt;br&gt;进程退出时系统调用" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="2130" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-92" value="exit_signals" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1510" y="1820" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-106" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-93" target="TPaQLXBtWYpYpvs7Lbnb-99">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-107" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-93" target="TPaQLXBtWYpYpvs7Lbnb-101">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-108" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.041;entryY=0.531;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-93" target="TPaQLXBtWYpYpvs7Lbnb-103">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-109" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-93" target="TPaQLXBtWYpYpvs7Lbnb-104">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-93" value="exit_mm" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1510" y="1930" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-94" value="exit_sem" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1510" y="2030" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-117" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-95" target="TPaQLXBtWYpYpvs7Lbnb-116">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-95" value="exit_files" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1510" y="2130" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-97" value="exit_notify&lt;br&gt;设置进程为僵尸进程，并唤醒其他在wait的进程" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1510" y="2280" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-98" value="do_task_dead" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1510" y="2400" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-102" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-99" target="TPaQLXBtWYpYpvs7Lbnb-100">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-99" value="exit_mm_release&lt;br&gt;接触task对mm的引用" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1710" y="1790" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-100" value="complete_vfork_done" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1890" y="1790" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-101" value="mmgrab" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1710" y="1880" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-103" value="current-&amp;gt;mm = NULL;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1710" y="1970" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-113" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-104" target="TPaQLXBtWYpYpvs7Lbnb-110">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-115" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-104" target="TPaQLXBtWYpYpvs7Lbnb-112">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-119" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-104" target="TPaQLXBtWYpYpvs7Lbnb-111">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-104" value="mmput&lt;br&gt;对mm_struct的引用计数-1，若引用为0，则走后续的处理" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1710" y="2050" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-110" value="exit_mmap&lt;br&gt;释放所有的mmap(vma)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1899" y="1880" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-111" value="set_mm_exe_file&lt;br&gt;设置可执行文件为NULL" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1899" y="1960" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-112" value="mmdrop&lt;br&gt;释放pgd、mm_struct" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1900" y="2050" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-121" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-116" target="TPaQLXBtWYpYpvs7Lbnb-120">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-123" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TPaQLXBtWYpYpvs7Lbnb-116" target="TPaQLXBtWYpYpvs7Lbnb-122">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-116" value="put_files_struct&lt;br&gt;对files_struct引用计数-1，若引用为0，则走后续的处理" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1680" y="2130" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-120" value="close_files&lt;br&gt;关闭打开的文件" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1870" y="2130" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TPaQLXBtWYpYpvs7Lbnb-122" value="释放fdt、files_struct" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1870" y="2210" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

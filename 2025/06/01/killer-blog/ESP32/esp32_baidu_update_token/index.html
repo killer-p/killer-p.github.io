@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="注意每个用户的token请求参数不一样，具体情况看百度开放平台的相关文档 123#define GET_TOKEN_URL &quot;https:&#x2F;&#x2F;openapi.baidu.com&#x2F;oauth&#x2F;2.0&#x2F;token?grant_type&#x3D;client_credentials&amp;client_id&#x3D;G86ZG9H52Mi1Ngf0uByK4IbA&amp;client_secret&#x3D;Wke">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/ESP32/esp32_baidu_update_token/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="注意每个用户的token请求参数不一样，具体情况看百度开放平台的相关文档 123#define GET_TOKEN_URL &quot;https:&#x2F;&#x2F;openapi.baidu.com&#x2F;oauth&#x2F;2.0&#x2F;token?grant_type&#x3D;client_credentials&amp;client_id&#x3D;G86ZG9H52Mi1Ngf0uByK4IbA&amp;client_secret&#x3D;Wke">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-06-01T00:23:34.657Z">
+<meta property="article:modified_time" content="2025-06-01T00:23:34.657Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/ESP32/esp32_baidu_update_token" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/ESP32/esp32_baidu_update_token/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:23:34.657Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>注意每个用户的token请求参数不一样，具体情况看百度开放平台的相关文档</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> GET_TOKEN_URL <span class="string">&quot;https://openapi.baidu.com/oauth/2.0/token?grant_type=client_credentials&amp;client_id=G86ZG9H52Mi1Ngf0uByK4IbA&amp;client_secret=WkelePkHg8zozxwztB2gvGq1kF9AOUgL&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">char</span> baidu_access_token[<span class="number">80</span>];</span><br></pre></td></tr></table></figure>
+<p>对应以上请求。返回结果如下：我们需要提取其中的access_token的值</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;refresh_token&quot;</span>: <span class="string">&quot;25.150b4d6b88fed9146f2f70a9e0e5b33e.315360000.1931916550.282335-23021308&quot;</span>,</span><br><span class="line">    <span class="string">&quot;expires_in&quot;</span>: 2592000,</span><br><span class="line">    <span class="string">&quot;session_key&quot;</span>: <span class="string">&quot;9mzdWui4vXxbxI0VHwyxpuWyLrq7zYM1GAsEH+Kx3AlOhtlWkInKQ5beXw5YwbW8FHdEal+lChIfsRuJ4BmN3HJpuRGr+A==&quot;</span>,</span><br><span class="line">    <span class="string">&quot;access_token&quot;</span>: <span class="string">&quot;24.a4e1cd6302eb93afe8e6cdd4d604d68b.2592000.1619148550.282335-23021308&quot;</span>,</span><br><span class="line">    <span class="string">&quot;scope&quot;</span>: <span class="string">&quot;brain_enhanced_asr audio_tts_post public nlp_simnet nlp_wordemb nlp_comtag nlp_dnnlm_cn brain_nlp_lexer brain_all_scope brain_nlp_comment_tag brain_nlp_dnnlm_cn brain_nlp_word_emb_vec brain_nlp_word_emb_sim brain_nlp_sentiment_classify brain_nlp_simnet brain_nlp_depparser brain_nlp_wordembedding brain_nlp_dnnlm_cn_legacy brain_nlp_simnet_legacy brain_nlp_comment_tag_legacy brain_nlp_lexer_custom brain_nlp_keyword brain_nlp_topic brain_nlp_ecnet brain_nlp_emotion brain_nlp_comment_tag_custom brain_nlp_news_summary brain_nlp_sentiment_classify_custom brain_nlp_address wise_adapt lebo_resource_base lightservice_public hetu_basic lightcms_map_poi kaidian_kaidian ApsMisTest_Test权限 vis-classify_flower lpq_开放 cop_helloScope ApsMis_fangdi_permission smartapp_snsapi_base smartapp_mapp_dev_manage iop_autocar oauth_tp_app smartapp_smart_game_openapi oauth_sessionkey smartapp_swanid_verify smartapp_opensource_openapi smartapp_opensource_recapi fake_face_detect_开放Scope vis-ocr_虚拟人物助理 idl-video_虚拟人物助理 smartapp_component smartapp_search_plugin avatar_video_test&quot;</span>,</span><br><span class="line">    <span class="string">&quot;session_secret&quot;</span>: <span class="string">&quot;ffbb07a7b9e1f62d56bb124f9f2b49f3&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">config.url = GET_TOKEN_URL;</span><br><span class="line">config.method = HTTP_METHOD_GET;</span><br><span class="line"></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;start connect to url = %s\r\n&quot;</span>,config.url);</span><br><span class="line">client = esp_http_client_init(&amp;config);</span><br><span class="line">esp_http_client_perform(client);</span><br><span class="line">esp_http_client_close(client);</span><br><span class="line">esp_http_client_cleanup(client);</span><br><span class="line"></span><br><span class="line">cJSON *root = cJSON_Parse(http_data);</span><br><span class="line"><span class="keyword">if</span>(root!=<span class="literal">NULL</span>)</span><br><span class="line">&#123;</span><br><span class="line">    cJSON *tok = cJSON_GetObjectItem(root, <span class="string">&quot;access_token&quot;</span>);</span><br><span class="line">    <span class="type">char</span> *newtoken = cJSON_GetStringValue(tok); <span class="comment">//获取新token</span></span><br><span class="line">    <span class="keyword">if</span>(newtoken != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">memset</span>(baidu_access_token, <span class="number">0</span>, <span class="number">80</span>);  <span class="comment">//清零全局变量baidu_access_token</span></span><br><span class="line">        <span class="built_in">strncpy</span>(baidu_access_token, newtoken, <span class="number">80</span>);  <span class="comment">//再更新</span></span><br><span class="line">        ESP_LOGI(TAG, <span class="string">&quot;new token = %s&quot;</span>, baidu_access_token);</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        ESP_LOGI(TAG, <span class="string">&quot;parse string error&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    ESP_LOGI(TAG, <span class="string">&quot;root error&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">cJSON_Delete(root);</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/ESP32/esp32_baidu_update_token/" data-id="cmbcy7rgy000kt8mtco0og60n" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/ESP32/esp32adf_play_mp3/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/ESP32/esp32_get_time/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

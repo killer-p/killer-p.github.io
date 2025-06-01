@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="samgr_lite简介服务是openharmony里非常重要的概念，不同模块、进程间的调用接口都被抽象称为服务。openharmony中的系统进程都以服务的方式提供接口给其他进程。 系统服务框架的具体的介绍可参考：https:&#x2F;&#x2F;gitee.com&#x2F;openharmony&#x2F;distributedschedule_samgr_lite openharmony定义了服务、服务的注册、发现、调用机制，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/OpenHarmony/1.samgr&softbus_service/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="samgr_lite简介服务是openharmony里非常重要的概念，不同模块、进程间的调用接口都被抽象称为服务。openharmony中的系统进程都以服务的方式提供接口给其他进程。 系统服务框架的具体的介绍可参考：https:&#x2F;&#x2F;gitee.com&#x2F;openharmony&#x2F;distributedschedule_samgr_lite openharmony定义了服务、服务的注册、发现、调用机制，">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/OpenHarmony/1.samgr&softbus_service/image-20220513101824918.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.643Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:27.095Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/OpenHarmony/1.samgr&softbus_service/image-20220513101824918.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/OpenHarmony/1.samgr&amp;softbus_service" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/OpenHarmony/1.samgr&softbus_service/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.643Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="samgr-lite简介"><a href="#samgr-lite简介" class="headerlink" title="samgr_lite简介"></a>samgr_lite简介</h2><p>服务是openharmony里非常重要的概念，不同模块、进程间的调用接口都被抽象称为服务。openharmony中的系统进程都以服务的方式提供接口给其他进程。</p>
+<p>系统服务框架的具体的介绍可参考：<a target="_blank" rel="noopener" href="https://gitee.com/openharmony/distributedschedule_samgr_lite">https://gitee.com/openharmony/distributedschedule_samgr_lite</a></p>
+<p>openharmony定义了服务、服务的注册、发现、调用机制，这里只关注系统服务的大概使用流程，如图所示：</p>
+<p><img src="/2025/05/30/hello-world/OpenHarmony/1.samgr&softbus_service/image-20220513101824918.png" alt="image-20220513101824918"></p>
+<p>上图所示有三个对象：</p>
+<ul>
+<li>系统服务A：本质上是一个在后台运行的进程。</li>
+<li>SAMGR：管理服务的注册、发现、调用。</li>
+<li>用户进程B：调用系统服务A的接口。</li>
+</ul>
+<h2 id="dsoftbus服务"><a href="#dsoftbus服务" class="headerlink" title="dsoftbus服务"></a>dsoftbus服务</h2><p>这里开始介绍软总线服务，该服务的代码实现在<code>OpenHarmony\foundation\communication\dsoftbus\core\frame\small\init\src\softbus_server_stub.c</code></p>
+<h3 id="服务接口"><a href="#服务接口" class="headerlink" title="服务接口"></a>服务接口</h3><p>首先看对软总线服务的定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//软总线服务的定义</span></span><br><span class="line"><span class="type">static</span> SoftbusSamgrService g_samgrService = &#123;</span><br><span class="line">    .GetName = GetName,</span><br><span class="line">    .Initialize = Initialize,</span><br><span class="line">    .MessageHandle = MessageHandle,</span><br><span class="line">    .GetTaskConfig = GetTaskConfig,</span><br><span class="line">    SERVER_IPROXY_IMPL_BEGIN,    <span class="comment">//SERVER_IPROXY_IMPL_BEGIN和IPROXY_END之间的代码定义了跨进程调用的函数</span></span><br><span class="line">    .Invoke = Invoke,   <span class="comment">//当进程B调用软总线服务时，Invoke会被执行</span></span><br><span class="line">    IPROXY_END,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>其中我们需要重点关注Invoke函数的实现，当用户进程B调用软总线服务的函数时，调用的请求就会被传递到Invoke函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//when dsoftbus sdk call g_serverProxy-&gt;Invoke(),it mean this:</span></span><br><span class="line"><span class="type">static</span> <span class="type">int32_t</span> <span class="title function_">Invoke</span><span class="params">(IServerProxy *iProxy, <span class="type">int</span> funcId, <span class="type">void</span> *origin, IpcIo *req, IpcIo *reply)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//call the special func</span></span><br><span class="line">    <span class="type">int</span> tblSize = <span class="keyword">sizeof</span>(g_serverInvokeCmdTbl) / <span class="keyword">sizeof</span>(ServerInvokeCmd);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; tblSize; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (funcId == g_serverInvokeCmdTbl[i].id) &#123;</span><br><span class="line">            <span class="keyword">return</span> g_serverInvokeCmdTbl[i].func(origin, req, reply);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> SOFTBUS_ERR;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里再给出一个例子，示例Invoke是如何起作用的，用户进程B调用软总线服务的接口的流程如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g_serverProxy-&gt;Invoke(g_serverProxy, SERVER_CREATE_SESSION_SERVER, &amp;request, &amp;ret, ProxyCallback);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>g_serverProxy：通过samgr获取到软总线服务</li>
+<li>SERVER_CREATE_SESSION_SERVER：对应funcId，制定要调用的函数</li>
+<li>request：要调用的函数的参数</li>
+<li>ret：软总线服务的函数的返回值</li>
+<li>ProxyCallback：软总线服务的函数执行完成的回调函数</li>
+</ul>
+<p>好了，当用户进程B调用上面的函数，softbus_server_stub.c中的Invoke()函数就会执行，这个函数很简单，就是根据funcId调用g_serverInvokeCmdTbl[]数组中的函数。这些函数是软总线服务的具体内容，我们先暂时不去考虑。</p>
+<h3 id="服务初始化"><a href="#服务初始化" class="headerlink" title="服务初始化"></a>服务初始化</h3><p>接下来是服务的初始化，可以在文件最后看到以下宏</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SYSEX_SERVICE_INIT(Init);</span><br></pre></td></tr></table></figure>
+
+<p>追寻这个宏：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> SYSEX_SERVICE_INIT(func) LAYER_INITCALL_DEF(func, app_service, <span class="string">&quot;app.service&quot;</span>)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LAYER_INITCALL_DEF(func, layer, clayer) LAYER_INITCALL(func, layer, clayer, 2)</span></span><br><span class="line"><span class="comment">//若编译成动态库，则定义一个初始化函数来执行Init</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> LAYER_INIT_SHARED_LIB</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LAYER_INITCALL(func, layer, clayer, priority)                                     \</span></span><br><span class="line"><span class="meta">    static __attribute__((constructor(CTOR_VALUE_##layer + LAYER_INIT_LEVEL_##priority))) \</span></span><br><span class="line"><span class="meta">        void BOOT_##layer##priority##func() &#123;func();&#125;</span></span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line"><span class="comment">//若编译成静态库，则把Init函数放入到系统镜像的zinitcall段中</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LAYER_INITCALL(func, layer, clayer, priority)            \</span></span><br><span class="line"><span class="meta">    static const InitCall USED_ATTR __zinitcall_##layer##_##func \</span></span><br><span class="line"><span class="meta">        __attribute__((section(<span class="string">&quot;.zinitcall.&quot;</span> clayer #priority <span class="string">&quot;.init&quot;</span>))) = func</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>初始化函数如下所示</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//entry of dsoftbus server</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">Init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    sleep(WAIT_FOR_SERVER);</span><br><span class="line">    <span class="comment">//register dsoftbus service to samgr</span></span><br><span class="line">    SAMGR_GetInstance()-&gt;RegisterService((Service *)&amp;g_samgrService);</span><br><span class="line">    <span class="comment">//register dsoftbus features to samgr</span></span><br><span class="line">    SAMGR_GetInstance()-&gt;RegisterDefaultFeatureApi(SOFTBUS_SERVICE, GET_IUNKNOWN(g_samgrService));</span><br><span class="line">    <span class="comment">//定位这个log</span></span><br><span class="line">    SoftBusLog(SOFTBUS_LOG_COMM, SOFTBUS_LOG_INFO, <span class="string">&quot;Init success %s&quot;</span>, SOFTBUS_SERVICE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>那么由谁来调用Init()函数呢，我们从日志中来分析：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">OHOS <span class="comment"># ./softbus_server</span></span><br><span class="line">01-01 00:04:27.948 13 73 I 015C0/dsoftbus_standard: [COMM]Init success softbus_service</span><br><span class="line">01-01 00:04:27.958 13 73 I 01800/Samgr: Bootstrap core services(count:1).</span><br><span class="line">01-01 00:04:27.958 13 73 I 01800/Samgr: Init service:softbus_service</span><br><span class="line">01-01 00:04:27.959 13 74 I 01800/Samgr: Initialize Client Registry!</span><br><span class="line">01-01 00:04:27.991 13 73 W 015C0/dsoftbus_standard: mutex is already init</span><br><span class="line">01-01 00:04:27.992 13 74 I 01800/Samgr: Init service softbus_service &lt;<span class="keyword">time</span>: 60ms&gt; success!</span><br><span class="line">01-01 00:04:27.992 13 74 I 01800/Samgr: Initialized all core system services!</span><br><span class="line">01-01 00:04:27.992 13 74 I 01800/Samgr: Goto next boot step <span class="built_in">return</span> code:-9</span><br></pre></td></tr></table></figure>
+
+<p>当我执行softbus_server时，会打印 Init success softbus_service ，这个就是Init()函数的执行结果。那么softbus_server是什么？</p>
+<h3 id="服务对应的进程"><a href="#服务对应的进程" class="headerlink" title="服务对应的进程"></a>服务对应的进程</h3><p>每一个系统服务背后都有一个对应的进程，来实现服务提供的接口。softbus_server就是软总线服务对应的进程，这个进程非常重要，软总线的实现内容全在里面。这里我们先不考虑。</p>
+<p>softbus_server是一个c程序，在main()函数中会调用 softbus_server_stub.c的ServerStubInit()</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> __attribute__((weak)) HOS_SystemInit(<span class="type">void</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//SAMGR_Bootstrap会检查所有未初始化的service，包括软总线服务，然后执行对应的Init函数</span></span><br><span class="line">    SAMGR_Bootstrap();</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">ServerStubInit</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    HOS_SystemInit();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (LnnIpcInit() != SOFTBUS_OK) &#123;</span><br><span class="line">        SoftBusLog(SOFTBUS_LOG_COMM, SOFTBUS_LOG_ERROR, <span class="string">&quot;Center Ipc init failed.&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> SOFTBUS_ERR;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (SERVER_InitClient() != SOFTBUS_OK) &#123;</span><br><span class="line">        SoftBusLog(SOFTBUS_LOG_COMM, SOFTBUS_LOG_ERROR, <span class="string">&quot;client manager init failed.&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> SOFTBUS_ERR;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> SOFTBUS_OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该函数调用SAMGR_Bootstrap，它会检查所有未初始化的service，包括软总线服务，然后执行对应的Init函数，也就出现了日志中的那句打印。</p>
+<p>当软总线服务注册完成以及softbus_server程序成功运行后，用户程序B就可以调用软总线服务提供的接口。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/OpenHarmony/1.samgr&softbus_service/" data-id="cmbcy7rhj0029t8mtdgyn7iql" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/OpenHarmony/0.dsoftbus_guide/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/Linux/mem_init/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

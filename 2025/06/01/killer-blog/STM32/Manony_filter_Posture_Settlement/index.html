@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="姿态解算的目的是得到飞行器在导航坐标系下的欧拉角，同时还要求算法能及时的更新姿态角度数据。  @[toc] 一，坐标系1，导航坐标系&#x2F;地理坐标系：以东边，北边，天上为坐标系正轴建立坐标系，这样的坐标系有助于人类观察飞机。 2，机体坐标系：以飞机自身为坐标系。 飞行器上的姿态传感器读取的数据是在机体坐标系下的数值，必须转换成导航坐标系下的数值才对我们有用。方法是通过旋转机体坐标系，使其与">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/STM32/Manony_filter_Posture_Settlement/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="姿态解算的目的是得到飞行器在导航坐标系下的欧拉角，同时还要求算法能及时的更新姿态角度数据。  @[toc] 一，坐标系1，导航坐标系&#x2F;地理坐标系：以东边，北边，天上为坐标系正轴建立坐标系，这样的坐标系有助于人类观察飞机。 2，机体坐标系：以飞机自身为坐标系。 飞行器上的姿态传感器读取的数据是在机体坐标系下的数值，必须转换成导航坐标系下的数值才对我们有用。方法是通过旋转机体坐标系，使其与">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210411085122884.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210411085515881.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/2021041108560131.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210517201425487.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20200911222905105.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20200911223737583.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210517200756448.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210411090255314.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210517200707627.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210411090424452.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210411090739184.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210411090808818.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210411090952463.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.646Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:27.073Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210411085122884.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/STM32/Manony_filter_Posture_Settlement" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/STM32/Manony_filter_Posture_Settlement/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.646Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>姿态解算的目的是得到飞行器在导航坐标系下的欧拉角，同时还要求算法能及时的更新姿态角度数据。</p>
+</blockquote>
+<p>@[toc]</p>
+<h2 id="一，坐标系"><a href="#一，坐标系" class="headerlink" title="一，坐标系"></a>一，坐标系</h2><p>1，导航坐标系&#x2F;地理坐标系：以东边，北边，天上为坐标系正轴建立坐标系，这样的坐标系有助于人类观察飞机。</p>
+<p>2，机体坐标系：以飞机自身为坐标系。</p>
+<p><strong>飞行器上的姿态传感器读取的数据是在机体坐标系下的数值，必须转换成导航坐标系下的数值才对我们有用。方法是通过旋转机体坐标系，使其与导航坐标系重合。</strong></p>
+<h2 id="二-，旋转矩阵"><a href="#二-，旋转矩阵" class="headerlink" title="二 ，旋转矩阵"></a>二 ，旋转矩阵</h2><p><strong>旋转矩阵可用于表示一个旋转，利用旋转矩阵可表示机体坐标系下的向量旋转到导航坐标系下的角度。此角度就是欧拉角；旋转矩阵的推导如下：</strong></p>
+<p>其中V‘是旋转后的新向量[x1,y1,z1];<br><img src="/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210411085122884.jpg" alt="在这里插入图片描述"></p>
+<h2 id="三，四元数旋转形式"><a href="#三，四元数旋转形式" class="headerlink" title="三，四元数旋转形式"></a>三，四元数旋转形式</h2><p><strong>四元数也可以用于表示一个旋转，且四元数的计算相比于旋转矩阵更加方便，两者可互补。</strong></p>
+<p>向量与四元数密切相关，先从向量的角度看旋转：</p>
+<p>三维空间的旋转可看成绕轴u旋转θ角度：</p>
+<p><img src="/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210411085515881.png" alt="在这里插入图片描述"><br>将向量V和V’分解正交分解成平行于U和垂直于U的两个向量。</p>
+<p>主要观察垂直于U的分向量Vt,从上往下看，可得：</p>
+<p><img src="/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/2021041108560131.png" alt="在这里插入图片描述"></p>
+<p>可得<strong>Vt’&#x3D;Vt×cosθ+(Vt×U)×sinθ</strong></p>
+<p>所以新向量<strong>V’&#x3D;Vu+Vt’&#x3D;Vu+(cosθ+U×sinθ)×Vt</strong></p>
+<p>令四元数<strong>q&#x3D;(cosθ+U×sinθ)，所以V’&#x3D;Vu+q*Vt</strong></p>
+<p><strong>四元数知识：</strong></p>
+<blockquote>
+<p>四元数q&#x3D;[cosΘ,sinθ×U]，q表示将某个向量V绕向量U旋转θ角度。<br>若v平行是纯四元数，而q&#x3D;[a,bu]，u是单位向量，若v平行平行于u，则q×v平行&#x3D;v平行×q（满足交换律）<br>若v平行是纯四元数，而q&#x3D;[a,bu]，u是单位向量，若v垂直垂直于u，则q×v垂直&#x3D;v垂直×q*</p>
+</blockquote>
+<p><img src="/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210517201425487.jpg" alt="在这里插入图片描述"></p>
+<p><img src="/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20200911222905105.jpg" alt="在这里插入图片描述"></p>
+<p>新的向量V’可由原向量V左乘p，并右乘p的共轭计算。</p>
+<p><strong>矩阵的左右乘法规则如下：</strong></p>
+<p><img src="/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20200911223737583.jpg" alt="在这里插入图片描述"><br><strong>得到四元数的旋转矩阵形式：</strong></p>
+<p><img src="/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210517200756448.jpg" alt="在这里插入图片描述"></p>
+<h2 id="四，计算欧拉角"><a href="#四，计算欧拉角" class="headerlink" title="四，计算欧拉角"></a>四，计算欧拉角</h2><p><strong>四元数矩阵与角度旋转矩阵在数学上是旋转两种不同的表示方式，将两个矩阵的元素一一对应，即可求出角度α，β，γ：</strong><br><img src="/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210411090255314.jpg" alt="在这里插入图片描述"><br><img src="/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210517200707627.jpg" alt="在这里插入图片描述"></p>
+<p><strong>两个3*3矩阵里的元素一一对应，可得欧拉角的计算公式：</strong></p>
+<p><img src="/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210411090424452.jpg" alt="在这里插入图片描述"></p>
+<h2 id="五，一阶龙格库塔法更新四元数"><a href="#五，一阶龙格库塔法更新四元数" class="headerlink" title="五，一阶龙格库塔法更新四元数"></a>五，一阶龙格库塔法更新四元数</h2><p><strong>以上步骤得到了四元数到欧拉角的计算公式。由于飞行器是动态的，欧拉角的数据需要实时更新，而陀螺仪传感器测量的是机体的角速度，需要使用角速度来更新欧拉角的大小。</strong></p>
+<p>方式上是使用一阶龙格库塔法解微分方程，一阶龙格库塔法的方程是：</p>
+<blockquote>
+<p>y(n+1)&#x3D;y(n)+▲t dy(n)&#x2F;dt;</p>
+</blockquote>
+<p>设四元数向量Q&#x3D;[a,b,c,d]将Q代入y可得：</p>
+<blockquote>
+<p>Q(n+1)&#x3D;Q(n)+▲t dQ(n)&#x2F;dt;</p>
+</blockquote>
+<p>Q是我们通过上面的运算已经计算出来的向量，重点在对Q的时间导数：</p>
+<p><img src="/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210411090739184.jpg" alt="在这里插入图片描述"></p>
+<p><strong>然后根据一阶龙格库塔法，得到四元数的更新方程：</strong></p>
+<p><img src="/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210411090808818.jpg" alt="在这里插入图片描述"></p>
+<h2 id="六，mahony滤波"><a href="#六，mahony滤波" class="headerlink" title="六，mahony滤波"></a>六，mahony滤波</h2><p>理论上只需要陀螺仪读取角速度我们就能获取姿态角，但由于陀螺仪在积分的过程中会积累误差，所以需要用加速度计在水平面上对重力进行比对和补偿，用来修正陀螺仪的垂直误差。</p>
+<p>方法是：读取加速度计的数据，并由四元数计算出重力分量，加速度计的数据与重力分量的叉积得到误差，对误差进行比例，积分运算，补偿到角速度中。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//归一化加速度计数据</span></span><br><span class="line">recipNorm=invSqrt(ax*ax+ay*ay+az*az);</span><br><span class="line">ax*=recipNorm;</span><br><span class="line">ay*=recipNorm;</span><br><span class="line">az*=recipNorm;</span><br><span class="line"></span><br><span class="line"><span class="comment">//由四元数计算重力分量</span></span><br><span class="line">vx=<span class="number">2</span>*(b*d-a*c);</span><br><span class="line">vy=<span class="number">2</span>*(a*b+c*d);</span><br><span class="line">vz=<span class="number">2</span>*(a*a+d*d-b*b-c*c);</span><br><span class="line"></span><br><span class="line"><span class="comment">//叉积求误差</span></span><br><span class="line">ex=(ay*vz-az*vy);</span><br><span class="line">ey=(az*vx-ax*vz);</span><br><span class="line">ez=(ax*vy-ay*vx);</span><br><span class="line"></span><br><span class="line"><span class="comment">//对误差进行积分运算</span></span><br><span class="line">inte_ex+=ki*ex*t;</span><br><span class="line">inte_ey+=ki*ey*t;</span><br><span class="line">inte_ez+=ki*ez*t;</span><br><span class="line"></span><br><span class="line"><span class="comment">//gx,gy,gz即角速度向量</span></span><br><span class="line">gx+=inte_ex;</span><br><span class="line">gy+=inte_ey;</span><br><span class="line">gz+=inte_ez;</span><br><span class="line"></span><br><span class="line"><span class="comment">//对误差进行比例运算</span></span><br><span class="line">gx+=kp*ex;</span><br><span class="line">gy+=kp*ey;</span><br><span class="line">gz+=kp*ez;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="感谢"><a href="#感谢" class="headerlink" title="感谢"></a>感谢</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/AASDSADAD/article/details/73080832">一阶龙格库塔法</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/warmlayu/p/9937067.html">欧拉角 旋转矩阵</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/21207-iHome/p/6894128.html">四元数与欧拉角</a></p>
+<p><img src="/2025/05/30/hello-world/STM32/Manony_filter_Posture_Settlement/20210411090952463.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/STM32/Manony_filter_Posture_Settlement/" data-id="cmbcy7rh9001kt8mt6pjf35p3" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/STM32/ble_debuger_hc-05/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/OpenHarmony/music_player/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

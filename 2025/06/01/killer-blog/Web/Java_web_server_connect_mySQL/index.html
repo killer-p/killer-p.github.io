@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="@[toc] 前言 经过前面的环境部署，今天我们终于可以来连接数据库了。参考我之前的文章。这篇文章把前面两章连接起来，做一个小总结，并做一个可以保存用户登录数据的网站，代码主要解释对数据库的部分。     先前的开发环境安装：centos7从零搭建java web服务器MySQL从零安装配置 一，建立工程1，在eclipse新建动态web工程，具体过程已经有很多人写过了，我就简单说明一下。  打开">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/Web/Java_web_server_connect_mySQL/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="@[toc] 前言 经过前面的环境部署，今天我们终于可以来连接数据库了。参考我之前的文章。这篇文章把前面两章连接起来，做一个小总结，并做一个可以保存用户登录数据的网站，代码主要解释对数据库的部分。     先前的开发环境安装：centos7从零搭建java web服务器MySQL从零安装配置 一，建立工程1，在eclipse新建动态web工程，具体过程已经有很多人写过了，我就简单说明一下。  打开">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200315221726831.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200315222317751.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200315222633679.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200316135712311.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200315224129223.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200315224506599.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200316133829869.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200316134746480.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200316134831617.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/2020061408491195.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.649Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:26.932Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200315221726831.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/Web/Java_web_server_connect_mySQL" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/Web/Java_web_server_connect_mySQL/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.649Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>@[toc]</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote>
+<p>经过前面的环境部署，今天我们终于可以来连接数据库了。参考我之前的文章。这篇文章把前面两章连接起来，做一个小总结，并做一个可以保存用户登录数据的网站，代码主要解释对数据库的部分。</p>
+</blockquote>
+<p>   先前的开发环境安装：<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/104532635">centos7从零搭建java web服务器</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/104870282">MySQL从零安装配置</a></p>
+<h2 id="一，建立工程"><a href="#一，建立工程" class="headerlink" title="一，建立工程"></a>一，建立工程</h2><p>1，在eclipse新建动态web工程，具体过程已经有很多人写过了，我就简单说明一下。</p>
+<blockquote>
+<p><strong>打开eclipse-&gt;file-&gt;new-&gt;dynamic web subject</strong></p>
+</blockquote>
+<p>tomcat版本选你安装的版本，方便以后调试，web module 版本我用2.5，跟3.0差不多。3.0少了web.xml的配置文件等。一路next下去就行了<br><img src="/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200315221726831.png" alt="在这里插入图片描述"></p>
+<h2 id="二，导入jar包"><a href="#二，导入jar包" class="headerlink" title="二，导入jar包"></a>二，导入jar包</h2><blockquote>
+<p>连接MySQL需要导入MySQL相关的jar包，另外我还加入log包，对于开发非常有帮助，可以在控制台打印数据，方便debug。jar包就放下图示目录，另外还需要在项目右击-&gt;properties-&gt;java built path-&gt;libraries里添加我们刚刚添加的jar包，这样jar包才算真正导入；</p>
+</blockquote>
+<p><strong>jar包下载连接：</strong><br>链接: <a target="_blank" rel="noopener" href="https://pan.baidu.com/s/143RT1qygtKIimCRmLdpAbw">https://pan.baidu.com/s/143RT1qygtKIimCRmLdpAbw</a> 提取码: vd22</p>
+<p><img src="/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200315222317751.png" alt="在这里插入图片描述"><br><strong>点击add jars 选择刚刚加入的jar包添加进去就行了</strong><br><img src="/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200315222633679.png" alt="在这里插入图片描述"><br>*</p>
+<h2 id="三，编写DataBase类实现连接数据库与操作数据库"><a href="#三，编写DataBase类实现连接数据库与操作数据库" class="headerlink" title="三，编写DataBase类实现连接数据库与操作数据库"></a>三，编写DataBase类实现连接数据库与操作数据库</h2><blockquote>
+<p>以下代码需要自己先了解SQL语句，MySQL基本命令。代码实现了连接数据库，对数据库的某表格进行添加，读取，更新操作。对应的应用是添加用户，读取用户登录信息，更新密码。</p>
+</blockquote>
+<p><strong>注意数据保存到MySQL数据库出现中文乱码的问题，要在前端，后台，连接串，MySQL都设置相同的编码方式，比如我选择的是utf8</strong><br>在MySQL命令中输入show variables like “%char%”;查看当前的编码，如图，都是utf8就没问题，需要修改的话可以<a target="_blank" rel="noopener" href="https://www.cnblogs.com/wsk312138147/p/9469285.html">查看修改办法</a><br><img src="/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200316135712311.png" alt="在这里插入图片描述"></p>
+<p>DataBase.java代码，主要实现对数据库连接和增改查操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> myapp;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.sql.DriverManager;</span><br><span class="line"><span class="keyword">import</span> java.sql.PreparedStatement;</span><br><span class="line"><span class="keyword">import</span> java.sql.ResultSet;</span><br><span class="line"><span class="keyword">import</span> java.sql.SQLException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.mysql.jdbc.Connection;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DataBase</span> &#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> String driver=<span class="string">&quot;com.mysql.jdbc.Driver&quot;</span>;<span class="comment">//MySQL驱动</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="type">String</span> <span class="variable">user</span> <span class="operator">=</span> <span class="string">&quot;prx&quot;</span>;<span class="comment">// MySQL的用户名和密码</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">String</span> <span class="variable">password</span> <span class="operator">=</span> <span class="string">&quot;5812870-Prx&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">String</span> <span class="variable">ip_adress</span> <span class="operator">=</span> <span class="string">&quot;192.168.x.x&quot;</span>;<span class="comment">//主机ip地址</span></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 说明：与数据库建立连接</span></span><br><span class="line"><span class="comment">     * 参数：数据库名称</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Connection <span class="title function_">getConn</span><span class="params">(String DatabaseName)</span> <span class="keyword">throws</span> SQLException</span><br><span class="line">    &#123;</span><br><span class="line">    	<span class="comment">//设置MySQL的连接串编码为UTF-8，避免中文乱码问题</span></span><br><span class="line">    	String url=<span class="string">&quot;jdbc:mysql://localhost:3306/&quot;</span>+DatabaseName+<span class="string">&quot;?characterEncoding=UTF-8&quot;</span>;</span><br><span class="line">    	System.out.println(<span class="string">&quot;the url is :&quot;</span>+url);</span><br><span class="line">    	Connection connection=<span class="literal">null</span>;</span><br><span class="line">    	<span class="keyword">try</span> &#123;</span><br><span class="line">			Class.forName(driver);<span class="comment">//加载MySQL驱动程序</span></span><br><span class="line">			<span class="comment">//连接数据库 驱动+ip地址+端口号+用户名+密码，端口号默认是3306</span></span><br><span class="line">			connection=(Connection) DriverManager.getConnection(<span class="string">&quot;jdbc:mysql://&quot;</span> + ip_adress + <span class="string">&quot;:3306/&quot;</span> + DatabaseName,</span><br><span class="line">                    user, password);</span><br><span class="line">			connection.setEncoding(<span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line">			</span><br><span class="line">		&#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">			<span class="comment">// TODO Auto-generated catch block</span></span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125;</span><br><span class="line">    	<span class="comment">//返回connection对象</span></span><br><span class="line">		<span class="keyword">return</span> connection;</span><br><span class="line">	&#125;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 添加新用户</span></span><br><span class="line"><span class="comment">     * String name,String sex,string age,String id,String password,String emailadress</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">adduser</span><span class="params">(String name,String sex,String age,String id,String password,String emailadress)</span> <span class="keyword">throws</span> SQLException</span><br><span class="line">    &#123;</span><br><span class="line">    	String Database=<span class="string">&quot;myapp&quot;</span>;</span><br><span class="line">    	String sql=<span class="string">&quot;INSERT INTO myapp_user (name,sex,age,id,password,emailadress) VALUES (?,?,?,?,?,?)&quot;</span>;</span><br><span class="line">    	Connection connection=getConn(Database);</span><br><span class="line">    	<span class="keyword">if</span> (connection!=<span class="literal">null</span>)&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                PreparedStatement ps=connection.prepareStatement(sql);</span><br><span class="line">                <span class="keyword">if</span> (ps!=<span class="literal">null</span>)&#123;</span><br><span class="line">                	</span><br><span class="line">                    ps.setString(<span class="number">1</span>,name);</span><br><span class="line">                    ps.setString(<span class="number">2</span>,sex);</span><br><span class="line">                    ps.setString(<span class="number">3</span>,age);</span><br><span class="line">                    ps.setString(<span class="number">4</span>,id);</span><br><span class="line">                    ps.setString(<span class="number">5</span>,password);</span><br><span class="line">                    ps.setString(<span class="number">6</span>,emailadress);</span><br><span class="line">                    <span class="comment">//执行语句,注意！！！如果你的SQL 语句是诸如update,insert的更新语句，应该用statement的execute()方法</span></span><br><span class="line">                    <span class="comment">// select用的是statement的executeQuery()</span></span><br><span class="line">                    ps.execute();</span><br><span class="line">                    </span><br><span class="line">                    connection.close();</span><br><span class="line">                    ps.close();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">                </span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">updatepassword</span><span class="params">(String id,String newpassword)</span> <span class="keyword">throws</span> SQLException</span><br><span class="line">    &#123;</span><br><span class="line">    	String Database=<span class="string">&quot;myapp&quot;</span>;</span><br><span class="line">    	String sql=<span class="string">&quot;UPDATE myapp_user SET password=? where id=?&quot;</span>;</span><br><span class="line">    	Connection connection=getConn(Database);</span><br><span class="line">    	<span class="keyword">if</span> (connection!=<span class="literal">null</span>)&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                PreparedStatement ps=connection.prepareStatement(sql);</span><br><span class="line">                <span class="keyword">if</span> (ps!=<span class="literal">null</span>)&#123;</span><br><span class="line">                    ps.setString(<span class="number">1</span>,newpassword);</span><br><span class="line">                    ps.setString(<span class="number">2</span>,id);</span><br><span class="line">                  </span><br><span class="line">                    <span class="comment">//执行语句,注意！！！如果你的SQL 语句是诸如update,insert的更新语句，应该用statement的execute()方法</span></span><br><span class="line">                    <span class="comment">// select用的是statement的executeQuery()</span></span><br><span class="line">                    ps.execute();</span><br><span class="line">                    </span><br><span class="line">                    connection.close();</span><br><span class="line">                    ps.close();</span><br><span class="line">                	&#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">                </span><br><span class="line">            &#125;</span><br><span class="line">    </span><br><span class="line">    	&#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 读取指定的值</span></span><br><span class="line"><span class="comment">     * 输入id 键</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">sele_userinfo</span><span class="params">(String id,String key)</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line">    	<span class="type">String</span> <span class="variable">value</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    	String Database=<span class="string">&quot;myapp&quot;</span>;</span><br><span class="line">    	String sql=<span class="string">&quot;SELECT &quot;</span>+key+<span class="string">&quot; FROM myapp_user WHERE id=?&quot;</span>;</span><br><span class="line">    	</span><br><span class="line">    	Connection connection=getConn(Database);</span><br><span class="line">    	<span class="keyword">if</span> (connection!=<span class="literal">null</span>)&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                PreparedStatement ps=connection.prepareStatement(sql);</span><br><span class="line">                <span class="keyword">if</span> (ps!=<span class="literal">null</span>)&#123;</span><br><span class="line">                    ps.setString(<span class="number">1</span>,id);</span><br><span class="line">                    ResultSet rs=ps.executeQuery();</span><br><span class="line">                    <span class="keyword">if</span>(rs!=<span class="literal">null</span>) &#123;</span><br><span class="line">                    	<span class="type">int</span> <span class="variable">count</span> <span class="operator">=</span>rs.getMetaData().getColumnCount();</span><br><span class="line">                        <span class="keyword">while</span>   (rs.next())&#123;</span><br><span class="line">                            <span class="keyword">for</span> (<span class="type">int</span> i=<span class="number">1</span> ;i&lt;=count;i++)&#123;</span><br><span class="line">                                String field=rs.getMetaData().getColumnName(i);     </span><br><span class="line">                                    value=rs.getString(field);</span><br><span class="line">                                    System.out.println(<span class="string">&quot;the database value is:&quot;</span>+value); </span><br><span class="line">                            	&#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    </span><br><span class="line">                	&#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">                </span><br><span class="line">            &#125;</span><br><span class="line">    </span><br><span class="line">    	&#125;</span><br><span class="line">    	<span class="keyword">return</span> value;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 检查id&#x27;是否存在</span></span><br><span class="line"><span class="comment">     * 传入id</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">hasId</span><span class="params">(String id)</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line">    	String Database=<span class="string">&quot;myapp&quot;</span>;</span><br><span class="line">    	String value;</span><br><span class="line">    	String sql=<span class="string">&quot;select id from myapp_user&quot;</span>;</span><br><span class="line">    	 System.out.println(<span class="string">&quot;the input id is :&quot;</span>+id);</span><br><span class="line">    	Connection connection=getConn(Database);</span><br><span class="line">    	<span class="keyword">if</span> (connection!=<span class="literal">null</span>)&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                PreparedStatement ps=connection.prepareStatement(sql);</span><br><span class="line">                <span class="keyword">if</span> (ps!=<span class="literal">null</span>)&#123;</span><br><span class="line">                   </span><br><span class="line">                    ResultSet rs=ps.executeQuery();</span><br><span class="line">                    <span class="keyword">if</span>(rs!=<span class="literal">null</span>) &#123;</span><br><span class="line">                    	<span class="type">int</span> <span class="variable">count</span> <span class="operator">=</span>rs.getMetaData().getColumnCount();</span><br><span class="line">                        <span class="keyword">while</span>   (rs.next())&#123;</span><br><span class="line">                            <span class="keyword">for</span> (<span class="type">int</span> i=<span class="number">1</span> ;i&lt;=count;i++)&#123;</span><br><span class="line">                                String field=rs.getMetaData().getColumnName(i);     </span><br><span class="line">                                value=rs.getString(field);</span><br><span class="line">                                </span><br><span class="line">                                System.out.println(<span class="string">&quot;the database id is:&quot;</span>+value); </span><br><span class="line">                        </span><br><span class="line">                                <span class="keyword">if</span>(value.equals(id))</span><br><span class="line">                                &#123;                            </span><br><span class="line">                                	<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">                                &#125;</span><br><span class="line">                                	 </span><br><span class="line">                            	&#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    </span><br><span class="line">                	&#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">                e.printStackTrace();               </span><br><span class="line">            &#125;   </span><br><span class="line">    	&#125;</span><br><span class="line">    	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="四，效果图"><a href="#四，效果图" class="headerlink" title="四，效果图"></a>四，效果图</h2><p>登录页面<br><img src="/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200315224129223.png" alt="登录页面"><br>注册<br><img src="/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200315224506599.png" alt="在这里插入图片描述"><br><img src="/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200316133829869.png" alt="在这里插入图片描述"><br>在终端查看数据库，数据保存成功<br><img src="/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200316134746480.png" alt="在这里插入图片描述"><br>登录成功！<br><img src="/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/20200316134831617.png" alt="在这里插入图片描述"><br><strong>整个工程文件下载：</strong><br><strong>链接: <a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1jq4LoetVdoksjjjGQeb4MA">https://pan.baidu.com/s/1jq4LoetVdoksjjjGQeb4MA</a> 提取码: 33xw 复制这段内容后打开百度网盘手机App，操作更方便哦</strong><br>2020.3.16</p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_35892775/article/details/83003283">Eclipse创建java Web项目工程</a><br><img src="/2025/05/30/hello-world/Web/Java_web_server_connect_mySQL/2020061408491195.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/Web/Java_web_server_connect_mySQL/" data-id="cmbcy7rhf0023t8mtedov7txe" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/Web/EMQX_webhook_route_msg/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/STM32/stm32_MS5611/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

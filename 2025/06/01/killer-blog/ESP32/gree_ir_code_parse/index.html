@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="使用红外遥控空调，就必须先了解红外遥控的原理，数据的定义等。本博客解析了空调的最基本的功能的红外编码，包括：开关，温度，定时，风速，扫风，校验码。其他的功能因为空调型号不同而差别较大，所以暂时不作解析。同时，空调大部分时间工作在制冷模式下，其他模式下的编码也暂时未解析。  一，红外遥控原理1，红外线红外线是波长在760nm到1mm的电磁波，根据波长的不同可分为可见光（0.38um-0.76um）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/ESP32/gree_ir_code_parse/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="使用红外遥控空调，就必须先了解红外遥控的原理，数据的定义等。本博客解析了空调的最基本的功能的红外编码，包括：开关，温度，定时，风速，扫风，校验码。其他的功能因为空调型号不同而差别较大，所以暂时不作解析。同时，空调大部分时间工作在制冷模式下，其他模式下的编码也暂时未解析。  一，红外遥控原理1，红外线红外线是波长在760nm到1mm的电磁波，根据波长的不同可分为可见光（0.38um-0.76um）">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/gree_ir_code_parse/20200921205928763.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/gree_ir_code_parse/20200921104951188.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/gree_ir_code_parse/20200921215113779.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/gree_ir_code_parse/20200921220014146.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/gree_ir_code_parse/weixin.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.637Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:26.952Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/ESP32/gree_ir_code_parse/20200921205928763.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/ESP32/gree_ir_code_parse" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/ESP32/gree_ir_code_parse/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.637Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>使用红外遥控空调，就必须先了解红外遥控的原理，数据的定义等。本博客解析了空调的最基本的功能的红外编码，包括：开关，温度，定时，风速，扫风，校验码。其他的功能因为空调型号不同而差别较大，所以暂时不作解析。同时，空调大部分时间工作在制冷模式下，其他模式下的编码也暂时未解析。</p>
+</blockquote>
+<h2 id="一，红外遥控原理"><a href="#一，红外遥控原理" class="headerlink" title="一，红外遥控原理"></a>一，红外遥控原理</h2><h3 id="1，红外线"><a href="#1，红外线" class="headerlink" title="1，红外线"></a>1，红外线</h3><p>红外线是波长在760nm到1mm的电磁波，根据波长的不同可分为可见光（0.38um-0.76um）和不可见光。使用红外线作为遥控的话，由于红外发射管与红外接收管的响应波长一般为0.8um-0.94um，所以选择波长为0.76um-1.5um的红外光作为通讯的波长。</p>
+<p>红外通信广泛应用于家电控制，其优点是抗干扰能力强（频率低），功耗小，性价比高等。</p>
+<h3 id="2，工作原理"><a href="#2，工作原理" class="headerlink" title="2，工作原理"></a>2，工作原理</h3><p>发射器发射38khz方波为载波的红外光（占空比50），即红外光以38khz的频率闪烁着，接收器接收到以此频率闪烁的红外光时，会在其信号脚输出高电平信号，否则输出低电平。</p>
+<p>根据这个最基本的原理来，来实现编码解码数据。数据就是一组二进制的数据，0和1的区别就是高低电平时间的不同。比如，以下例子中，0与1的区别就是1的高电平时间较长。发射器首先需要编码，根据二进制数据每一位的内容，发射持续时间不一样的红外光（控制低高电平时间），而接收器则需要判断高低电平的时间来解码数据。</p>
+<h2 id="二，实验波形"><a href="#二，实验波形" class="headerlink" title="二，实验波形"></a>二，实验波形</h2><p>本实验是基于格力空调的红外数据<br>一帧红外编码数据的组成如下：<br><strong>起始码+35位数据+连接码+32位数据+结束码</strong><br><img src="/2025/05/30/hello-world/ESP32/gree_ir_code_parse/20200921205928763.png" alt="在这里插入图片描述">其中多次测量得出：</p>
+<p><strong>起始码：9000us 低电平 + 4500us高电平；<br>连接码：646us低电平 + 20000us高电平；<br>结束码：646us低电平 + 高电平；</strong></p>
+<p><strong>数据0：646us低电平 + 516us高电平；<br>数据1：646us低电平 + 1643us高电平；</strong></p>
+<p>数据码中的0和1，经过多次的测量，取众数作为依据，实验数据如下：</p>
+<p><img src="/2025/05/30/hello-world/ESP32/gree_ir_code_parse/20200921104951188.png" alt="在这里插入图片描述"></p>
+<h2 id="三，红外编码解析"><a href="#三，红外编码解析" class="headerlink" title="三，红外编码解析"></a>三，红外编码解析</h2><p>知道了一帧红外数据的0和1的表示，我们就可以自由的组成一帧数据。接下来需要了解的是在一帧数据中，数据位中的每一个bit代表的意思。<br>这里以<code>25℃，制冷模式，低风速，无扫风，打开，定时时间为0</code>的一帧数据为例子：</p>
+<h3 id="第一段数据："><a href="#第一段数据：" class="headerlink" title="第一段数据："></a>第一段数据：</h3><p><strong>开关：bit3；</strong></p>
+<blockquote>
+<p>0：关闭；1：开启</p>
+</blockquote>
+<p><strong>风速：bit4，bit5；</strong></p>
+<blockquote>
+<p>自动风速：00<br>一级风速：10<br>二级风速：01<br>三级风速：11</p>
+</blockquote>
+<p><strong>扫风开关：bit6，以及第二段bit0；</strong></p>
+<blockquote>
+<p>0：关闭；1：开启</p>
+</blockquote>
+<p><strong>温度：bit8，bit9，bit10，bit11；</strong></p>
+<blockquote>
+<p>16℃:	0000<br>17℃:	1000<br>18℃:	0100<br>19℃:	1100<br>20℃:	0010<br>21℃:	1010<br>22℃:	0110<br>23℃:	1110<br>24℃:	0001<br>25℃:	1001<br>26℃:	0101<br>27℃:	1101<br>28℃:	0011</p>
+</blockquote>
+<p><strong>定时分钟数：bit12，bit13，bit14；</strong></p>
+<p>由于我的手机只能发送定时半小时为最小单位的定时时间，所以只有定时30分钟的数据</p>
+<blockquote>
+<p>30min:	100</p>
+</blockquote>
+<p><strong>bit15	定时开关；</strong></p>
+<blockquote>
+<p>0：关闭；1：开启</p>
+</blockquote>
+<p><strong>定时小时数：bit16，bit17，bit18，bit19；</strong></p>
+<blockquote>
+<p>一小时：1000<br>两小时：0100<br>三小时：1100<br>…..</p>
+</blockquote>
+<p><img src="/2025/05/30/hello-world/ESP32/gree_ir_code_parse/20200921215113779.png" alt="在这里插入图片描述"></p>
+<h3 id="第二段数据："><a href="#第二段数据：" class="headerlink" title="第二段数据："></a>第二段数据：</h3><p>第二段数据比较简单，需要注意的就是<code>bit0</code>是扫风的开关，她与第一段数据中的<code>bit6</code>是一样的数值。另外是后四位<code>bit28,bit29,bit30,bit31</code>组成的校验码。<br>网上也有许多关于校验码的公式，但是我试了后发现并不适用，于是自己尝试出了一条公式：<br><code>校验码 = 温度 - 18 + 定时小时数 + 空调开关 × 8；</code><br>例如以上例子的校验码是：25 - 18 + 0 + 1× 8 &#x3D; 15 &#x3D; 0xf;<br><img src="/2025/05/30/hello-world/ESP32/gree_ir_code_parse/20200921220014146.png" alt="在这里插入图片描述"></p>
+<h2 id="四，小结"><a href="#四，小结" class="headerlink" title="四，小结"></a>四，小结</h2><p>红外遥控的实现大同小异，最好还是要自己有测试的设备进行代码的测试。红外接收管和逻辑分析仪是你的不二选择。</p>
+<p>友情连接：<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/108592858">esp32实现红外发射与接收</a></p>
+<p>作者才疏学浅，难免有错误，希望指正。如果文章对你有帮助，帮忙点个赞呗。</p>
+<p><img src="/2025/05/30/hello-world/ESP32/gree_ir_code_parse/weixin.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/ESP32/gree_ir_code_parse/" data-id="cmbcy7rh1000st8mte3gxhx1e" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/ESP32/smart_control/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/ESP32/esp32_weather_report/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

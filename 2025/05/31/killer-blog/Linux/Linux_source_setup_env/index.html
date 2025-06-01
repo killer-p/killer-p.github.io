@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Linux内核源码学习（一）环境搭建一、Ubuntu虚拟机网络使用桥接模式连接，首先准备一个ubuntu 虚拟机，不推荐WSL2了，坑太多了。我这里使用的是ubuntu20.04 lts 二、QEMU 环境搭建使用QEMU模拟一个arm 开发板，在这个虚拟的arm板子上可以对内核进行debug。参考手把手教你搭建ARM32 QEMU环境 - 知乎 (zhihu.com) 1234567891011">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/05/31/killer-blog/Linux/Linux_source_setup_env/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Linux内核源码学习（一）环境搭建一、Ubuntu虚拟机网络使用桥接模式连接，首先准备一个ubuntu 虚拟机，不推荐WSL2了，坑太多了。我这里使用的是ubuntu20.04 lts 二、QEMU 环境搭建使用QEMU模拟一个arm 开发板，在这个虚拟的arm板子上可以对内核进行debug。参考手把手教你搭建ARM32 QEMU环境 - 知乎 (zhihu.com) 1234567891011">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-31T17:16:20.235Z">
+<meta property="article:modified_time" content="2025-06-01T00:19:46.398Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/Linux/Linux_source_setup_env" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/05/31/killer-blog/Linux/Linux_source_setup_env/" class="article-date">
+  <time class="dt-published" datetime="2025-05-31T17:16:20.235Z" itemprop="datePublished">2025-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="Linux内核源码学习（一）环境搭建"><a href="#Linux内核源码学习（一）环境搭建" class="headerlink" title="Linux内核源码学习（一）环境搭建"></a>Linux内核源码学习（一）环境搭建</h1><h2 id="一、Ubuntu虚拟机"><a href="#一、Ubuntu虚拟机" class="headerlink" title="一、Ubuntu虚拟机"></a>一、Ubuntu虚拟机</h2><p>网络使用桥接模式连接，首先准备一个ubuntu 虚拟机，不推荐WSL2了，坑太多了。我这里使用的是ubuntu20.04 lts</p>
+<h2 id="二、QEMU-环境搭建"><a href="#二、QEMU-环境搭建" class="headerlink" title="二、QEMU 环境搭建"></a>二、QEMU 环境搭建</h2><p>使用QEMU模拟一个arm 开发板，在这个虚拟的arm板子上可以对内核进行debug。参考<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/681323420">手把手教你搭建ARM32 QEMU环境 - 知乎 (zhihu.com)</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装一些必须的工具</span></span><br><span class="line">apt install gcc make flex bison qemu qemu-utils gcc-arm-linux-gnueabi qemu-system-arm gdb-multiarch</span><br><span class="line"></span><br><span class="line"><span class="comment"># 下载linux-5.10</span></span><br><span class="line">git <span class="built_in">clone</span> https://gitee.com/mirrors/linux_old1.git --depth 1</span><br><span class="line"><span class="comment"># 编译kernel</span></span><br><span class="line">make CROSS_COMPILE=arm-linux-gnueabi- ARCH=arm vexpress_defconfig</span><br><span class="line">make CROSS_COMPILE=arm-linux-gnueabi- ARCH=arm -j8</span><br><span class="line"></span><br><span class="line"><span class="comment"># 下载busybox</span></span><br><span class="line"><span class="built_in">sudo</span> wget https://www.busybox.net/downloads/busybox-1.36.1.tar.bz2</span><br><span class="line"><span class="built_in">sudo</span> tar -xjf busybox-1.36.1.tar.bz2</span><br><span class="line"><span class="comment"># 编译busybox</span></span><br><span class="line">make defconfig CROSS_COMPILE=arm-linux-gnueabi- ARCH=arm</span><br><span class="line">make -j8 CROSS_COMPILE=arm-linux-gnueabi- ARCH=arm</span><br><span class="line"><span class="comment"># 在_install目录生成根文件系统所需的内容</span></span><br><span class="line">make install</span><br><span class="line">~/busybox-1.36.1/_install$ <span class="built_in">ls</span></span><br><span class="line">bin  linuxrc  sbin  usr</span><br><span class="line"></span><br><span class="line"><span class="comment">#现在开始制作根文件系统</span></span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">mkdir</span> roootfs</span><br><span class="line"><span class="built_in">mkdir</span> -p rootfs/lib</span><br><span class="line"><span class="built_in">cp</span> -r /usr/arm-linux-gnueabi/lib/ rootfs/lib/</span><br><span class="line"><span class="built_in">cp</span> -r _install/* rootfs</span><br><span class="line"><span class="built_in">mkdir</span> -p rootfs/dev/</span><br><span class="line"><span class="built_in">mkdir</span> -p  etc/init.d</span><br><span class="line">vim rootfs/etc/init.d/rcS</span><br><span class="line"><span class="comment"># 在rcS填入以下内容</span></span><br><span class="line"><span class="comment">#!/bin/sh </span></span><br><span class="line">/bin/mount -a</span><br><span class="line"><span class="built_in">echo</span> /sbin/mdev &gt; /proc/sys/kernel/hotplug </span><br><span class="line">/sbin/mdev -s  </span><br><span class="line"></span><br><span class="line">vim etc/fatab</span><br><span class="line"><span class="comment"># 在fstab填入以下内容</span></span><br><span class="line"><span class="comment">#device mount-point type options dump fsck orde</span></span><br><span class="line">proc   /proc  proc  defaults  0  0</span><br><span class="line">tpfs  /tmp   tmpfs defaults  0  0</span><br><span class="line">sysfs  /sys   sysfs defaults  0  0</span><br><span class="line">tmpfs  /dev   tmpfs defaults  0  0 </span><br><span class="line"></span><br><span class="line">vim etc/inittab</span><br><span class="line"><span class="comment"># 在inittab填入以下内容</span></span><br><span class="line">::sysinit:/etc/init.d/rcS </span><br><span class="line">::askfirst:-/bin/sh</span><br><span class="line">::restart:/sbin/init </span><br><span class="line">::ctrlaltdel:/sbin/reboot </span><br><span class="line"></span><br><span class="line">vim etc/profile</span><br><span class="line"><span class="comment"># 在profile填入以下内容</span></span><br><span class="line"><span class="built_in">export</span> HOSTNAME=HQYJ</span><br><span class="line"><span class="built_in">export</span> USER=root</span><br><span class="line"><span class="built_in">export</span> HOME=ot</span><br><span class="line"><span class="comment">#export PS1=&quot;\[\u@\h \W\ ]\$ &quot;</span></span><br><span class="line"><span class="comment">#cd root</span></span><br><span class="line"><span class="built_in">export</span> PS1=<span class="string">&quot;[<span class="variable">$USER</span>@<span class="variable">$HOSTNAME</span> \W]\# &quot;</span></span><br><span class="line">PATH=/bin:/sbin:/usr/bin:/usr/sbin</span><br><span class="line">LD_LIBRARY_PATH=/lib:/usr/lib:<span class="variable">$LD_LIBRARY_PATH</span></span><br><span class="line"><span class="built_in">export</span> PATH LD_LIBRARY_PATH</span><br><span class="line"></span><br><span class="line"><span class="comment">#创建其他目录</span></span><br><span class="line"><span class="built_in">mkdir</span> lib mnt proc root sys tmp var</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">mknod</span> -m 666 tty1 c 4 1 </span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">mknod</span> -m 666 tty2 c 4 2</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">mknod</span> -m 666 tty3 c 4 3</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">mknod</span> -m 666 tty4 c 4 4</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">mknod</span> -m 666 console c 5 1</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">mknod</span> -m 666 null c 1 3</span><br><span class="line"></span><br><span class="line"><span class="comment"># 制作根文件系统镜像rootfs.ext4</span></span><br><span class="line"><span class="built_in">sudo</span> mount -t ext4 rootfs.ext4 /mnt -o loop</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">cp</span> -r rootfs/* /mnt</span><br><span class="line"><span class="built_in">sudo</span> umount /mnt</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">cp</span> rootfs.ext4 ../linux-5.10/</span><br></pre></td></tr></table></figure>
+
+<h3 id="开始GDB调试"><a href="#开始GDB调试" class="headerlink" title="开始GDB调试"></a>开始GDB调试</h3><p>启动qemu，模拟vexpress-a9开发板，-gdb tcp::8899表示开启gdb server 在8899端口监听，-S表示等待gdb 连接ok后再运行kernel</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> qemu-system-arm -M vexpress-a9 -m 512M -kernel ./arch/arm/boot/zImage -dtb ./arch/arm/boot/dts/arm/vexpress-v2p-ca9.dtb -nographic -append <span class="string">&quot;root=/dev/mmcblk0 rw console=ttyAMA0 rootwait rootfstype=ext4&quot;</span> -sd rootfs.ext4 -gdb tcp::8899 -S</span><br></pre></td></tr></table></figure>
+
+
+
+<p>重新开启一个终端，运行gdb：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gdb-multiarch vmlinux</span><br><span class="line"><span class="comment"># 在gdb中输入下面命令连接到qemu的gdb server</span></span><br><span class="line">target remote localhost:8899</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、rk1103"><a href="#三、rk1103" class="headerlink" title="三、rk1103"></a>三、rk1103</h2><p>这里我们以luckfox-pico min B 开发版作为我们实际学习的硬件平台。这是因为我们实际工作中都是在ARM平台的，使用真实的硬件平台对于我们来说，还可以进一步了解其flash 以及uboot启动流程，以及后续可以使用该平台做一些有趣的项目。</p>
+<blockquote>
+<p>为什么使用这个平台？<br>首先是价格，50块的价格可以买到一个ARM开发版，功能全面，开发文档也较丰富。开发版本身是一块核心板，可以嵌入到很多产品中。</p>
+</blockquote>
+<h3 id="官网资料"><a href="#官网资料" class="headerlink" title="官网资料"></a>官网资料</h3><p>官网的资料做的就非常不错，<a target="_blank" rel="noopener" href="https://wiki.luckfox.com/zh/Luckfox-Pico/Luckfox-Pico-RV1103/Luckfox-Pico-Plus-Mini/Luckfox-Pico-quick-start">上手教程 | LUCKFOX WIKI</a><br>我基本上就是参考上面的设置来做的。建议学习顺序：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://wiki.luckfox.com/zh/Luckfox-Pico/Luckfox-Pico-RV1103/Luckfox-Pico-Plus-Mini/Luckfox-Pico-prepare">准备事项 | LUCKFOX WIKI</a>安装驱动以及image，先试试能否正常烧录</li>
+<li><a target="_blank" rel="noopener" href="https://wiki.luckfox.com/zh/Luckfox-Pico/Luckfox-Pico-RV1103/Luckfox-Pico-Plus-Mini/Luckfox-Pico-Flash-burn-image">SPI NAND Flash 镜像烧录 | LUCKFOX WIKI</a>使用tool烧录到nand里</li>
+<li><a target="_blank" rel="noopener" href="https://wiki.luckfox.com/zh/Luckfox-Pico/Luckfox-Pico-RV1103/Luckfox-Pico-Plus-Mini/Linux-MacOS-Burn-Image">Linux&#x2F;MacOS 镜像烧录 | LUCKFOX WIKI</a>若可以的话，建议在虚拟机里进行烧录、调试，不要经过windows。我们设置vmware station，在插入usb时，将usb直接连接到虚拟机。</li>
+<li><a target="_blank" rel="noopener" href="https://wiki.luckfox.com/zh/Luckfox-Pico/Luckfox-Pico-RV1103/Luckfox-Pico-Plus-Mini/SSH-Telnet-Login">SSH&#x2F;Telnet 登录 | LUCKFOX WIKI</a>在虚拟机内使用ssh进行登陆板子。虽然 板子没有网口，但是可以使用USB模拟网口，使板子拥有网络。官网的wiki是在windows下配置的，我这里出了一个在Linux下的wiki：[[操作备忘录#在虚拟机中连接板子]]</li>
+<li><a target="_blank" rel="noopener" href="https://wiki.luckfox.com/zh/Luckfox-Pico/Luckfox-Pico-RV1103/Luckfox-Pico-Plus-Mini/Luckfox-Pico-File-Transfer">文件传输 | LUCKFOX WIKI</a>推荐使用scp进行文件传输，主要是将我们编译的驱动、app传输到板子进行调试</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/05/31/killer-blog/Linux/Linux_source_setup_env/" data-id="cmbcy7rh40012t8mta1n874ji" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/05/31/killer-blog/Linux/KProbeLabs/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/05/31/killer-blog/Linux/Linux_isr_3/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

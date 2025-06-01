@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="构建gcc交叉工具链一、交叉工具链简介工具链就是一系列用于编译的程序，以特定的顺序组织在一起，一个程序的结果输出到下一个程序，直到最终编译出目标程序。而运行工具链的计算机和运行目标程序的计算机不一样时，这个工具链就叫交叉工具链。 使用最广泛的就是gnu gcc交叉工具链，该工具链包含了c、c++等语言的编译器，汇编器，连接器等，是一个工具集合。 二、生成gcc交叉工具链工具链的组成：GUN将构建软">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/Compiler/build_gcc_cross_compiler/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="构建gcc交叉工具链一、交叉工具链简介工具链就是一系列用于编译的程序，以特定的顺序组织在一起，一个程序的结果输出到下一个程序，直到最终编译出目标程序。而运行工具链的计算机和运行目标程序的计算机不一样时，这个工具链就叫交叉工具链。 使用最广泛的就是gnu gcc交叉工具链，该工具链包含了c、c++等语言的编译器，汇编器，连接器等，是一个工具集合。 二、生成gcc交叉工具链工具链的组成：GUN将构建软">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/1.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/2.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/3.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/4.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/5.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/6.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/7.png">
+<meta property="og:image" content="http://example.com/image-20220715121513331.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/8.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/9.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/10.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.633Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:26.774Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/1.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/Compiler/build_gcc_cross_compiler" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/Compiler/build_gcc_cross_compiler/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.633Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="构建gcc交叉工具链"><a href="#构建gcc交叉工具链" class="headerlink" title="构建gcc交叉工具链"></a>构建gcc交叉工具链</h1><h2 id="一、交叉工具链简介"><a href="#一、交叉工具链简介" class="headerlink" title="一、交叉工具链简介"></a>一、交叉工具链简介</h2><p>工具链就是一系列用于编译的程序，以特定的顺序组织在一起，一个程序的结果输出到下一个程序，直到最终编译出目标程序。而运行工具链的计算机和运行目标程序的计算机不一样时，这个工具链就叫交叉工具链。</p>
+<p>使用最广泛的就是gnu gcc交叉工具链，该工具链包含了c、c++等语言的编译器，汇编器，连接器等，是一个工具集合。</p>
+<h2 id="二、生成gcc交叉工具链"><a href="#二、生成gcc交叉工具链" class="headerlink" title="二、生成gcc交叉工具链"></a>二、生成gcc交叉工具链</h2><p>工具链的组成：GUN将构建软件过程中的工具分别包含在3个软件包中：Binutils、GCC、Glibc。</p>
+<ul>
+<li>编译器：用于把源码编译成汇编代码，例如gcc、g++</li>
+<li>汇编器：用于把汇编代码汇编成机器码</li>
+<li>链接器：把各个机器码链接成最终的可执行机器码。汇编器和链接器都存在于binutils</li>
+<li>C库：提供抽象层来运行基本的任务如内存管理、输入输出、管理文件。</li>
+<li>kernel：C库的生成需要linux kernel头文件提供一些特性信息。</li>
+</ul>
+<p>GUN将编译器和C库分开放在两个软件包里，好处是比较灵活，方便在工具链中可以选择不同的C库，比如Glibc、uClibc等。但是，也带来了编译器和C库的循环依赖问题：编译C库需要C编译器，但是C编译器又依赖C库。</p>
+<blockquote>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">C编译器为何依赖C库？</span><br><span class="line">C编译器需要根据C库的某此特性来决定自己支持哪些特性，因此C编译器要依赖C库的头文件。</span><br><span class="line">C++的库和编译器需要C库支持，比如异常处理和栈回溯部分。</span><br><span class="line">GCC不仅包含编译器，还包含一些库，这些库通常依赖C库</span><br><span class="line">C编译器本身也会使用C库的一些函数。</span><br><span class="line">Glibc基本是自包含的，可能有小部分地方使用了GCC的代码。</span><br></pre></td></tr></table></figure></blockquote>
+<p>由于上述原因，编译的过程如下：</p>
+<ul>
+<li>1、使用host的gcc构建Binutils</li>
+<li>2、使用host的gcc构建第一阶段的gcc</li>
+<li>3、安装target机器的内核头文件</li>
+<li>4、使用第一阶段的gcc构建glibc库</li>
+<li>5、使用第一阶段的gcc和glibc构建完整的gcc</li>
+</ul>
+<h2 id="三、crosstool-ng"><a href="#三、crosstool-ng" class="headerlink" title="三、crosstool-ng"></a>三、crosstool-ng</h2><p>上述是通用的GCC工具链构建方法，步骤比较复杂，所以有人就做出了一个脚本工具，叫做crosstool-ng来简化上述步骤。他将上述过程合并成一个步骤，我们只需要配置好参数，然后一键就能生成gcc工具链。</p>
+<h3 id="3-1、安装crosstool-ng"><a href="#3-1、安装crosstool-ng" class="headerlink" title="3.1、安装crosstool-ng"></a>3.1、安装crosstool-ng</h3><p>使用wget下载最新源码压缩包：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget http://crosstool-ng.org/download/crosstool-ng/crosstool-ng-1.25.0.tar.xz</span><br><span class="line">tar -xvf crosstool-ng-1.25.0.tar.xz</span><br></pre></td></tr></table></figure>
+
+<p>创建crosstool-ng的安装目录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> crosstool-ng</span><br></pre></td></tr></table></figure>
+
+<p>开始安装crosstool-ng:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> crosstool-ng-1.25.0 <span class="comment">#进入源码目录</span></span><br><span class="line"><span class="built_in">sudo</span> apt install gcc flex texinfo gawk make libtool-bin libncurses5-dev bison g++ git#需要使用到这些工具来帮助安装</span><br><span class="line">./configure --prefix=/home/prx/crosstool-ng <span class="comment">#设置安装路径</span></span><br><span class="line"><span class="comment"># 开始安装</span></span><br><span class="line"><span class="built_in">sudo</span> make</span><br><span class="line"><span class="built_in">sudo</span> make install</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="string">&quot;/home/prx/crosstool-ng/bin：<span class="variable">$&#123;PATH&#125;</span>:&quot;</span> <span class="comment">#把crosstool-ng的路径添加到环境变量</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>执行<code>ct-ng -v</code>能打印出信息说明在crosstool-ng目录下安装成功。</p>
+<h3 id="3-2、配置"><a href="#3-2、配置" class="headerlink" title="3.2、配置"></a>3.2、配置</h3><p>我们要使用crosstool-ng来制作gcc交叉工具链，首先需要确定gcc工具链的配置参数，参数与目标机器的架构很大关系。crosstool-ng提供了一些常用的参数配置模板，以及一个图像化配置界面来帮助配置。</p>
+<p>首先创建一个work-space目录来存放crosstool-ng的配置文件,进入work-space目录。</p>
+<p>执行<code>ct-ng list-samples</code>可以列出所有的模板，选择合适的配置模板，因为I6C是ARMV7-a cortex-a7，我们可以使用：<code>armv7-rpi2-linux-gnueabihf</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">prx@ubuntu:~$ <span class="built_in">mkdir</span> work-space </span><br><span class="line">prx@ubuntu:~$ <span class="built_in">cd</span> work-space</span><br><span class="line">prx@ubuntu:~/work-space$ ct-ng list-samples</span><br><span class="line">Status  Sample name</span><br><span class="line">[G...]   aarch64-ol7u9-linux-gnu</span><br><span class="line">[G...]   aarch64-rpi3-linux-gnu</span><br><span class="line">[G...]   aarch64-rpi4-linux-gnu</span><br><span class="line">[G..X]   aarch64-unknown-linux-android</span><br><span class="line">[G...]   aarch64-unknown-linux-gnu</span><br><span class="line">[G...]   aarch64-unknown-linux-uclibc</span><br><span class="line">[G...]   alphaev56-unknown-linux-gnu</span><br><span class="line">[G...]   alphaev67-unknown-linux-gnu</span><br><span class="line">[G...]   arc-arc700-linux-uclibc</span><br><span class="line">[G...]   arc-archs-linux-gnu</span><br><span class="line">[G...]   arc-multilib-elf32</span><br><span class="line">[G...]   arc-multilib-linux-gnu</span><br><span class="line">[G...]   arc-multilib-linux-uclibc</span><br><span class="line">[G...]   arm-bare_newlib_cortex_m3_nommu-eabi</span><br><span class="line">[G...]   arm-cortex_a15-linux-gnueabihf</span><br><span class="line">[G..X]   arm-cortexa5-linux-uclibcgnueabihf</span><br><span class="line">[G...]   arm-cortex_a8-linux-gnueabi</span><br><span class="line">[G..X]   arm-cortexa9_neon-linux-gnueabihf</span><br><span class="line">[G..X]   x86_64-w64-mingw32,arm-cortexa9_neon-linux-gnueabihf</span><br><span class="line">[G...]   armeb-unknown-eabi</span><br><span class="line">[G...]   armeb-unknown-linux-gnueabi</span><br><span class="line">[G...]   armeb-unknown-linux-uclibcgnueabi</span><br><span class="line">[G...]   arm-multilib-linux-uclibcgnueabi</span><br><span class="line">[G...]   arm-nano-eabi</span><br><span class="line">[G...]   arm-ol7u9-linux-gnueabi</span><br><span class="line">[G...]   arm-ol7u9-linux-gnueabihf</span><br><span class="line">[G...]   arm-picolibc-eabi</span><br><span class="line">[G...]   arm-unknown-eabi</span><br><span class="line">[G...]   arm-unknown-linux-gnueabi</span><br><span class="line">[G..X]   arm-unknown-linux-musleabi</span><br><span class="line">[G...]   arm-unknown-linux-uclibcgnueabi</span><br><span class="line">[G..X]   arm-unknown-linux-uclibcgnueabihf</span><br><span class="line">[G...]   armv6-nommu-linux-uclibcgnueabi</span><br><span class="line">[G...]   armv6-unknown-linux-gnueabi</span><br><span class="line">[G...]   armv6-unknown-linux-gnueabihf</span><br><span class="line">[G...]   armv7-rpi2-linux-gnueabihf</span><br><span class="line">[G...]   armv8-rpi3-linux-gnueabihf</span><br><span class="line">[G...]   armv8-rpi4-linux-gnueabihf</span><br></pre></td></tr></table></figure>
+
+<p>执行<code>ct-ng armv7-rpi2-linux-gnueabihf</code>选择该配置，然后执行<code>ct-ng menuconfig</code>进入配置界面，对配置进行微调。</p>
+<h4 id="3-2-1、配置corsstool-ng"><a href="#3-2-1、配置corsstool-ng" class="headerlink" title="3.2.1、配置corsstool-ng"></a>3.2.1、配置corsstool-ng</h4><p>构建过程会使用到很多工具，这些工具可以安装在指定目录下，也可以使用默认配置：</p>
+<ul>
+<li><p>Local tarballs directory：指定存放编译gcc所需的工具</p>
+</li>
+<li><p>Working directory：存放.config配置文件</p>
+</li>
+<li><p>Prefix Directory：存放生成的gcc交叉工具链</p>
+</li>
+<li><p>选中Debug crosstool-NG： 选择save intermediate step: 当编译出错时，再次编译会从出错的地方开始，节省编译时间</p>
+</li>
+<li><p>Number of parallel jobs：选择并行编译的内核数量 -j</p>
+</li>
+</ul>
+<p><img src="/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/1.png" alt="image-20220714103217558"></p>
+<h4 id="3-2-2、配置Target-option"><a href="#3-2-2、配置Target-option" class="headerlink" title="3.2.2、配置Target option"></a>3.2.2、配置Target option</h4><p>这里的选项用于配置目标cpu的具体信息：</p>
+<ol>
+<li>Target Architecture: 目标架构，选择arm</li>
+<li>Suffix to the arch-part：架构的后缀，可以是指令集版本v7，和Target Architecture一起组成arm-v7</li>
+<li>bitness：指令集位数：只有aarch64才有64bit</li>
+<li>architecture level：目标架构，可理解为指令集</li>
+<li>emit assembly for cpu：目标cpu的具体架构和特性</li>
+<li>tune for cpu：cpu的具体架构</li>
+<li>Use specific FPU : FPU型号</li>
+</ol>
+<p><strong>note：4、5、6在最后GCC配置选项有详细说明</strong></p>
+<p><img src="/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/2.png" alt="image-20220715142100586"></p>
+<h4 id="3-2-3、配置toolchain"><a href="#3-2-3、配置toolchain" class="headerlink" title="3.2.3、配置toolchain"></a>3.2.3、配置toolchain</h4><p>配置生成的toolchain的功能、名称</p>
+<p>Tuple vendor string：厂商名称，例如是sigmastar，则生成的工具链就是：armv7-sigmastar-linux-gnueabihf</p>
+<p>sysroot：根文件系统，工具链会生成一个最小的根文件系统，里面有c库等</p>
+<p><img src="/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/3.png" alt="image-20220713165014460"></p>
+<h4 id="3-2-4、配置内核信息"><a href="#3-2-4、配置内核信息" class="headerlink" title="3.2.4、配置内核信息"></a>3.2.4、配置内核信息</h4><p>指定内核版本，如果menuconfig上没有所需要的内核版本，可以直接修改.config文件，最终都会去linux官网下载对应的内核压缩包。也可以在这里指定linux的下载地址。</p>
+<p>由于I6和I7内核版本都是5.10.61，所以修改 .config 文件，把 <code>CT_LINUX_VERSION</code>设置为5.10.61</p>
+<p><img src="/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/4.png" alt="image-20220713165246913"></p>
+<h4 id="3-2-5、配置glibc"><a href="#3-2-5、配置glibc" class="headerlink" title="3.2.5、配置glibc"></a>3.2.5、配置glibc</h4><ul>
+<li>选择glibc的版本号为2.33，以I6C为例</li>
+<li>enable -Werror during the build 设置为n，防止一些报错</li>
+</ul>
+<p><img src="/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/5.png" alt="image-20220714171138996"></p>
+<h4 id="3-2-6、配置gcc"><a href="#3-2-6、配置gcc" class="headerlink" title="3.2.6、配置gcc"></a>3.2.6、配置gcc</h4><p>选择gcc版本，若menuconfig中没有想要的版本，可以设置从网络下载。例如下载gcc-11.1.0：</p>
+<ol>
+<li>source of gcc：gcc的源，选择vendor&#x2F;custom repository 远程仓库</li>
+<li>vcs type ：网络协议，选择git</li>
+<li>repository url：仓库的url，<a target="_blank" rel="noopener" href="https://gcc.gnu.org/git/gcc.git">https://gcc.gnu.org/git/gcc.git</a></li>
+<li>branch&#x2F;tag to check out：分支&#x2F;标签，例如releases&#x2F;gcc-11.1.0</li>
+</ol>
+<p><img src="/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/6.png" alt="image-20220713165654609"></p>
+<h4 id="3-2-7、其他"><a href="#3-2-7、其他" class="headerlink" title="3.2.7、其他"></a>3.2.7、其他</h4><p>首先关闭debug facilities -&gt; gdb，否则会产生INVALID_CONFIGURATION错误，暂时未找到原因；</p>
+<p>完成配置后，执行<code>ct-ng build</code>开始生成工具链。</p>
+<h3 id="3-3、构建过程"><a href="#3-3、构建过程" class="headerlink" title="3.3、构建过程"></a>3.3、构建过程</h3><p>crosstool-ng会首先下载所需的软件压缩包，并解压：</p>
+<ul>
+<li>linux-5.10.61</li>
+<li>zlib</li>
+<li>gmp</li>
+<li>mpfr</li>
+<li>isl</li>
+<li>mpc</li>
+<li>ncurses</li>
+<li>libiconv</li>
+<li>gettext</li>
+<li>binutils</li>
+<li>gcc-11.1.0</li>
+<li>glibc-2.33</li>
+</ul>
+<p>然后开始安装上面的软件：</p>
+<ol>
+<li>ncurses</li>
+<li>zlib</li>
+<li>gmp</li>
+<li>mpfr</li>
+<li>isl</li>
+<li>mpc</li>
+<li>libiconv</li>
+<li>gettext</li>
+<li>binutils ：编译binutils</li>
+<li>kernel header</li>
+<li>gcc：编译第一阶段gcc</li>
+<li>glibc：编译glibc</li>
+<li>gcc：生成最终的gcc</li>
+</ol>
+<p>出现以下信息说明gcc成功生成：</p>
+<p><img src="/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/7.png" alt="image-20220713180502100"></p>
+<h2 id="四、详细补充"><a href="#四、详细补充" class="headerlink" title="四、详细补充"></a>四、详细补充</h2><h3 id="什么是交叉工具链"><a href="#什么是交叉工具链" class="headerlink" title="什么是交叉工具链"></a>什么是交叉工具链</h3><p>工具链就是一系列用于编译的程序，以特定的顺序组织在一起，一个程序的结果输出到下一个程序，直到最终编译出目标程序。而运行工具链的计算机和运行目标程序的计算机不一样时，这个工具链就叫交叉工具链。</p>
+<h3 id="工具链有哪些组件？"><a href="#工具链有哪些组件？" class="headerlink" title="工具链有哪些组件？"></a>工具链有哪些组件？</h3><ol>
+<li>编译器：用于把源码编译成汇编代码，例如gcc、g++</li>
+<li>汇编器：用于把汇编代码汇编成机器码</li>
+<li>链接器：把各个机器码链接成最终的可执行机器码。汇编器和链接器都存在于binutils</li>
+<li>C库：提供抽象层来运行基本的任务如内存管理、输入输出、管理文件。</li>
+<li>kernel：C库的生成需要linux kernel头文件提供一些特性信息。</li>
+</ol>
+<h3 id="这些组件如何工作？"><a href="#这些组件如何工作？" class="headerlink" title="这些组件如何工作？"></a>这些组件如何工作？</h3><p>note：我们把想要生成的gcc工具链称为 终极gcc</p>
+<ol>
+<li>编译出一个终极gcc，需要一个C库</li>
+<li>编译一个C库，需要使用gcc</li>
+</ol>
+<p>这是一个鸡生蛋的问题，解决办法是：首先构建一个不需要C库的临时gcc，称他为pass2 gcc</p>
+<p>所以流程是这样：</p>
+<ol>
+<li>编译出一个终极gcc，需要一个C库</li>
+<li>编译一个C库，需要使用pass2 gcc</li>
+<li>pass2 gcc要编译C库，需要知道C库的头文件和启动文件</li>
+</ol>
+<p>所以我们需要构建一个只有头文件和启动文件的C库，构建这个C库需要一个gcc编译器，所以我们还需要一个pass1 gcc来构建这样的一样C库，而且C库需要kernel头文件，所以流程如下：</p>
+<ol>
+<li>编译出一个终极gcc，需要一个C库</li>
+<li>编译一个C库，需要使用pass2 gcc</li>
+<li>pass2 gcc要编译C库，需要知道C库的头文件和启动文件</li>
+<li>需要pass1 gcc来构建C库头文件和启动文件，kernel 头文件</li>
+</ol>
+<p>构建pass1 gcc需要使用汇编器、链接器等，这些由binutils提供。幸好binutils不依赖其他软件，我们可以使用本地的gcc直接构建binutils，新的流程如下：</p>
+<ol>
+<li>编译出一个终极gcc，需要一个C库</li>
+<li>编译一个C库，需要使用pass2 gcc</li>
+<li>pass2 gcc要编译C库，需要知道C库的头文件和启动文件</li>
+<li>需要pass1 gcc来构建C库头文件和启动文件，kernel 头文件</li>
+<li>构建pass1 gcc需要binutils</li>
+</ol>
+<p>最后，gcc还需要一些额外的库来支持大量算术计算、编译、链接优化等，这些库互相依赖，有一定的构建顺序，所以最终的流程如下：</p>
+<ol>
+<li>编译出一个终极gcc，需要一个C库</li>
+<li>编译一个C库，需要使用pass2 gcc</li>
+<li>pass2 gcc要编译C库，需要知道C库的头文件和启动文件</li>
+<li>需要pass1 gcc来构建C库头文件和启动文件，kernel 头文件</li>
+<li>构建pass1 gcc需要binutils</li>
+<li>需要构建GMP、MPFR、MPC、PPL、ISL、CLooG 、libelf</li>
+</ol>
+<p>补充，对crosstoo-ng来说，还需要一些额外的工具来帮助构建：</p>
+<ul>
+<li>elf2flt：将gcc转换成flat bin</li>
+<li>zlib：用于压缩</li>
+<li>libiconv、gettext：本地化工具链需要</li>
+</ul>
+<h3 id="最终的构建流程"><a href="#最终的构建流程" class="headerlink" title="最终的构建流程"></a>最终的构建流程</h3><p>crosstool-ng会下载、解压所需的所有软件源码，所以按顺序进行配置、构建、安装所需的软件：</p>
+<ol>
+<li>ncurses</li>
+<li>zlib</li>
+<li>gmp</li>
+<li>mpfr</li>
+<li>isl</li>
+<li>mpc</li>
+<li>libiconv</li>
+<li>gettext</li>
+<li>binutils </li>
+<li>kernel header</li>
+<li>pass1 gcc </li>
+<li>pass2 gcc </li>
+<li>glibc</li>
+<li>终极gcc</li>
+</ol>
+<h2 id="GCC配置选项"><a href="#GCC配置选项" class="headerlink" title="GCC配置选项"></a>GCC配置选项</h2><p>这里先分析arch、cpu、tune选项，其余大部分可以再<a target="_blank" rel="noopener" href="https://gcc.gnu.org/install/configure.html%E4%B8%AD%E6%9F%A5%E7%9C%8B%EF%BC%8C%E4%BB%A5%E5%8F%8A%E5%9C%A8gcc-11.x">https://gcc.gnu.org/install/configure.html中查看，以及在gcc-11.x</a> manual 第三章gcc command options 中查看。</p>
+<p>gcc command options 是 在使用gcc编译代码时带的选项，这些选项帮助我们生成特定的机器指令。我们就从arch、cpu、tune这些选项入手，分析crosstool-ng如何配置这些选项的。</p>
+<h3 id="march"><a href="#march" class="headerlink" title="-march"></a>-march</h3><p>在manual手册的定义如下：</p>
+<blockquote>
+<p>-march&#x3D;name</p>
+<p>Specify the name of the target architecture and, optionally, one or more feature modifiers. This option has the form ‘-march&#x3D;arch{+[no]feature}*’.<br>The table below summarizes the permissible values for arch and the features<br>that they enable by default:</p>
+<table>
+<thead>
+<tr>
+<th>arch value</th>
+<th>Architecture</th>
+<th>feature Includes by default</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>‘armv8-a’</td>
+<td>armv8-a</td>
+<td>‘+fp’, ‘+simd’</td>
+</tr>
+<tr>
+<td>‘armv8.1-a’</td>
+<td>armv8.1-a</td>
+<td>‘armv8-a’, ‘+crc’, ‘+lse’, ‘+rdma’</td>
+</tr>
+<tr>
+<td>‘armv8.2-a’</td>
+<td>armv8.2-a</td>
+<td>‘armv8.1-a’</td>
+</tr>
+<tr>
+<td>‘armv8.3-a’</td>
+<td>armv8.3-a</td>
+<td>‘armv8.2-a’, ‘+pauth’</td>
+</tr>
+<tr>
+<td>‘armv8.4-a’</td>
+<td>armv8.4-a</td>
+<td>‘armv8.3-a’, ‘+flagm’, ‘+fp16fml’, ‘+dotprod’</td>
+</tr>
+<tr>
+<td>‘armv8.5-a’</td>
+<td>armv8.5-a</td>
+<td>‘armv8.4-a’, ‘+sb’, ‘+ssbs’, ‘+predres’</td>
+</tr>
+<tr>
+<td>‘armv8.6-a’</td>
+<td>armv8.6-a</td>
+<td>‘armv8.5-a’, ‘+bf16’, ‘+i8mm’</td>
+</tr>
+<tr>
+<td>‘armv8-r’</td>
+<td>armv8-r</td>
+<td>‘armv8-r’</td>
+</tr>
+</tbody></table>
+<p>The value ‘native’ is available on native AArch64 GNU&#x2F;Linux and causes the<br>compiler to pick the architecture of the host system. This option has no effect<br>if the compiler is unable to recognize the architecture of the host system,<br>The permissible values for feature are listed in the sub-section on [‘-march’ and<br>‘-mcpu’ Feature Modifiers], page 285. Where conflicting feature modifiers are<br>specified, the right-most feature is used.<br>GCC uses name to determine what kind of instructions it can emit when generating assembly code. If ‘-march’ is specified without either of ‘-mtune’ or<br>‘-mcpu’ also being specified, the code is tuned to perform well across a range of<br>target processors implementing the target architecture.</p>
+</blockquote>
+<p>简单来说就是：</p>
+<p><strong>-march指定了目标处理器的架构，GCC使用名称来决定产生特定指令集的汇编代码，如何-mtune和-mcpu没有值，那么gcc就会产生适合该系列处理器的汇编代码</strong></p>
+<p>在crosstool-ng中如图所示有其对应的选项：</p>
+<p><code>architecture level</code>的值对应于GCC命令行选项中的<code>-march</code>，只有当<code>emit assembly for cpu</code> 和<code>tune for cpu</code>不填时，这个选项才有效。</p>
+<p><img src="/image-20220715121513331.png" alt="image-20220715121513331"></p>
+<h3 id="mtune"><a href="#mtune" class="headerlink" title="-mtune"></a>-mtune</h3><p>定义如下：</p>
+<blockquote>
+<p>Specify the name of the target processor for which GCC should tune<br>the performance of the code. Permissible values for this option are:  </p>
+<p>‘generic’, ‘cortex-a35’, ‘cortex-a53’, ‘cortex-a55’, ‘cortex-a57’,<br>‘cortex-a72’, ‘cortex-a73’, ‘cortex-a75’, ‘cortex-a76’, ‘cortex-a76ae’,<br>‘cortex-a77’, ‘cortex-a65’, ‘cortex-a65ae’, ‘cortex-a34’, ‘cortex-a78’,<br>‘cortex-a78ae’, ‘cortex-a78c’, ‘ares’, ‘exynos-m1’, ‘emag’, ‘falkor’,<br>‘neoverse-512tvb’, ‘neoverse-e1’, ‘neoverse-n1’, ‘neoverse-n2’,<br>‘neoverse-v1’, ‘qdf24xx’, ‘saphira’, ‘phecda’, ‘xgene1’, ‘vulcan’,<br>‘octeontx’, ‘octeontx81’, ‘octeontx83’, ‘octeontx2’, ‘octeontx2t98’,<br>‘octeontx2t96’ ‘octeontx2t93’, ‘octeontx2f95’, ‘octeontx2f95n’,<br>‘octeontx2f95mm’, ‘a64fx’, ‘thunderx’, ‘thunderxt88’, ‘thunderxt88p1’,<br>‘thunderxt81’, ‘tsv110’, ‘thunderxt83’, ‘thunderx2t99’, ‘thunderx3t110’,<br>‘zeus’, ‘cortex-a57.cortex-a53’, ‘cortex-a72.cortex-a53’,<br>‘cortex-a73.cortex-a35’, ‘cortex-a73.cortex-a53’, ‘cortex-a75.cortex-a55’,<br>‘cortex-a76.cortex-a55’, ‘cortex-r82’, ‘cortex-x1’, ‘ampere1’, ‘native’.<br>The values ‘cortex-a57.cortex-a53’, ‘cortex-a72.cortex-a53’,<br>‘cortex-a73.cortex-a35’, ‘cortex-a73.cortex-a53’, ‘cortex-a75.cortex-a55’,<br>‘cortex-a76.cortex-a55’ specify that GCC should tune for a big.LITTLE<br>system.<br>The value ‘neoverse-512tvb’ specifies that GCC should tune for Neoverse cores<br>that (a) implement SVE and (b) have a total vector bandwidth of 512 bits per<br>cycle. In other words, the option tells GCC to tune for Neoverse cores that can<br>execute 4 128-bit Advanced SIMD arithmetic instructions a cycle and that can<br>execute an equivalent number of SVE arithmetic instructions per cycle (2 for<br>256-bit SVE, 4 for 128-bit SVE). This is more general than tuning for a specific<br>core like Neoverse V1 but is more specific than the default tuning described<br>below.<br>Additionally on native AArch64 GNU&#x2F;Linux systems the value ‘native’ tunes<br>performance to the host system. This option has no effect if the compiler is<br>unable to recognize the processor of the host system.<br>Where none of ‘-mtune&#x3D;’, ‘-mcpu&#x3D;’ or ‘-march&#x3D;’ are specified, the code is tuned<br>to perform well across a range of target processors.<br>This option cannot be suffixed by feature modifiers.  </p>
+</blockquote>
+<p><strong>简单来说就是：指定目标处理器，gcc应该优化这个处理器的代码。这些处理器可以是：</strong></p>
+<blockquote>
+<p>‘generic’, ‘cortex-a35’, ‘cortex-a53’, ‘cortex-a55’, ‘cortex-a57’,<br>‘cortex-a72’, ‘cortex-a73’, ‘cortex-a75’, ‘cortex-a76’, ‘cortex-a76ae’,<br>‘cortex-a77’, ‘cortex-a65’, ‘cortex-a65ae’, ‘cortex-a34’, ‘cortex-a78’,<br>‘cortex-a78ae’, ‘cortex-a78c’, ‘ares’, ‘exynos-m1’, ‘emag’, ‘falkor’,<br>‘neoverse-512tvb’, ‘neoverse-e1’, ‘neoverse-n1’, ‘neoverse-n2’,<br>‘neoverse-v1’, ‘qdf24xx’, ‘saphira’, ‘phecda’, ‘xgene1’, ‘vulcan’,<br>‘octeontx’, ‘octeontx81’, ‘octeontx83’, ‘octeontx2’, ‘octeontx2t98’,<br>‘octeontx2t96’ ‘octeontx2t93’, ‘octeontx2f95’, ‘octeontx2f95n’,<br>‘octeontx2f95mm’, ‘a64fx’, ‘thunderx’, ‘thunderxt88’, ‘thunderxt88p1’,<br>‘thunderxt81’, ‘tsv110’, ‘thunderxt83’, ‘thunderx2t99’, ‘thunderx3t110’,<br>‘zeus’, ‘cortex-a57.cortex-a53’, ‘cortex-a72.cortex-a53’,<br>‘cortex-a73.cortex-a35’, ‘cortex-a73.cortex-a53’, ‘cortex-a75.cortex-a55’,<br>‘cortex-a76.cortex-a55’, ‘cortex-r82’, ‘cortex-x1’, ‘ampere1’, ‘native’.<br>The values ‘cortex-a57.cortex-a53’, ‘cortex-a72.cortex-a53’,<br>‘cortex-a73.cortex-a35’, ‘cortex-a73.cortex-a53’, ‘cortex-a75.cortex-a55’,<br>‘cortex-a76.cortex-a55’ specify that GCC should tune for a big.LITTLE<br>system.</p>
+</blockquote>
+<p>在crosstool-ng的menuconfig中对应<code>tune for cpu</code></p>
+<h3 id="mcpu"><a href="#mcpu" class="headerlink" title="-mcpu"></a>-mcpu</h3><p>定义如下：</p>
+<blockquote>
+<p>-mcpu&#x3D;name<br>Specify the name of the target processor, optionally suffixed by one or more<br>feature modifiers. This option has the form ‘-mcpu&#x3D;cpu{+[no]feature}*’, where<br>the permissible values for cpu are the same as those available for ‘-mtune’. The<br>permissible values for feature are documented in the sub-section on [‘-march’<br>and ‘-mcpu’ Feature Modifiers], page 285. Where conflicting feature modifiers<br>are specified, the right-most feature is used.<br>GCC uses name to determine what kind of instructions it can emit when generating assembly code (as if by ‘-march’) and to determine the target processor<br>for which to tune for performance (as if by ‘-mtune’). Where this option is used<br>in conjunction with ‘-march’ or ‘-mtune’, those options take precedence over<br>the appropriate part of this option.<br>‘-mcpu&#x3D;neoverse-512tvb’ is special in that it does not refer to a specific core,<br>but instead refers to all Neoverse cores that (a) implement SVE and (b) have<br>a total vector bandwidth of 512 bits a cycle. Unless overridden by ‘-march’,<br>‘-mcpu&#x3D;neoverse-512tvb’ generates code that can run on a Neoverse V1 core,<br>since Neoverse V1 is the first Neoverse core with these properties. Unless overridden by ‘-mtune’, ‘-mcpu&#x3D;neoverse-512tvb’ tunes code in the same way as<br>for ‘-mtune&#x3D;neoverse-512tvb’  </p>
+</blockquote>
+<p><strong>简单来说，就是在-mtune的基础上，可以增加额外的feature，同时会覆盖-march和-mtune</strong></p>
+<p>在crosstool-ng的menuconfig中对应<code>emit assembly for cpu</code></p>
+<h3 id="feature的取值"><a href="#feature的取值" class="headerlink" title="feature的取值"></a>feature的取值</h3><p><img src="/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/8.png" alt="image-20220715133741905"></p>
+<p><img src="/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/9.png" alt="image-20220715133812235"></p>
+<p><img src="/2025/05/30/hello-world/Compiler/build_gcc_cross_compiler/10.png" alt="image-20220715133824472"></p>
+<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><p>能适应-mcpu则尽量指明，因为：</p>
+<ul>
+<li>-mcpu：指出cpu指令集，具体架构，特性</li>
+<li>-mtune：指出cpu指令集，具体架构</li>
+<li>-march：指出指令集</li>
+</ul>
+<p>优先级：</p>
+<p>-mcpu &gt; -mtune &gt; -march</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/Compiler/build_gcc_cross_compiler/" data-id="cmbcy7rgt0008t8mtbks8gplz" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/Android/read_from_Mysql/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/ARM/ARM-CortexA7/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="@[toc] 前言这篇博客将介绍使用stm32的IIC库函数开发MS5611气压计，获取气压数据和温度数据，并对数据进行补偿。过程将结合芯片手册与代码。手册下载地址：https:&#x2F;&#x2F;wws.lanzous.com&#x2F;iZDAvf6joyd代码仓库地址：https:&#x2F;&#x2F;gitee.com&#x2F;killerp&#x2F;MS5611 通信接口：IIC使用IIC接口进行数据读取。当PS脚接高电平时，7和8引脚复用为II">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/STM32/stm32_MS5611/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="@[toc] 前言这篇博客将介绍使用stm32的IIC库函数开发MS5611气压计，获取气压数据和温度数据，并对数据进行补偿。过程将结合芯片手册与代码。手册下载地址：https:&#x2F;&#x2F;wws.lanzous.com&#x2F;iZDAvf6joyd代码仓库地址：https:&#x2F;&#x2F;gitee.com&#x2F;killerp&#x2F;MS5611 通信接口：IIC使用IIC接口进行数据读取。当PS脚接高电平时，7和8引脚复用为II">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/stm32_MS5611/20200801003256676.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/stm32_MS5611/20200801003521916.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/stm32_MS5611/20200801001418430.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/stm32_MS5611/20200801001750606.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/stm32_MS5611/20200801002538713.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/stm32_MS5611/20200801002723755.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.648Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:27.078Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/STM32/stm32_MS5611/20200801003256676.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/STM32/stm32_MS5611" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/STM32/stm32_MS5611/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.648Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>@[toc]</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><strong>这篇博客将介绍使用stm32的IIC库函数开发MS5611气压计，获取气压数据和温度数据，并对数据进行补偿。过程将结合芯片手册与代码。</strong><br>手册下载地址：<a target="_blank" rel="noopener" href="https://wws.lanzous.com/iZDAvf6joyd">https://wws.lanzous.com/iZDAvf6joyd</a><br>代码仓库地址：<a target="_blank" rel="noopener" href="https://gitee.com/killerp/MS5611">https://gitee.com/killerp/MS5611</a></p>
+<h4 id="通信接口：IIC"><a href="#通信接口：IIC" class="headerlink" title="通信接口：IIC"></a>通信接口：IIC</h4><p>使用IIC接口进行数据读取。<br>当PS脚接高电平时，7和8引脚复用为IIC模式，否则为SPI模式；<br><img src="/2025/05/30/hello-world/STM32/stm32_MS5611/20200801003256676.png" alt="在这里插入图片描述">由上图，CSB接地，则CSB非就是1了。所以MS5611的地址就是0xEE;<br><img src="/2025/05/30/hello-world/STM32/stm32_MS5611/20200801003521916.png" alt="在这里插入图片描述"></p>
+<h2 id="一，MS5611的5种命令"><a href="#一，MS5611的5种命令" class="headerlink" title="一，MS5611的5种命令"></a>一，MS5611的5种命令</h2><p>MS5611仅有5种基础命令：</p>
+<h4 id="RESET-重启芯片"><a href="#RESET-重启芯片" class="headerlink" title="RESET : 重启芯片"></a>RESET : 重启芯片</h4><p>在读取PROM数据之前必须REST芯片，也就是在初始化的时候reset一下：<br>reset命令固定是0x1E;</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 重启ms5611</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">MS5611_Rest</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">	I2C_WriteByte(I2C1,MS5611_SLAVE_ADDR,MS5611_CMD_REST);</span><br><span class="line">	delay_ms(<span class="number">4</span>);</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="READ-PROM："><a href="#READ-PROM：" class="headerlink" title="READ PROM："></a>READ PROM：</h4><p><strong>读取PROM内存的数据，PROM存放8个16位数据，第一个16位数据包含工厂数据，第二到第七个数据用于补偿气压和温度。2-7的具体含义见图：</strong><br><img src="/2025/05/30/hello-world/STM32/stm32_MS5611/20200801001418430.png" alt="在这里插入图片描述"><strong>最后一个数据是CRC校验数据</strong></p>
+<h4 id="D1-D2-CONVERSION"><a href="#D1-D2-CONVERSION" class="headerlink" title="D1,D2 CONVERSION"></a>D1,D2 CONVERSION</h4><p><strong>因为传感器获得的气压数据，温度数据是模拟量，需要进行模数转换。D1,D2分别对应气压和温度的模数转换精度。支持从256到4096的转换精度，精度越大，转换时间越长，具体对应关系见图：</strong><br><img src="/2025/05/30/hello-world/STM32/stm32_MS5611/20200801001750606.png" alt="在这里插入图片描述"></p>
+<h4 id="READ-ADC-RESULT："><a href="#READ-ADC-RESULT：" class="headerlink" title="READ ADC RESULT："></a>READ ADC RESULT：</h4><p><strong>读取气压和温度模数转换后的数据，就是我们需要的数据。每次读取必须先进行模数转换后，延时一个转换时间后再发送此命令。</strong></p>
+<h2 id="二，实现代码"><a href="#二，实现代码" class="headerlink" title="二，实现代码"></a>二，实现代码</h2><h4 id="1-初始化-："><a href="#1-初始化-：" class="headerlink" title="1 初始化 ："></a>1 初始化 ：</h4><p><strong>需要重启芯片，然后读取保存PROM内8个数据，等会补偿数据时会用到</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">*  读取prom的内容</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">MS5611_init</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">	ms5611_init();</span><br><span class="line">	Ms5611_Rest();</span><br><span class="line">	I2C_ReadBytes(I2C1,MS5611_SLAVE_ADDR,MS5611_PROM_READ_0,<span class="number">2</span>,(<span class="type">unsigned</span> <span class="type">char</span> *)(ms5611_handle-&gt;reserve),MSB);</span><br><span class="line">	I2C_ReadBytes(I2C1,MS5611_SLAVE_ADDR,MS5611_PROM_READ_1,<span class="number">2</span>,(<span class="type">unsigned</span> <span class="type">char</span> *)(ms5611_handle-&gt;C),MSB);</span><br><span class="line">	I2C_ReadBytes(I2C1,MS5611_SLAVE_ADDR,MS5611_PROM_READ_2,<span class="number">2</span>,(<span class="type">unsigned</span> <span class="type">char</span> *)((ms5611_handle-&gt;C)+<span class="number">1</span>),MSB);</span><br><span class="line">	I2C_ReadBytes(I2C1,MS5611_SLAVE_ADDR,MS5611_PROM_READ_3,<span class="number">2</span>,(<span class="type">unsigned</span> <span class="type">char</span> *)((ms5611_handle-&gt;C)+<span class="number">2</span>),MSB);</span><br><span class="line">	I2C_ReadBytes(I2C1,MS5611_SLAVE_ADDR,MS5611_PROM_READ_4,<span class="number">2</span>,(<span class="type">unsigned</span> <span class="type">char</span> *)((ms5611_handle-&gt;C)+<span class="number">3</span>),MSB);</span><br><span class="line">	I2C_ReadBytes(I2C1,MS5611_SLAVE_ADDR,MS5611_PROM_READ_5,<span class="number">2</span>,(<span class="type">unsigned</span> <span class="type">char</span> *)((ms5611_handle-&gt;C)+<span class="number">4</span>),MSB);</span><br><span class="line">	I2C_ReadBytes(I2C1,MS5611_SLAVE_ADDR,MS5611_PROM_READ_6,<span class="number">2</span>,(<span class="type">unsigned</span> <span class="type">char</span> *)((ms5611_handle-&gt;C)+<span class="number">5</span>),MSB);</span><br><span class="line">	I2C_ReadBytes(I2C1,MS5611_SLAVE_ADDR,MS5611_PROM_READ_7,<span class="number">2</span>,(<span class="type">unsigned</span> <span class="type">char</span> *)(ms5611_handle-&gt;CRC),MSB);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2，读取数据"><a href="#2，读取数据" class="headerlink" title="2，读取数据"></a>2，读取数据</h4><p><strong>以读取温度数据为例，先发送转换命令，等待转换时间，再去读取3个字节的温度数据</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 读取温度 转换精度4096</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">MS5611_read_temp</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">	I2C_WriteByte(I2C1,MS5611_SLAVE_ADDR,MS5611_CMD_CONVERT_D2_4096);<span class="comment">//发送转换命令</span></span><br><span class="line">	delay_ms(<span class="number">9</span>);<span class="comment">//等待转换完成</span></span><br><span class="line">	I2C_ReadBytes(I2C1,MS5611_SLAVE_ADDR,MS6511_ADC_READ,<span class="number">3</span>,(<span class="type">unsigned</span> <span class="type">char</span> *)((ms5611_handle-&gt;D)+<span class="number">1</span>),MSB);<span class="comment">//读取三个字节的温度</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="3，补偿温度数据"><a href="#3，补偿温度数据" class="headerlink" title="3，补偿温度数据"></a>3，补偿温度数据</h4><p>计算公式来自手册，主要是为了求出P（温度补偿压力）：<br><img src="/2025/05/30/hello-world/STM32/stm32_MS5611/20200801002538713.png" alt="在这里插入图片描述"><br><strong>当温度过低时，计算过程就多了T2,OFF2等步骤：</strong><br><img src="/2025/05/30/hello-world/STM32/stm32_MS5611/20200801002723755.png" alt="在这里插入图片描述"><br><strong>代码上基本跟着手册的公式来，这里不考虑温度低于-15°的情况</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 修正气压和温度</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">MS5611_calculate</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">signed</span> <span class="type">long</span> <span class="type">long</span> dT = <span class="number">0</span>,TEMP = <span class="number">0</span>,T2 = <span class="number">0</span>,OFF = <span class="number">0</span>,OFF2 = <span class="number">0</span>,SENS2 = <span class="number">0</span>,SENS = <span class="number">0</span>;</span><br><span class="line">	</span><br><span class="line">	dT = ms5611_handle-&gt;D[<span class="number">1</span>] - ((<span class="type">signed</span> <span class="type">long</span> <span class="type">long</span>) (ms5611_handle-&gt;C[<span class="number">4</span>])&lt;&lt;<span class="number">8</span>);</span><br><span class="line">	TEMP = <span class="number">2000</span> + ((<span class="type">signed</span> <span class="type">long</span> <span class="type">long</span>) (dT*(ms5611_handle-&gt;C[<span class="number">5</span>]))&gt;&gt;<span class="number">23</span>);</span><br><span class="line">	<span class="comment">//低于20°时：</span></span><br><span class="line">	<span class="keyword">if</span>(TEMP &lt; <span class="number">2000</span> &amp;&amp; TEMP &gt; <span class="number">-1500</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		T2 = ( dT*dT )&gt;&gt;<span class="number">31</span>;</span><br><span class="line">		OFF2 = <span class="number">5</span> * (TEMP - <span class="number">2000</span>) * (TEMP - <span class="number">2000</span>) / <span class="number">2</span>;</span><br><span class="line">		SENS2 = <span class="number">5</span> * (TEMP - <span class="number">2000</span>) * (TEMP - <span class="number">2000</span>) / <span class="number">4</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	OFF = (((<span class="type">int64_t</span>)(ms5611_handle-&gt;C[<span class="number">1</span>])) &lt;&lt; <span class="number">16</span>) + (((ms5611_handle-&gt;C[<span class="number">3</span>]) * dT) &gt;&gt; <span class="number">7</span>);</span><br><span class="line">	SENS = (((<span class="type">int64_t</span>)(ms5611_handle-&gt;C[<span class="number">0</span>])) &lt;&lt; <span class="number">15</span>) + (((ms5611_handle-&gt;C[<span class="number">2</span>]) * dT) &gt;&gt; <span class="number">8</span>);</span><br><span class="line">	</span><br><span class="line">	ms5611_handle-&gt;dT = dT;</span><br><span class="line">	ms5611_handle-&gt;OFF -= OFF2;</span><br><span class="line">	ms5611_handle-&gt;TEMP -= T2;</span><br><span class="line">	ms5611_handle-&gt;SENS -= SENS2;</span><br><span class="line">	ms5611_handle-&gt;P = ((((ms5611_handle-&gt;D[<span class="number">0</span>]) * (ms5611_handle-&gt;SENS))&gt;&gt;<span class="number">21</span>) - (ms5611_handle-&gt;OFF))&gt;&gt;<span class="number">15</span>;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/STM32/stm32_MS5611/" data-id="cmbcy7rha001mt8mta0ejanyy" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/Web/Java_web_server_connect_mySQL/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/STM32/stm32_MPU6050_Mahony/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

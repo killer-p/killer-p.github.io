@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="@[toc] MQTT协议MQTT协议是一个应用层协议，他要求使用的传输层协议能提供有序的，可靠的双向字节流传输服务。 MQTT协议通信对象分为客户端和服务端，数据的传输以消息为单位，每个消息包含主题，消息服务质量和有效数据。消息的发送和接收都需要依赖主题：A订阅主题T1，B订阅主题T2，A想发送消息给B，就需要将消息发送到主题T2。 一，客户端通信双方的身份。mqtt通信双方都是客户端，消息传递">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/ESP32/ESP32_MQTT_API/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="@[toc] MQTT协议MQTT协议是一个应用层协议，他要求使用的传输层协议能提供有序的，可靠的双向字节流传输服务。 MQTT协议通信对象分为客户端和服务端，数据的传输以消息为单位，每个消息包含主题，消息服务质量和有效数据。消息的发送和接收都需要依赖主题：A订阅主题T1，B订阅主题T2，A想发送消息给B，就需要将消息发送到主题T2。 一，客户端通信双方的身份。mqtt通信双方都是客户端，消息传递">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/ESP32_MQTT_API/20210608232625443.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/ESP32_MQTT_API/20210608232657598.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/ESP32_MQTT_API/20210608234620980.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.634Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:26.962Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/ESP32/ESP32_MQTT_API/20210608232625443.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/ESP32/ESP32_MQTT_API" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/ESP32/ESP32_MQTT_API/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.634Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>@[toc]</p>
+<h2 id="MQTT协议"><a href="#MQTT协议" class="headerlink" title="MQTT协议"></a>MQTT协议</h2><p><strong>MQTT协议是一个应用层协议，他要求使用的传输层协议能提供有序的，可靠的双向字节流传输服务。</strong></p>
+<p>MQTT协议通信对象分为客户端和服务端，数据的传输以消息为单位，每个消息包含主题，消息服务质量和有效数据。消息的发送和接收都需要依赖主题：A订阅主题T1，B订阅主题T2，A想发送消息给B，就需要将消息发送到主题T2。</p>
+<h3 id="一，客户端"><a href="#一，客户端" class="headerlink" title="一，客户端"></a>一，客户端</h3><p>通信双方的身份。mqtt通信双方都是客户端，消息传递是以订阅主题的形式。</p>
+<ul>
+<li><strong>发布消息到服务端以转发到其他客户端</strong></li>
+<li><strong>订阅主题以接收其他客户端的消息</strong></li>
+<li><strong>发起连接&#x2F;断开</strong></li>
+</ul>
+<h3 id="二，服务端"><a href="#二，服务端" class="headerlink" title="二，服务端"></a>二，服务端</h3><p>作为客户端与客户端之间通信的中介。</p>
+<ul>
+<li><strong>接收客户端发布的消息</strong></li>
+<li><strong>接收客户端的连接</strong></li>
+<li><strong>转发消息给特定的客户端</strong></li>
+<li><strong>接收客户端的订阅主题请求</strong></li>
+</ul>
+<h3 id="三，消息服务质量"><a href="#三，消息服务质量" class="headerlink" title="三，消息服务质量"></a>三，消息服务质量</h3><p>消息服务质量决定了一个MQTT报文的消息应如何处理。</p>
+<ul>
+<li>qos0：<strong>客户端仅讲报文发送一次，服务端不需要应答，报文是否送达不保证。</strong></li>
+<li>qos1：<strong>客户端发送报文，服务端接收到后必须应答，超时重发。</strong></li>
+<li>qos2：<strong>客户端发送报文，服务端接收到后应答，客户端再次发送一个release报文，服务端发送该报文到指定主题下的客户端，并应答。</strong></li>
+</ul>
+<p>qos0-qos2，服务的质量逐步提高。qos2能使客户端对报文的发送有全局的掌控。qos0很不负责任，嫁出去的女儿泼出去的水，不管了。qos1还行。</p>
+<h3 id="四，主题"><a href="#四，主题" class="headerlink" title="四，主题"></a>四，主题</h3><p>MQTT主题是一个<strong>字符串</strong>，由服务端维护。客户端通过在服务端订阅主题，可接收来自该主题的消息。<strong>客户端可向该主题发送消息，所有订阅该主题的客户端都会受到该消息。实现的方式是：客户端向服务端发送带主题的消息到服务端，由服务端将消息转发给订阅该主题的客户端，所以服务端地位重要。</strong></p>
+<p>MQTT主题支持分级，如&#x2F;Home&#x2F;BathRoom&#x2F;Mirror，&#x2F;Home&#x2F;LivingRoom&#x2F;Tv，是同一等级下的主题。</p>
+<p>主题也支持通配符#，发送消息到主题 &#x2F;Home&#x2F;# 则BathRoom和LivingRoom主题下的客户端都会收到消息。</p>
+<p>主题也支持单层通配符+，&#x2F;Home&#x2F;+ 则BathRoom和LivingRoom主题下的客户端会受到消息，但&#x2F;Home&#x2F;BathRoom&#x2F;Mirror和&#x2F;Home&#x2F;LivingRoom&#x2F;Tv 不会收到消息，这点需要跟#区别。</p>
+<h3 id="五，MQTT控制报文"><a href="#五，MQTT控制报文" class="headerlink" title="五，MQTT控制报文"></a>五，MQTT控制报文</h3><p><strong>MQTT协议依靠MQTT控制报文来通信</strong><br><img src="/2025/05/30/hello-world/ESP32/ESP32_MQTT_API/20210608232625443.png" alt="在这里插入图片描述"></p>
+<h4 id="5-1-固定报头"><a href="#5-1-固定报头" class="headerlink" title="5.1 固定报头"></a>5.1 固定报头</h4><p>表示控制<strong>报文的类型</strong>，报文的一些<strong>标志位</strong>（包括消息服务质量），以及报文<strong>剩余的字节长度</strong>。</p>
+<h4 id="5-2-可变报头"><a href="#5-2-可变报头" class="headerlink" title="5.2 可变报头"></a>5.2 可变报头</h4><p>可变报头的内容跟<strong>报文类型</strong>有关。</p>
+<p>包含报文标识符，一个16bit的数据，用于<strong>唯一的标记此次通信</strong>的报文。当客户端处理完当前报文后，标识符可释放重用。qos0的消息不需要标识符，因为不需要服务端的应答。</p>
+<h4 id="5-3-有效载荷"><a href="#5-3-有效载荷" class="headerlink" title="5.3 有效载荷"></a>5.3 有效载荷</h4><p>前面都是协议规定必须的，有效载荷是真正的用户数据。不同类型的报文，有效载荷里的数据不同。</p>
+<h4 id="5-4-控制报文类型"><a href="#5-4-控制报文类型" class="headerlink" title="5.4 控制报文类型"></a>5.4 控制报文类型</h4><p>不同类型的报文，其<strong>不同点在于可变报头及有效载荷</strong>。就以这两部分看看主要的报文：</p>
+<h5 id="5-4-1-连接报文"><a href="#5-4-1-连接报文" class="headerlink" title="5.4.1 连接报文"></a>5.4.1 连接报文</h5><ul>
+<li>可变报头：包含 “使用传输层协议名”（TCP），MQTT协议等级（3.1.1）,连接标志，保持连接。</li>
+</ul>
+<p><strong>连接标志</strong>：<strong>指示有效载荷部分的内容</strong>。</p>
+<p><strong>保持连接</strong>：<strong>MQTT客户端需要在一个时间内给服务端发送心跳报文，服务端也要在规定时间内应答。由此判断通信双方是否在线。</strong></p>
+<ul>
+<li>有效载荷</li>
+</ul>
+<p>由连接标志指示其内容，出现的顺序为：**客户端标识符，遗嘱主题，遗嘱消息，**用户名，密码。</p>
+<p><strong>客户端标志</strong>：字符串，用于唯一标志一个客户端。</p>
+<p><strong>遗嘱</strong>：<strong>是一种错误补救方式，当客户端以异常方式断开连接时，服务端长时间未能联系到客户端，则服务端将该客户端的遗嘱消息发布到遗嘱主题。</strong></p>
+<p><strong>用户名和密码</strong>：字符串，用于识别客户端是否合法。</p>
+<h5 id="5-4-2-发布publish"><a href="#5-4-2-发布publish" class="headerlink" title="5.4.2 发布publish"></a>5.4.2 发布publish</h5><ul>
+<li>固定报头：<br><img src="/2025/05/30/hello-world/ESP32/ESP32_MQTT_API/20210608232657598.png" alt="在这里插入图片描述"><br><strong>DUP</strong>：<strong>重发标志，是否是一个重发的报文，qos0大咩。</strong></li>
+</ul>
+<p><strong>RETAIN</strong>:保留标志位。若为1，服务端需要在内存中保留该消息。</p>
+<ul>
+<li>可变报头：主题及报文标识符</li>
+<li>有效载荷：应用数据，一般是<strong>json字符串。</strong></li>
+</ul>
+<h5 id="5-4-3-订阅主题subscribe"><a href="#5-4-3-订阅主题subscribe" class="headerlink" title="5.4.3 订阅主题subscribe"></a>5.4.3 订阅主题subscribe</h5><p>可<strong>订阅多个主题</strong></p>
+<ul>
+<li>有效载荷：<strong>包含一个主题过滤器表示客户端要订阅的主题，消息服务质量qos</strong>。主题过滤器是一个字符串，后面跟着一个字节的消息服务质量，组成一组，一个订阅报文可包含多组这样的东西，来支持订阅多个主题。</li>
+</ul>
+<h3 id="六，安全"><a href="#六，安全" class="headerlink" title="六，安全"></a>六，安全</h3><p>安全的实现主要依赖于传输层协议，推进TLS协议服务端使用8883端口。</p>
+<p>轻量加密AES</p>
+<h2 id="ESP-MQTT-API-指南"><a href="#ESP-MQTT-API-指南" class="headerlink" title="ESP-MQTT API 指南"></a>ESP-MQTT API 指南</h2><h3 id="概括"><a href="#概括" class="headerlink" title="概括"></a>概括</h3><p>ESP-MQTT是一个MQTT协议客户端的应用程序</p>
+<h3 id="一，特性"><a href="#一，特性" class="headerlink" title="一，特性"></a>一，特性</h3><ul>
+<li>支持多种传输层协议如：TCP,SSL,Websocket,wws.</li>
+<li>使用url建立连接</li>
+<li>允许一个应用中多个客户端</li>
+<li>支持订阅，发布，认证，遗嘱，保活和3个消息质量</li>
+</ul>
+<h3 id="二，应用示例"><a href="#二，应用示例" class="headerlink" title="二，应用示例"></a>二，应用示例</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/espressif/esp-idf/tree/a921852/examples/protocols/mqtt/tcp">protocols&#x2F;mqtt.tcp</a>:使用tcp，1883 端口</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/espressif/esp-idf/tree/a921852/examples/protocols/mqtt/ssl">protocols&#x2F;mqtt&#x2F;ssl</a>:使用tcp，端口8883，比较安全</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/espressif/esp-idf/tree/a921852/examples/protocols/mqtt/ssl_psk">protocols&#x2F;mqtt&#x2F;ssl_psk</a>:使用tcp，基于公钥加密认证，端口8883</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/espressif/esp-idf/tree/a921852/examples/protocols/mqtt/ws">protocols&#x2F;mqtt&#x2F;ws</a>:使用websocket，端口80</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/espressif/esp-idf/tree/a921852/examples/protocols/mqtt/wss">protocols&#x2F;mqtt&#x2F;wss</a>:使用wss，端口443</li>
+</ul>
+<h3 id="三，初始化配置"><a href="#三，初始化配置" class="headerlink" title="三，初始化配置"></a>三，初始化配置</h3><h4 id="3-1-URI"><a href="#3-1-URI" class="headerlink" title="3.1 URI"></a>3.1 URI</h4><ul>
+<li><p>当前支持mqtt，mqtts，ws，wss方式</p>
+</li>
+<li><p>mqtt 使用tcp例子：</p>
+<ul>
+<li><code>mqtt://mqtt.eclipse.org</code>: MQTT over TCP, default port 1883</li>
+<li><code>mqtt://mqtt.eclipse.org:1884</code> MQTT over TCP, port 1884</li>
+<li><code>mqtt://username:password@mqtt.eclipse.org:1884</code> MQTT over TCP, port 1884, with username and password</li>
+</ul>
+</li>
+<li><p>MQTT over SSL samples:</p>
+<ul>
+<li><code>mqtts://mqtt.eclipse.org</code>: MQTT over SSL, port 8883</li>
+<li><code>mqtts://mqtt.eclipse.org:8884</code>: MQTT over SSL, port 8884</li>
+</ul>
+</li>
+<li><p>MQTT over Websocket samples:</p>
+<ul>
+<li><code>ws://mqtt.eclipse.org:80/mqtt</code></li>
+</ul>
+</li>
+<li><p>MQTT over Websocket Secure samples:</p>
+<ul>
+<li><code>wss://mqtt.eclipse.org:443/mqtt</code></li>
+</ul>
+</li>
+<li><p>最小配置:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">esp_mqtt_client_config_t</span> mqtt_cfg = &#123;</span><br><span class="line">    .uri = <span class="string">&quot;mqtt://mqtt.eclipse.org&quot;</span>,</span><br><span class="line">    <span class="comment">// .user_context = (void *)your_context</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="type">esp_mqtt_client_handle_t</span> client = esp_mqtt_client_init(&amp;mqtt_cfg);</span><br><span class="line"></span><br><span class="line"><span class="comment">//注册回调函数</span></span><br><span class="line">esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler, client);</span><br><span class="line">esp_mqtt_client_start(client);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><em><strong>注意，默认mqtt客户端使用事件句柄来处理mqtt的事件，如连接，订阅，发布等等。</strong></em></p>
+</li>
+</ul>
+<h4 id="3-2-SSL"><a href="#3-2-SSL" class="headerlink" title="3.2 SSL"></a>3.2 SSL</h4><h4 id="3-3-遗嘱"><a href="#3-3-遗嘱" class="headerlink" title="3.3 遗嘱"></a>3.3 遗嘱</h4><p>MQTT支持使用遗嘱消息，当客户端意外断开连接时，遗嘱消息被服务端发送并用于通知其他客户端。在 <code>esp_mqtt_client_config_t</code> 中可配置遗嘱消息：</p>
+<ul>
+<li>lwt_topic ：指向遗嘱消息的主题</li>
+<li>lwt_msg：指向遗嘱消息</li>
+<li>lwt_msg_len：消息有效载荷长度</li>
+<li>lwt_qos：消息服务质量</li>
+<li>lwt_retain：是否保留</li>
+</ul>
+<h4 id="3-4-其他配置参数"><a href="#3-4-其他配置参数" class="headerlink" title="3.4 其他配置参数"></a>3.4 其他配置参数</h4><ul>
+<li>disable_clean_session：默认清除会话，对于连接消息，该参数关闭清除会话标志</li>
+<li>keepalive：保活时间，<strong>默认120s</strong></li>
+<li>disable_auto_reconnect：关闭自动重连</li>
+<li>user_context：<strong>本地参数，用于传递到事件处理句柄</strong></li>
+<li>task_prio：<strong>mqtt任务等级，默认5</strong></li>
+<li>task_stack：<strong>mqtt堆栈默认6144 bytes，menuconfig可配置</strong></li>
+<li>buffer_size：<strong>接收和缓存的长度，默认1024 bytes</strong></li>
+<li>username：<strong>连接到broker的用户名（服务器）</strong></li>
+<li>password：<strong>连接到broker的密码（服务器）</strong></li>
+<li>client_id：<strong>指向客户端id，一般是一个唯一的字符串，可从broker中获取</strong></li>
+<li>host：<strong>MQTT broker的ip地址，域名。设置了url会重写该参数</strong></li>
+<li>port：<strong>MQTT broker的端口</strong>。设置了url会重写该参数</li>
+<li>transport：<strong>设置传输协议</strong>。设置了url会重写该参数</li>
+<li>refresh_connection_after_ms：在多少时间（ms）后刷新连接</li>
+<li>event_handle：<strong>处理mqtt事件的回调函数</strong></li>
+<li>event_loop_handle：mqtt事件组库</li>
+</ul>
+<p>更多<code>esp_mqtt_client_config_t</code>的选项，请参考下面API：</p>
+<h4 id="3-5-项目配置菜单来配置mqtt"><a href="#3-5-项目配置菜单来配置mqtt" class="headerlink" title="3.5 项目配置菜单来配置mqtt"></a>3.5 项目配置菜单来配置mqtt</h4><p>通过<code>idf.py menuconfig</code>项目配置菜单来配置mqtt，在<code>Component config -&gt; ESP-MQTT Configuration</code></p>
+<p>下面的设置是可行的：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.espressif.com/projects/esp-idf/zh_CN/release-v4.1/api-reference/kconfig.html#config-mqtt-protocol-311">CONFIG_MQTT_PROTOCOL_311</a>：使用3.1.1版本的MQTT协议</li>
+<li><a target="_blank" rel="noopener" href="https://docs.espressif.com/projects/esp-idf/zh_CN/release-v4.1/api-reference/kconfig.html#config-mqtt-transport-ssl">CONFIG_MQTT_TRANSPORT_SSL</a>, <a target="_blank" rel="noopener" href="https://docs.espressif.com/projects/esp-idf/zh_CN/release-v4.1/api-reference/kconfig.html#config-mqtt-transport-websocket">CONFIG_MQTT_TRANSPORT_WEBSOCKET</a>：选择传输层协议</li>
+<li><a target="_blank" rel="noopener" href="https://docs.espressif.com/projects/esp-idf/zh_CN/release-v4.1/api-reference/kconfig.html#config-mqtt-custom-outbox">CONFIG_MQTT_CUSTOM_OUTBOX</a>：使用本地邮箱</li>
+</ul>
+<h4 id="3-6-事件"><a href="#3-6-事件" class="headerlink" title="3.6 事件"></a>3.6 事件</h4><p>mqtt主要围绕以下事件进行数据的处理：</p>
+<ul>
+<li>MQTT_EVENT_BEFORE_CONNECT：<strong>客户端初始化完成并开始连接到broker</strong></li>
+<li>MQTT_EVENT_CONNECTED：<strong>客户端成功与broker建立连接，客户端准备好接收发送数据</strong></li>
+<li>MQTT_EVENT_DISCONNECTED：客户端由于无法接收或者发送消息而断开连接</li>
+<li>MQTT_EVENT_SUBSCRIBED：broker 确认客户端的订阅请求。保留订阅消息的id</li>
+<li>MQTT_EVENT_UNSUBSCRIBED：broker确认了客户端的取消订阅消息。保留取消订阅消息的id</li>
+<li>MQTT_EVENT_PUBLISHED：broker确认了用户发布的消息。仅对qos为1和2的消息有效，保留发布消息的id</li>
+<li>MQTT_EVENT_DATA：<strong>客户端已接收到一个发布的消息</strong>。event data包括：消息id，主题名称，数据及数据长度。若数据长度超过buffer大小，则多个MQTT_EVENT_DATA事件会被触发，<code>*current_data_offset</code>和<code>*total_data_len</code>用于保持对数据的追踪。<strong>在此可将数据读到缓存中。</strong></li>
+<li>MQTT_EVENT_ERROR：客户端遇到错误。esp_mqtt_error_type_t from error_handle in the event data 可用于判断是哪个类型的错误。</li>
+</ul>
+<h3 id="四，API参考"><a href="#四，API参考" class="headerlink" title="四，API参考"></a>四，API参考</h3><blockquote>
+<p>esp_mqtt_client_handle_t <code>esp_mqtt_client_init</code>(const esp_mqtt_client_config_t *config)</p>
+</blockquote>
+<p>根据配置创建mqtt 客户端句柄。</p>
+<blockquote>
+<p>esp_err_t esp_mqtt_client_set_uri(esp_mqtt_client_handle_t client, const char *uri);</p>
+</blockquote>
+<p>设置mqtt连接的url，这个函数通常会重写<code>esp_mqtt_client_init</code>里的配置。</p>
+<blockquote>
+<p>esp_err_t esp_mqtt_client_start(esp_mqtt_client_handle_t client);</p>
+</blockquote>
+<p>开启mqtt客户端</p>
+<blockquote>
+<p>esp_err_t esp_mqtt_client_reconnect(esp_mqtt_client_handle_t client);</p>
+</blockquote>
+<p>用于强制重新连接</p>
+<blockquote>
+<p>esp_err_t esp_mqtt_client_disconnect(esp_mqtt_client_handle_t client);</p>
+</blockquote>
+<p>用于强制从broker中断开连接</p>
+<blockquote>
+<p>esp_err_t esp_mqtt_client_stop(esp_mqtt_client_handle_t client);</p>
+</blockquote>
+<p>停止mqtt客户端任务，不能再event handle中调用。</p>
+<blockquote>
+<p>int esp_mqtt_client_subscribe(esp_mqtt_client_handle_t client, const char *topic, int qos);</p>
+</blockquote>
+<p>客户端订阅指向服务质量的主题。</p>
+<ul>
+<li><p>客户端必须已经连接，该API可被用户任务或mqtt event 回调函数调用。该API使用信号量，所以可能导致一段时间的阻塞。</p>
+</li>
+<li><p>返回：消息id</p>
+</li>
+</ul>
+<blockquote>
+<p>int esp_mqtt_client_unsubscribe(esp_mqtt_client_handle_t client, const char *topic);</p>
+</blockquote>
+<p>取消订阅指定主题</p>
+<ul>
+<li>客户端必须连接</li>
+<li>线程安全。参考上面</li>
+<li>返回：消息id</li>
+</ul>
+<blockquote>
+<p>int esp_mqtt_client_publish(esp_mqtt_client_handle_t client, const char *topic, const char *data, int len, int qos, int retain);</p>
+</blockquote>
+<p>客户端发布消息到broker</p>
+<ul>
+<li>该API可能会阻塞几秒钟（由于网络，数据长度问题）</li>
+<li>客户端不必连接</li>
+<li>线程安全</li>
+<li>返回：消息id</li>
+</ul>
+<p>参数：</p>
+<ul>
+<li>client：客户端句柄</li>
+<li>topic：主题字符串</li>
+<li>data：有效载荷字符串</li>
+<li>len：有效载荷字符串长度</li>
+<li>qos：消息服务质量</li>
+<li>retain：保留消息标志</li>
+</ul>
+<blockquote>
+<p>esp_err_t esp_mqtt_client_destroy(esp_mqtt_client_handle_t client);</p>
+</blockquote>
+<p>销毁mqtt客户端，不能再mqtt回调函数中调用</p>
+<blockquote>
+<p>esp_err_t esp_mqtt_set_config(esp_mqtt_client_handle_t client, const esp_mqtt_client_config_t *config);</p>
+</blockquote>
+<p>设置配置结构体，通常用于更新mqtt配置，再连接之前的回调事件中。</p>
+<blockquote>
+<p>esp_err_t esp_mqtt_client_register_event(esp_mqtt_client_handle_t client, esp_mqtt_event_id_t event, esp_event_handler_t event_handler, void* event_handler_arg);</p>
+</blockquote>
+<p>注册mqtt事件</p>
+<p>参数：</p>
+<ul>
+<li><p>client：</p>
+</li>
+<li><p>event：事件类型</p>
+</li>
+<li><p>event_handler:事件处理回调函数</p>
+</li>
+<li><p>event_handler_arg:事件处理回调函数传入参数</p>
+</li>
+</ul>
+<blockquote>
+<p>int esp_mqtt_client_get_outbox_size(esp_mqtt_client_handle_t client);</p>
+</blockquote>
+<p>获取邮箱大小</p>
+<h3 id="六，示例"><a href="#六，示例" class="headerlink" title="六，示例"></a>六，示例</h3><p><img src="/2025/05/30/hello-world/ESP32/ESP32_MQTT_API/20210608234620980.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/ESP32/ESP32_MQTT_API/" data-id="cmbcy7rgw000ft8mtb14mghi7" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/ESP32/ESP32A1S_asr/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/ESP32/ESP32_baidu_Lexicalanalysis/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

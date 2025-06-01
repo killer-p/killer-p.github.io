@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="考虑一个结构体 12345struct S&#123;	char a;	int b;	char c;&#125;s; 编译器按照成员列表的顺序一个个给成员分配内存，同时内存还需要满足边界对齐的要求，边界的大小就是占用内存最大的成员的大小，在这个例子中，是int类型的b，大小为4字节。所以该结构体的边界对齐要求为4字节。  编译器首先给a分配一个字节的内存 接着由于b需要占用4个字节内存，所以分配另">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/C_CPP/c_struct/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="考虑一个结构体 12345struct S&#123;	char a;	int b;	char c;&#125;s; 编译器按照成员列表的顺序一个个给成员分配内存，同时内存还需要满足边界对齐的要求，边界的大小就是占用内存最大的成员的大小，在这个例子中，是int类型的b，大小为4字节。所以该结构体的边界对齐要求为4字节。  编译器首先给a分配一个字节的内存 接着由于b需要占用4个字节内存，所以分配另">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/C_CPP/c_struct/c_struct_1.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/C_CPP/c_struct/c_struct_2.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.633Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:27.044Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/C_CPP/c_struct/c_struct_1.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/C_CPP/c_struct" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/C_CPP/c_struct/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.633Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>考虑一个结构体</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">S</span>&#123;</span></span><br><span class="line">	<span class="type">char</span> a;</span><br><span class="line">	<span class="type">int</span> b;</span><br><span class="line">	<span class="type">char</span> c;</span><br><span class="line">&#125;s;</span><br></pre></td></tr></table></figure>
+<p>编译器按照成员列表的顺序一个个给成员分配内存，同时内存还需要满足边界对齐的要求，边界的大小就是占用内存最大的成员的大小，在这个例子中，是int类型的b，大小为4字节。所以该结构体的边界对齐要求为4字节。</p>
+<ul>
+<li>编译器首先给a分配一个字节的内存</li>
+<li>接着由于b需要占用4个字节内存，所以分配另外3个字节的内存来满足对齐的要求，这三个字节的内存只起填充作用</li>
+<li>为b分配4个字节的内存</li>
+<li>最后为c分配一个字节内存，再分配额外3个字节满足对齐。<br><img src="/2025/05/30/hello-world/C_CPP/c_struct/c_struct_1.png" alt="在这里插入图片描述"><br>（绿色表示填充的内存）<br>很明显，造成了6个字节的内存浪费，合理的结构体定义应该先定义内存较大的成员：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">S</span>&#123;</span></span><br><span class="line">	<span class="type">int</span> b;</span><br><span class="line">	<span class="type">char</span> a;</span><br><span class="line">	<span class="type">char</span> c;</span><br><span class="line">&#125;s;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>编译器首先给b分配四个字节的内存</li>
+<li>接着为a分配一个字节内存</li>
+<li>由于c只占一个字节，所以给c分配一个字节内存</li>
+<li>最后为满足对齐，分配两个字节内存作为填充<br><img src="/2025/05/30/hello-world/C_CPP/c_struct/c_struct_2.png" alt="在这里插入图片描述"></li>
+</ul>
+<p>这样的结构体只占用了8个字节的内存。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/C_CPP/c_struct/" data-id="cmbcy7rgp0001t8mtbrfj4ghg" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/ESP32/ESP32_baidu_SpeechSynthesis/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/C_CPP/complie/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

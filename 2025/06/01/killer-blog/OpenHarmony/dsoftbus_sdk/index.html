@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="dsoftbus sdk架构图  123456&#x2F;foundation&#x2F;communication&#x2F;dsoftbus├── interfaces            # 接口代码├── adapter               # 适配层代码├── core                  # 核心代码├── sdk                   # 运行业务进程代码└── compon">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/OpenHarmony/dsoftbus_sdk/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="dsoftbus sdk架构图  123456&#x2F;foundation&#x2F;communication&#x2F;dsoftbus├── interfaces            # 接口代码├── adapter               # 适配层代码├── core                  # 核心代码├── sdk                   # 运行业务进程代码└── compon">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/OpenHarmony/dsoftbus_sdk/dsoftbus-architecture_zh.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.645Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:27.097Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/OpenHarmony/dsoftbus_sdk/dsoftbus-architecture_zh.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/OpenHarmony/dsoftbus_sdk" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/OpenHarmony/dsoftbus_sdk/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.645Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="dsoftbus-sdk"><a href="#dsoftbus-sdk" class="headerlink" title="dsoftbus sdk"></a>dsoftbus sdk</h2><p>架构图</p>
+<p><img src="/2025/05/30/hello-world/OpenHarmony/dsoftbus_sdk/dsoftbus-architecture_zh.png" alt="dsoftbus-architecture_zh"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/foundation/communication/dsoftbus</span><br><span class="line">├── interfaces            # 接口代码</span><br><span class="line">├── adapter               # 适配层代码</span><br><span class="line">├── core                  # 核心代码</span><br><span class="line">├── sdk                   # 运行业务进程代码</span><br><span class="line">└── components            # 依赖组件代码</span><br></pre></td></tr></table></figure>
+
+<p>组网之前，需先完成设备绑定，绑定流程参见安全子系统中说明。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//通过发布服务，来使手机能发现本设备</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">PublishService</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pkgName, <span class="type">const</span> PublishInfo *info, <span class="type">const</span> IPublishCallback *cb)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//发现其他设备的服务</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">StartDiscovery</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pkgName, <span class="type">const</span> SubscribeInfo *info, <span class="type">const</span> IDiscoveryCallback *cb)</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="发现"><a href="#发现" class="headerlink" title="发现"></a>发现</h3><p>从PublishService入手，来看软总线的实现。在interface目录下，有许多头文件，声明了许多函数给用户使用，例如int PublishService(const char *pkgName, const PublishInfo *info, const IPublishCallback *cb)；</p>
+<p>这一部分内容涉及到IPC、服务管理者samgr，在下面可以看到，主要的代码是集中在InitSoftBus，而无论发布服务还是发现动作，都是基于IPC调用来完成，所以必须深入理解IPC。</p>
+<p>该函数的定义在sdk目录下，该目录下的代码都是以进程的身份在运行，InitSoftBus函数的调用流程：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">InitSoftBus</span><br><span class="line">    AddClientPkgName	<span class="comment">//创建PkgNameInfo，并添加到g_pkgNameList</span></span><br><span class="line">    SoftBusTimerInit    <span class="comment">//创建定时器回调HandleTimeoutFun,负责执行g_timerFunList函数数组</span></span><br><span class="line">    ClientModuleInit    <span class="comment">//初始变量：g_configItems、g_observerList、g_busCenterClient</span></span><br><span class="line">        SoftbusConfigInit    <span class="comment">//设置g_configItems</span></span><br><span class="line">        EventClientInit      <span class="comment">//CreateSoftBusList创建一个g_observerList</span></span><br><span class="line">        BusCenterClientInit</span><br><span class="line">            SoftbusGetConfig    <span class="comment">//获取g_configItems[]成员</span></span><br><span class="line">            ListInit()          <span class="comment">//初始化g_busCenterClient的：joinLNNCbList、leaveLNNCbList、nodeStateCbList、timeSyncCbList</span></span><br><span class="line">            BusCenterServerProxyInit    <span class="comment">//通过某种方法请求g_serverProxy，该方法的获取时间是无法确定的，可能是需要远程回答</span></span><br><span class="line">                iUnknown = SAMGR_GetInstance()-&gt;GetDefaultFeatureApi(SOFTBUS_SERVICE);</span><br><span class="line">                <span class="keyword">if</span> (iUnknown == <span class="literal">NULL</span>) &#123;</span><br><span class="line">                    SoftBusSleepMs(WAIT_SERVER_READY_INTERVAL);</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                iUnknown-&gt;QueryInterface(iUnknown, CLIENT_PROXY_VER, (<span class="type">void</span> **)&amp;g_serverProxy);</span><br><span class="line">        DiscClientInit    <span class="comment">//创建g_discInfo</span></span><br><span class="line">            DiscServerProxyInit    <span class="comment">//代码与BusCenterServerProxyInit一样</span></span><br><span class="line">        TransClientInit    </span><br><span class="line">            g_clientSessionServerList = CreateSoftBusList()    </span><br><span class="line">            TransServerProxyInit	 <span class="comment">//代码与BusCenterServerProxyInit一样</span></span><br><span class="line">            ClientTransChannelInit    <span class="comment">//设置传输通道回调函数</span></span><br><span class="line">                cb = GetClientSessionCb();    <span class="comment">//获取g_sessionCb，定义在client_trans_session_callback.c</span></span><br><span class="line">                TransTdcManagerInit(cb)</span><br><span class="line">                    g_tcpDirectChannelInfoList = CreateSoftBusList();</span><br><span class="line">                    ClientTransTdcSetCallBack(cb)    <span class="comment">//g_sessionCb = cb</span></span><br><span class="line">                    PendingInit(PENDING_TYPE_DIRECT)    <span class="comment">//g_pendingList[type] = CreateSoftBusList()</span></span><br><span class="line">                ClientTransAuthInit(cb)    <span class="comment">//g_sessionCb = *cb;</span></span><br><span class="line">                ClinetTransProxyInit(cb)</span><br><span class="line">                    g_sessionCb = *cb;</span><br><span class="line">                    RegisterTimeoutCallback(SENDFILE_TIMER_FUN,ProxyFileTransTimerProc)    <span class="comment">//g_timerFunList[timerFunId] = callback;</span></span><br><span class="line">                ClientTransUdpMgrInit(cb)    </span><br><span class="line">                    g_sessionCb = cb;</span><br><span class="line">                    g_udpChannelMgrCb = g_udpChannelCb;</span><br><span class="line">                    g_fileListener = CreateSoftBusList();</span><br><span class="line">                    g_udpChannelMgrCb = g_udpChannelCb;</span><br><span class="line">                    g_udpChannelMgr = CreateSoftBusList();    </span><br><span class="line">            ClientTransRegLnnOffline    <span class="comment">//设置组网回调函数</span></span><br><span class="line">                RegNodeDeviceStateCbInner(<span class="string">&quot;trans&quot;</span>, &amp;g_transLnnCb);    <span class="comment">//创建NodeStateCallbackItem，并将g_transLnnCb赋值给item</span></span><br><span class="line">    ClientStubInit</span><br><span class="line">        ServerProxyInit</span><br><span class="line">            HOS_SystemInit    <span class="comment">//SAMGR_Bootstrap</span></span><br><span class="line">            g_serverProxy = GetServerProxy();</span><br><span class="line">        RegisterIpcCallback(ClientIpcInterfaceMsgHandle, <span class="number">0</span>, IPC_WAIT_FOREVER, &amp;clientIdentity, <span class="literal">NULL</span>);</span><br><span class="line">        ClientContextInit    <span class="comment">//创建g_clientCtx</span></span><br><span class="line">        SetClientIdentity(clientIdentity.handle, clientIdentity.token, clientIdentity.cookie, clientIdentity.ipcContext);   <span class="comment">//设置g_clientCtx</span></span><br><span class="line">        RegisterServerDeathCb   </span><br><span class="line">    ClientRegisterService</span><br><span class="line">        GetClientIdentity</span><br><span class="line">        RegisterService</span><br><span class="line">            IpcIoInit</span><br><span class="line">            IpcIoPushString</span><br><span class="line">            IpcIoPushSvc</span><br><span class="line">            g_serverProxy-&gt;Invoke</span><br><span class="line">    </span><br><span class="line">PublishServiceInner</span><br><span class="line">    ServerIpcPublishService</span><br><span class="line">        IpcIoInit</span><br><span class="line">        IpcIoPushString</span><br><span class="line">        IpcIoPushFlatObj</span><br><span class="line">        IpcIoPushString</span><br><span class="line">        g_serverProxy-&gt;Invoke</span><br></pre></td></tr></table></figure>
+
+<p>看看StartDiscovery有什么调用：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">InitSoftBus</span><br><span class="line"><span class="title function_">StartDiscoveryInner</span><span class="params">(packageName, info, cb)</span>;</span><br><span class="line">    g_discInfo-&gt;subscribeCb = *cb;</span><br><span class="line">    ServerIpcStartDiscovery</span><br><span class="line">        <span class="title function_">IpcIoInit</span><span class="params">(&amp;request, data, MAX_SOFT_BUS_IPC_LEN, <span class="number">0</span>)</span>;</span><br><span class="line">        IpcIoPushString(&amp;request, pkgName);</span><br><span class="line">        IpcIoPushFlatObj(&amp;request, (<span class="type">void</span>*)&amp;subscribeSerializer, <span class="keyword">sizeof</span>(SubscribeSerializer));</span><br><span class="line">        g_serverProxy-&gt;Invoke(g_serverProxy, SERVER_START_DISCOVERY, &amp;request, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h3 id="IPC的使用"><a href="#IPC的使用" class="headerlink" title="IPC的使用"></a>IPC的使用</h3><p>以ipc_lite为例吧，正好是使用小型系统,似乎是提供了一个类似于栈的结构体</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">char</span>* bufferBase;</span><br><span class="line">    <span class="type">size_t</span>* offsetsBase;</span><br><span class="line">    <span class="type">char</span>* bufferCur;</span><br><span class="line">    <span class="type">size_t</span>* offsetsCur;</span><br><span class="line">    <span class="type">size_t</span> bufferLeft;</span><br><span class="line">    <span class="type">size_t</span> offsetsLeft;</span><br><span class="line">    <span class="type">uint32_t</span> flag;</span><br><span class="line">    NDK_DL_LIST ptrFreeList;</span><br><span class="line">&#125; IpcIo;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* allocate a IpcIo, providing a stack-allocated working</span></span><br><span class="line"><span class="comment"> * buffer, size of the working buffer, and how many object</span></span><br><span class="line"><span class="comment"> * offset entries to reserve from the buffer</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoInit</span><span class="params">(IpcIo* io, <span class="type">void</span>* data, <span class="type">size_t</span> maxdata, <span class="type">size_t</span> maxobjects)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoInitFromMsg</span><span class="params">(IpcIo* io, <span class="type">const</span> <span class="type">void</span>* msg)</span>;</span><br><span class="line"><span class="type">bool</span> <span class="title function_">IpcIoAvailable</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="comment">/* Must ensure all the input is valid */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushChar</span><span class="params">(IpcIo* io, <span class="type">char</span> c)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushCharUnaligned</span><span class="params">(IpcIo* io, <span class="type">char</span> c)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushBool</span><span class="params">(IpcIo* io, <span class="type">bool</span> b)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushBoolUnaligned</span><span class="params">(IpcIo* io, <span class="type">bool</span> b)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushIntptr</span><span class="params">(IpcIo* io, <span class="type">intptr_t</span> n)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushUintptr</span><span class="params">(IpcIo* io, <span class="type">uintptr_t</span> n)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushInt8</span><span class="params">(IpcIo* io, <span class="type">int8_t</span> n)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushInt8Unaligned</span><span class="params">(IpcIo* io, <span class="type">int8_t</span> n)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushUint8</span><span class="params">(IpcIo* io, <span class="type">uint8_t</span> n)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushUint8Unaligned</span><span class="params">(IpcIo* io, <span class="type">uint8_t</span> n)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushInt16</span><span class="params">(IpcIo* io, <span class="type">int16_t</span> n)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushInt16Unaligned</span><span class="params">(IpcIo* io, <span class="type">int16_t</span> n)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushUint16</span><span class="params">(IpcIo* io, <span class="type">uint16_t</span> n)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushUint16Unaligned</span><span class="params">(IpcIo* io, <span class="type">uint16_t</span> n)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushInt32</span><span class="params">(IpcIo* io, <span class="type">int32_t</span> n)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushUint32</span><span class="params">(IpcIo* io, <span class="type">uint32_t</span> n)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushInt64</span><span class="params">(IpcIo* io, <span class="type">int64_t</span> n)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushUint64</span><span class="params">(IpcIo* io, <span class="type">uint64_t</span> n)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushFloat</span><span class="params">(IpcIo* io, <span class="type">float</span> n)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushDouble</span><span class="params">(IpcIo* io, <span class="type">double</span> n)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushString</span><span class="params">(IpcIo* io, <span class="type">const</span> <span class="type">char</span>* cstr)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushFlatObj</span><span class="params">(IpcIo* io, <span class="type">const</span> <span class="type">void</span>* obj, <span class="type">uint32_t</span> size)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushSvc</span><span class="params">(IpcIo* io, <span class="type">const</span> SvcIdentity* svc)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushFd</span><span class="params">(IpcIo* io, <span class="type">uint32_t</span> fd)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushDataBuff</span><span class="params">(IpcIo* io, <span class="type">const</span> BuffPtr* dataBuff)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoPushDataBuffWithFree</span><span class="params">(IpcIo* io, <span class="type">const</span> BuffPtr* dataBuff, IpcIoPtrFree ipcIoFree)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">IpcIoFreeDataBuff</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">char</span> <span class="title function_">IpcIoPopChar</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">char</span> <span class="title function_">IpcIoPopCharUnaligned</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">bool</span> <span class="title function_">IpcIoPopBool</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">bool</span> <span class="title function_">IpcIoPopBoolUnaligned</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">intptr_t</span> <span class="title function_">IpcIoPopIntptr</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">uintptr_t</span> <span class="title function_">IpcIoPopUintptr</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">int8_t</span> <span class="title function_">IpcIoPopInt8</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">int8_t</span> <span class="title function_">IpcIoPopInt8Unaligned</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">uint8_t</span> <span class="title function_">IpcIoPopUint8</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">uint8_t</span> <span class="title function_">IpcIoPopUint8Unaligned</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">int16_t</span> <span class="title function_">IpcIoPopInt16</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">int16_t</span> <span class="title function_">IpcIoPopInt16Unaligned</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">uint16_t</span> <span class="title function_">IpcIoPopUint16</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">uint16_t</span> <span class="title function_">IpcIoPopUint16Unaligned</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">int32_t</span> <span class="title function_">IpcIoPopInt32</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">uint32_t</span> <span class="title function_">IpcIoPopUint32</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">int64_t</span> <span class="title function_">IpcIoPopInt64</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">uint64_t</span> <span class="title function_">IpcIoPopUint64</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">float</span> <span class="title function_">IpcIoPopFloat</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">double</span> <span class="title function_">IpcIoPopDouble</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">uint8_t</span>* <span class="title function_">IpcIoPopString</span><span class="params">(IpcIo* io, <span class="type">size_t</span>* sz)</span>;</span><br><span class="line"><span class="type">void</span>* <span class="title function_">IpcIoPopFlatObj</span><span class="params">(IpcIo* io, <span class="type">uint32_t</span>* size)</span>;</span><br><span class="line">SvcIdentity* <span class="title function_">IpcIoPopSvc</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"><span class="type">int32_t</span> <span class="title function_">IpcIoPopFd</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line">BuffPtr* <span class="title function_">IpcIoPopDataBuff</span><span class="params">(IpcIo* io)</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>以上都好理解，往栈里填充数据后。要如何处理，在以上发现：IClientProxy static IClientProxy *g_serverProxy;这个对象,应该就是通过这个proxy来给服务端发送请求的。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g_serverProxy-&gt;Invoke(g_serverProxy, SERVER_START_DISCOVERY, &amp;request, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br></pre></td></tr></table></figure>
+<p>IClientProxy的获取方式很容易看出来就是：通过samgr获取SOFTBUS_SERVICE，和官网的说明是一样的。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">iUnknown = SAMGR_GetInstance()-&gt;GetDefaultFeatureApi(SOFTBUS_SERVICE);</span><br><span class="line"><span class="keyword">if</span> (iUnknown == <span class="literal">NULL</span>) &#123;</span><br><span class="line">    SoftBusSleepMs(WAIT_SERVER_READY_INTERVAL);</span><br><span class="line">    <span class="keyword">continue</span>;</span><br><span class="line">&#125;</span><br><span class="line">iUnknown-&gt;QueryInterface(iUnknown, CLIENT_PROXY_VER, (<span class="type">void</span> **)&amp;g_serverProxy);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>好家伙，终于找到你的定义了:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief Defines the client proxy object.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * This object is used for the IPC with the server. \n</span></span><br><span class="line"><span class="comment"> * If you want to use the same invocation mode as that on the server, create an object inherited</span></span><br><span class="line"><span class="comment"> * from &#123;@code IClientProxy&#125; and implement serialization.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @since 1.0</span></span><br><span class="line"><span class="comment"> * @version 1.0</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">IClientProxy</span> &#123;</span></span><br><span class="line">    <span class="comment">/** Inherites the &lt;b&gt;IUnknown&lt;/b&gt; base class. */</span></span><br><span class="line">    INHERIT_IUNKNOWN;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * @brief Sends an IPC message from the client to the &lt;b&gt;IServerProxy&lt;/b&gt;.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * This function is used for IPC. \n</span></span><br><span class="line"><span class="comment">     * The passed &lt;b&gt;proxy&lt;/b&gt; is used to obtain the server information. Then, &lt;b&gt;request&lt;/b&gt;</span></span><br><span class="line"><span class="comment">     * carries the request message to be sent to the server and processed by the function specified</span></span><br><span class="line"><span class="comment">     * by &lt;b&gt;funcId&lt;/b&gt;. &lt;b&gt;notify&lt;/b&gt; is a callback function used to process the response message. \n</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * @param proxy Indicates the pointer of the client proxy object.</span></span><br><span class="line"><span class="comment">     * @param funcId Indicates the ID of the function implemented on the server.</span></span><br><span class="line"><span class="comment">     * @param request Indicates the pointer to the serialized request message.</span></span><br><span class="line"><span class="comment">     * @param owner Indicates the receiver (generics type) of the response message.</span></span><br><span class="line"><span class="comment">     * @param notify Indicates the callback function that notifies the client of the response</span></span><br><span class="line"><span class="comment">     * message.</span></span><br><span class="line"><span class="comment">     * @return Returns &lt;b&gt;EC_SUCCESS&lt;/b&gt; if the IPC message is sent successfully; returns other</span></span><br><span class="line"><span class="comment">     * error codes if the message fails to be sent.</span></span><br><span class="line"><span class="comment">     * @since 1.0</span></span><br><span class="line"><span class="comment">     * @version 1.0</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">int</span> (*Invoke)(IClientProxy *proxy, <span class="type">int</span> funcId, IpcIo *request, IOwner owner, INotify notify);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>我猜测一下，IPC为了实现进程间的函数调用，需要模仿进程内的函数调用，而函数调用会使用到栈，所以IpcIoInit()得到的是一个特俗的栈，这个栈可以跨进程使用，在栈中填入参数，调用IClientProxy()就是类似<br>于函数调用，那么同理，返回值也是跟着栈一起返回，那么进程间如何同步呢？</p>
+<p>所以可以猜测 <code>g_serverProxy-&gt;Invoke(g_serverProxy, SERVER_START_DISCOVERY, &amp;request, NULL, NULL);</code></p>
+<p>就是调用服务，执行start函数，函数的参数在request，不需要返回值。</p>
+<h3 id="传输"><a href="#传输" class="headerlink" title="传输"></a>传输</h3><p>大胆地猜测，sdk目录下的实现应该都不是很复杂，都是通过IPC去调用服务</p>
+<p>以OpenSession为例,这次设置了回调函数，在函数里保存了返回值</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ClientAddSession</span><br><span class="line">    CreateNewSession</span><br><span class="line">    AddSession</span><br><span class="line">ServerIpcOpenSession</span><br><span class="line">    IpcIoInit</span><br><span class="line">    IpcIoPushString</span><br><span class="line">    g_serverProxy-&gt;Invoke</span><br><span class="line">ClientSetChannelBySessionId</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="组网"><a href="#组网" class="headerlink" title="组网"></a>组网</h3><p>必须用JoinLNN来分析分析，果然也是使用ipc调用服务端。所以接下来我们将重点分析服务的实现。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int32_t</span> <span class="title function_">JoinLNN</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pkgName, ConnectionAddr *target, OnJoinLNNResult cb)</span>;</span><br><span class="line"></span><br><span class="line">CommonInit</span><br><span class="line"><span class="title function_">JoinLNNInner</span><span class="params">(cb)</span></span><br><span class="line">    <span class="title function_">FindJoinLNNCbItem</span><span class="params">(target, cb)</span></span><br><span class="line">    <span class="title function_">ServerIpcJoinLNN</span><span class="params">(pkgName, target, <span class="keyword">sizeof</span>(*target))</span>;</span><br><span class="line">        IpcIoInit</span><br><span class="line">        IpcIoInit</span><br><span class="line">        g_serverProxy-&gt;Invoke</span><br><span class="line">    <span class="title function_">AddJoinLNNCbItem</span><span class="params">(target, cb)</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/OpenHarmony/dsoftbus_sdk/" data-id="cmbcy7rho002ot8mtgurc4ivz" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/OpenHarmony/bearpi_pwm_driver/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/OpenHarmony/Input_framework_key_base_on_micro/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

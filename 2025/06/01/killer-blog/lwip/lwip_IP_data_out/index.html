@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="@[toc] 一，导读lwip提供接口给传输层，使传输层能将数据传递给ip层。本章介绍该接口函数如何实现将传输层的数据封装成ip数据报，并将数据报发送出去。 二，源码分析运输层，以TCP协议为例，调用ip_output_if()将tcp数据报传递给ip层，ip_output_if()会根据目的ip选择不同ip版本发送函数。 1，ipv4输出若目的ip是ipv4，则使用以下函数发送。 该函数将上层数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/lwip/lwip_IP_data_out/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="@[toc] 一，导读lwip提供接口给传输层，使传输层能将数据传递给ip层。本章介绍该接口函数如何实现将传输层的数据封装成ip数据报，并将数据报发送出去。 二，源码分析运输层，以TCP协议为例，调用ip_output_if()将tcp数据报传递给ip层，ip_output_if()会根据目的ip选择不同ip版本发送函数。 1，ipv4输出若目的ip是ipv4，则使用以下函数发送。 该函数将上层数">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/lwip/lwip_IP_data_out/20201225002927134.jpg">
+<meta property="article:published_time" content="2025-06-01T00:24:26.653Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:26.749Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/lwip/lwip_IP_data_out/20201225002927134.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/lwip/lwip_IP_data_out" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/lwip/lwip_IP_data_out/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.653Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>@[toc]</p>
+<h2 id="一，导读"><a href="#一，导读" class="headerlink" title="一，导读"></a>一，导读</h2><p>lwip提供接口给传输层，使传输层能将数据传递给ip层。本章介绍该接口函数如何实现将传输层的数据封装成ip数据报，并将数据报发送出去。</p>
+<h2 id="二，源码分析"><a href="#二，源码分析" class="headerlink" title="二，源码分析"></a>二，源码分析</h2><p>运输层，以TCP协议为例，调用ip_output_if()将tcp数据报传递给ip层，ip_output_if()会根据目的ip选择不同ip版本发送函数。</p>
+<h3 id="1，ipv4输出"><a href="#1，ipv4输出" class="headerlink" title="1，ipv4输出"></a>1，ipv4输出</h3><p>若目的ip是ipv4，则使用以下函数发送。</p>
+<p><strong>该函数将上层数据报封装成ip数据，并填充ip首部，调用网络接口的发送函数发送数据。</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//通过netif输出ip数据报 pbuf</span></span><br><span class="line"><span class="type">err_t</span> <span class="title function_">ip4_output_if_src</span><span class="params">(<span class="keyword">struct</span> pbuf *p, <span class="type">const</span> <span class="type">ip4_addr_t</span> *src, <span class="type">const</span> <span class="type">ip4_addr_t</span> *dest,</span></span><br><span class="line"><span class="params">             <span class="type">u8_t</span> ttl, <span class="type">u8_t</span> tos,</span></span><br><span class="line"><span class="params">             <span class="type">u8_t</span> proto, <span class="keyword">struct</span> netif *netif)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">ip_hdr</span> *<span class="title">iphdr</span>;</span></span><br><span class="line">  <span class="type">ip4_addr_t</span> dest_addr;</span><br><span class="line">  <span class="type">u32_t</span> chk_sum = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//目的ip地址不在pbuf中</span></span><br><span class="line">  <span class="keyword">if</span> (dest != LWIP_IP_HDRINCL) &#123;</span><br><span class="line">    <span class="type">u16_t</span> ip_hlen = IP_HLEN;  <span class="comment">//ip首部长度20字节</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//pbuf的payload前移20字节作为ip首部</span></span><br><span class="line">    <span class="keyword">if</span> (pbuf_header(p, IP_HLEN)) &#123;</span><br><span class="line">	  <span class="comment">//移动失败 返回</span></span><br><span class="line">      <span class="keyword">return</span> ERR_BUF;</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">    iphdr = (<span class="keyword">struct</span> ip_hdr *)p-&gt;payload;  <span class="comment">//payload指向ip首部，接下来要填充ip首部</span></span><br><span class="line"></span><br><span class="line">    IPH_TTL_SET(iphdr, ttl);  <span class="comment">//设置ip存活时间</span></span><br><span class="line">    IPH_PROTO_SET(iphdr, proto);  <span class="comment">//协议类型</span></span><br><span class="line"></span><br><span class="line">    chk_sum += PP_NTOHS(proto | (ttl &lt;&lt; <span class="number">8</span>));  <span class="comment">//校验和</span></span><br><span class="line"></span><br><span class="line">    ip4_addr_copy(iphdr-&gt;dest, *dest);  <span class="comment">//填充目的ip</span></span><br><span class="line">	<span class="comment">//更新校验和</span></span><br><span class="line">    chk_sum += ip4_addr_get_u32(&amp;iphdr-&gt;dest) &amp; <span class="number">0xFFFF</span>;</span><br><span class="line">    chk_sum += ip4_addr_get_u32(&amp;iphdr-&gt;dest) &gt;&gt; <span class="number">16</span>;</span><br><span class="line"></span><br><span class="line">    IPH_VHL_SET(iphdr, <span class="number">4</span>, ip_hlen / <span class="number">4</span>); <span class="comment">//填充版本号和首部长度</span></span><br><span class="line">    IPH_TOS_SET(iphdr, tos);  <span class="comment">//设置服务类型</span></span><br><span class="line"></span><br><span class="line">    chk_sum += PP_NTOHS(tos | (iphdr-&gt;_v_hl &lt;&lt; <span class="number">8</span>));</span><br><span class="line"></span><br><span class="line">    IPH_LEN_SET(iphdr, lwip_htons(p-&gt;tot_len));</span><br><span class="line"></span><br><span class="line">    chk_sum += iphdr-&gt;_len;</span><br><span class="line"></span><br><span class="line">    IPH_OFFSET_SET(iphdr, <span class="number">0</span>); <span class="comment">//设置第一个分片的片偏移量0</span></span><br><span class="line">    IPH_ID_SET(iphdr, lwip_htons(ip_id)); <span class="comment">//填充标志位</span></span><br><span class="line"></span><br><span class="line">    chk_sum += iphdr-&gt;_id;</span><br><span class="line"></span><br><span class="line">    ++ip_id;  <span class="comment">//ip_id更新，ip_id用于填充ip数据报的id字段，每个ip数据报不一样</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//填充源ip地址</span></span><br><span class="line">    <span class="keyword">if</span> (src == <span class="literal">NULL</span>) &#123;</span><br><span class="line">      <span class="comment">//若src是null，使用0.0.0.0 广播地址？</span></span><br><span class="line">      ip4_addr_copy(iphdr-&gt;src, *IP4_ADDR_ANY4);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="comment">//否则复制输入的源ip</span></span><br><span class="line">      ip4_addr_copy(iphdr-&gt;src, *src);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//计算校验和</span></span><br><span class="line">    chk_sum += ip4_addr_get_u32(&amp;iphdr-&gt;src) &amp; <span class="number">0xFFFF</span>;</span><br><span class="line">    chk_sum += ip4_addr_get_u32(&amp;iphdr-&gt;src) &gt;&gt; <span class="number">16</span>;</span><br><span class="line">    chk_sum = (chk_sum &gt;&gt; <span class="number">16</span>) + (chk_sum &amp; <span class="number">0xFFFF</span>);</span><br><span class="line">    chk_sum = (chk_sum &gt;&gt; <span class="number">16</span>) + chk_sum;</span><br><span class="line">    chk_sum = ~chk_sum;</span><br><span class="line">    IF__NETIF_CHECKSUM_ENABLED(netif, NETIF_CHECKSUM_GEN_IP) &#123;</span><br><span class="line">      iphdr-&gt;_chksum = (<span class="type">u16_t</span>)chk_sum; <span class="comment">/* network order */</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    IF__NETIF_CHECKSUM_ENABLED(netif, NETIF_CHECKSUM_GEN_IP) &#123;</span><br><span class="line">      IPH_CHKSUM_SET(iphdr, inet_chksum(iphdr, ip_hlen));</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">//ip首部已经在pbuf中</span></span><br><span class="line">    iphdr = (<span class="keyword">struct</span> ip_hdr *)p-&gt;payload;</span><br><span class="line">    ip4_addr_copy(dest_addr, iphdr-&gt;dest);</span><br><span class="line">    dest = &amp;dest_addr;	<span class="comment">//获取目的ip</span></span><br><span class="line">  </span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//若发送的数据长度大于网络接口支持的最大长度，则进行ip分片</span></span><br><span class="line">  <span class="keyword">if</span> (netif-&gt;mtu &amp;&amp; (p-&gt;tot_len &gt; netif-&gt;mtu)) &#123;</span><br><span class="line">    <span class="keyword">return</span> ip4_frag(p, netif, dest);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> netif-&gt;output(netif, p, dest); <span class="comment">//调用网络接口的发送函数（链路层）</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上述代码中需要注意的是<strong>当tcp层进行报文重传时，传递下来的数据是一个之前封装完成的ip数据，所以直接调用接口发送函数就行。dest为null时，说明这是一个重传的报文。</strong></p>
+<h3 id="2，ip数据分片发送"><a href="#2，ip数据分片发送" class="headerlink" title="2，ip数据分片发送"></a>2，ip数据分片发送</h3><p>ip层发送的分组大小是受接口的最大数据帧限制的。若发送的ip数据大于接口最大数据帧长度(mtu)，需要将ip数据进行分片发送。</p>
+<p>在lwip中，ip4_frag()完成该功能。</p>
+<p>在开始代码前，需要先认识一位新朋友，结构体 <code>pbuf_custom_ref</code> 它两个成员，pc是它本身的pbuf，original是它所引用的pbuf，pc的payload指向original的数据区。使用这个结构体是为了避免在分片时对输入的pbuf链进行复制。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pbuf_custom_ref</span> &#123;</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">pbuf_custom</span> <span class="title">pc</span>;</span>  <span class="comment">//本地的pbuf</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">pbuf</span> *<span class="title">original</span>;</span>  <span class="comment">//引用的pbuf</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><strong>分片过程如下图</strong><br><img src="/2025/05/30/hello-world/lwip/lwip_IP_data_out/20201225002927134.jpg" alt="在这里插入图片描述"><br><strong>该函数所做的就是上图所示。把输入的pbuf链中切割成等长的分片，再将分片通过接口的发送函数neitif-&gt;output()发送出去。</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">err_t</span> <span class="title function_">ip4_frag</span><span class="params">(<span class="keyword">struct</span> pbuf *p, <span class="keyword">struct</span> netif *netif, <span class="type">const</span> <span class="type">ip4_addr_t</span> *dest)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">pbuf</span> *<span class="title">rambuf</span>;</span>  <span class="comment">//分片的第一个pbuf</span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> !LWIP_NETIF_TX_SINGLE_PBUF</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">pbuf</span> *<span class="title">newpbuf</span>;</span></span><br><span class="line">  <span class="type">u16_t</span> newpbuflen = <span class="number">0</span>;</span><br><span class="line">  <span class="type">u16_t</span> left_to_copy; <span class="comment">//一个分片中需要复制的数据</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">ip_hdr</span> *<span class="title">original_iphdr</span>;</span>  <span class="comment">//第一个分片ip首部</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">ip_hdr</span> *<span class="title">iphdr</span>;</span>	</span><br><span class="line">  <span class="type">const</span> <span class="type">u16_t</span> nfb = (netif-&gt;mtu - IP_HLEN) / <span class="number">8</span>; <span class="comment">//分片中允许最大数据量</span></span><br><span class="line">  <span class="type">u16_t</span> left, fragsize; <span class="comment">//left：剩下未复制的数据，fragsize：分片大小</span></span><br><span class="line">  <span class="type">u16_t</span> ofo;  <span class="comment">//分片偏移量</span></span><br><span class="line">  <span class="type">int</span> last; <span class="comment">//最后一个分片标志</span></span><br><span class="line">  <span class="type">u16_t</span> poff = IP_HLEN; <span class="comment">//数据在pbuf中的偏移（ip数据第一个pbuf的poff为20，其余为0）</span></span><br><span class="line">  <span class="type">u16_t</span> tmp;  <span class="comment">//offset偏移字段（3位标志+13位分片偏移量）</span></span><br><span class="line"></span><br><span class="line">  original_iphdr = (<span class="keyword">struct</span> ip_hdr *)p-&gt;payload; <span class="comment">//指向当前ip数据首部</span></span><br><span class="line">  iphdr = original_iphdr;</span><br><span class="line">  </span><br><span class="line">  tmp = lwip_ntohs(IPH_OFFSET(iphdr));  <span class="comment">//暂存第一个分片offset字段 </span></span><br><span class="line">  ofo = tmp &amp; IP_OFFMASK; <span class="comment">//得到分片偏移量 应该是0？</span></span><br><span class="line"> </span><br><span class="line">  left = p-&gt;tot_len - IP_HLEN;  <span class="comment">//待发送的数据长度</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">//将数据分片并发送</span></span><br><span class="line">  <span class="keyword">while</span> (left) &#123;</span><br><span class="line"></span><br><span class="line">    fragsize = LWIP_MIN(left, nfb * <span class="number">8</span>); <span class="comment">//计算当前分片有效数据大小</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//申请一个ram类型pbuf，其包含链路层的首部和ip首部，作为分片的第一个pbuf</span></span><br><span class="line">    rambuf = pbuf_alloc(PBUF_LINK, IP_HLEN, PBUF_RAM);  </span><br><span class="line">    <span class="keyword">if</span> (rambuf == <span class="literal">NULL</span>) &#123;</span><br><span class="line">      <span class="keyword">goto</span> memerr;</span><br><span class="line">    &#125;</span><br><span class="line">   </span><br><span class="line">    SMEMCPY(rambuf-&gt;payload, original_iphdr, IP_HLEN);  <span class="comment">//将源ip的首部复制到rambuf的payload，ranbuf是一个链路层的数据包了</span></span><br><span class="line">    iphdr = (<span class="keyword">struct</span> ip_hdr *)rambuf-&gt;payload; <span class="comment">//现在修改iphdr，使其指向第一个分片首部</span></span><br><span class="line"></span><br><span class="line">    left_to_copy = fragsize;	<span class="comment">//需要复制的数据大小等于当前分片有效数据的大小</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//使用pbuf链填充ip分片，该pbuf链引用了原pbuf</span></span><br><span class="line">    <span class="keyword">while</span> (left_to_copy) &#123;</span><br><span class="line">      <span class="class"><span class="keyword">struct</span> <span class="title">pbuf_custom_ref</span> *<span class="title">pcr</span>;</span>  <span class="comment">//此类型pbuf引用其他pbuf</span></span><br><span class="line">      <span class="type">u16_t</span> plen = p-&gt;len - poff; <span class="comment">//当复制第一个pbuf时，plen=p-&gt;len-20，否则plen=p-&gt;len</span></span><br><span class="line">      newpbuflen = LWIP_MIN(left_to_copy, plen);</span><br><span class="line">   </span><br><span class="line">      <span class="keyword">if</span> (!newpbuflen) &#123;  <span class="comment">//plen=0，要复制的pbuf的数据为0，跳过它</span></span><br><span class="line">        poff = <span class="number">0</span>;</span><br><span class="line">        p = p-&gt;next;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">//申请一个ref的pbuf</span></span><br><span class="line">      pcr = ip_frag_alloc_pbuf_custom_ref();</span><br><span class="line">      <span class="keyword">if</span> (pcr == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        pbuf_free(rambuf);</span><br><span class="line">        <span class="keyword">goto</span> memerr;</span><br><span class="line">      &#125;</span><br><span class="line">   </span><br><span class="line">      <span class="comment">//将p中newpbuflen长度的数据复制到pcr-&gt;pc的pbuf（pcr-&gt;pc的pbuf的payload指向ip数据）</span></span><br><span class="line">      newpbuf = pbuf_alloced_custom(PBUF_RAW, newpbuflen, PBUF_REF, &amp;pcr-&gt;pc,</span><br><span class="line">        (<span class="type">u8_t</span>*)p-&gt;payload + poff, newpbuflen);</span><br><span class="line">      <span class="comment">//此时，newbuf指向pcr-&gt;pc，newbuf的payload指向p的一段数据</span></span><br><span class="line">      <span class="keyword">if</span> (newpbuf == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        ip_frag_free_pbuf_custom_ref(pcr);</span><br><span class="line">        pbuf_free(rambuf);</span><br><span class="line">        <span class="keyword">goto</span> memerr;</span><br><span class="line">      &#125;</span><br><span class="line">      pbuf_ref(p);  <span class="comment">//p的引用次数++</span></span><br><span class="line">      pcr-&gt;original = p;  <span class="comment">//pcr的源pbuf指向p</span></span><br><span class="line">      pcr-&gt;pc.custom_free_function = ipfrag_free_pbuf_custom; <span class="comment">//初始化pbuf_custom_ref释放函数</span></span><br><span class="line"></span><br><span class="line">      pbuf_cat(rambuf, newpbuf);  <span class="comment">//将newpbuf插入rambuf链表尾</span></span><br><span class="line">      left_to_copy -= newpbuflen; <span class="comment">//更新接下来需要复制的数据量</span></span><br><span class="line">      <span class="keyword">if</span> (left_to_copy) &#123; <span class="comment">//若还有数据需要复制</span></span><br><span class="line">        poff = <span class="number">0</span>; <span class="comment">//p的偏移应该为0，因为除了第一个p的payload中包含首部，其余的pbuf的payload中全是数据（看图）</span></span><br><span class="line">        p = p-&gt;next;  <span class="comment">//接着复制下一个pbuf</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//填充完一个分片，此时pbuf的偏移为newpbuflen。</span></span><br><span class="line">    poff += newpbuflen;</span><br><span class="line">	<span class="comment">//是否是最后最后一个分片</span></span><br><span class="line">    last = (left &lt;= netif-&gt;mtu - IP_HLEN);</span><br><span class="line">	<span class="comment">//设置offset字段</span></span><br><span class="line">    tmp = (IP_OFFMASK &amp; (ofo));</span><br><span class="line">    <span class="keyword">if</span> (!last) &#123;</span><br><span class="line">      tmp = tmp | IP_MF;  <span class="comment">//不是最后一个分片，设置标志位</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//填充当前分片的首部</span></span><br><span class="line">    IPH_OFFSET_SET(iphdr, lwip_htons(tmp));</span><br><span class="line">    IPH_LEN_SET(iphdr, lwip_htons(fragsize + IP_HLEN));</span><br><span class="line">    IPH_CHKSUM_SET(iphdr, <span class="number">0</span>);</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> CHECKSUM_GEN_IP</span></span><br><span class="line">    IF__NETIF_CHECKSUM_ENABLED(netif, NETIF_CHECKSUM_GEN_IP) &#123;</span><br><span class="line">      IPH_CHKSUM_SET(iphdr, inet_chksum(iphdr, IP_HLEN)); <span class="comment">//由首部计算校验和</span></span><br><span class="line">    &#125;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span> <span class="comment">/* CHECKSUM_GEN_IP */</span></span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//网络接口输出分片</span></span><br><span class="line">    netif-&gt;output(netif, rambuf, dest);</span><br><span class="line">    </span><br><span class="line">    pbuf_free(rambuf);  <span class="comment">//释放pbuf</span></span><br><span class="line">    left -= fragsize; <span class="comment">//更新剩下的未发送的数据</span></span><br><span class="line">    ofo += nfb; <span class="comment">//更新分片的片偏移（分片偏移量增加一个分片的长度）</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> ERR_OK;</span><br><span class="line">memerr:</span><br><span class="line">  MIB2_STATS_INC(mib2.ipfragfails);</span><br><span class="line">  <span class="keyword">return</span> ERR_MEM;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="3，ipv6输出"><a href="#3，ipv6输出" class="headerlink" title="3，ipv6输出"></a>3，ipv6输出</h3>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/lwip/lwip_IP_data_out/" data-id="cmbcy7rht0033t8mt91mj6b2w" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/lwip/lwip_IP_data_in_2/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/lwip/lwip_TCP/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="@[toc] 一、编译步骤简介一个.c文件，是如何“变成一个”可执行文件呢。以main.c为例，如何得到main?你会回答是通过编译器的编译后输出来的，就像以下命令： 1gcc main.c -o main gcc是一个集合了编译器，链接器，将一个输入的C文件变成可执行文件，这需要经过预编译（prepressing）、编译（compilation）、汇编（assernbly）、链接（linking">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/C_CPP/complie/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="@[toc] 一、编译步骤简介一个.c文件，是如何“变成一个”可执行文件呢。以main.c为例，如何得到main?你会回答是通过编译器的编译后输出来的，就像以下命令： 1gcc main.c -o main gcc是一个集合了编译器，链接器，将一个输入的C文件变成可执行文件，这需要经过预编译（prepressing）、编译（compilation）、汇编（assernbly）、链接（linking">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="http://example.com/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="http://example.com/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="http://example.com/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="http://example.com/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBAa2lsbGVyLXA=,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="http://example.com/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBAa2lsbGVyLXA=,size_16,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="http://example.com/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBAa2lsbGVyLXA=,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="article:published_time" content="2025-06-01T00:24:26.633Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:27.039Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/C_CPP/complie" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/C_CPP/complie/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.633Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>@[toc]</p>
+<h2 id="一、编译步骤简介"><a href="#一、编译步骤简介" class="headerlink" title="一、编译步骤简介"></a>一、编译步骤简介</h2><p>一个.c文件，是如何“变成一个”可执行文件呢。以main.c为例，如何得到main?你会回答是通过编译器的编译后输出来的，就像以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc main.c -o main</span><br></pre></td></tr></table></figure>
+<p>gcc是一个集合了编译器，链接器，将一个输入的C文件变成可执行文件，这需要经过预编译（prepressing）、编译（compilation）、汇编（assernbly）、链接（linking）四个步骤。本文就介绍这四个步骤主要做了啥。</p>
+<p>如图，整个编译过程的大概就是这么个情况：<br><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<ol>
+<li><strong>预编译</strong>：main.c首先进入预编译处理器，该部分处理以“#”开始的预编译指令，如#include、宏展开等，并删除注释，添加行号，方便调试打印程序，生成main.i文件。</li>
+<li><strong>词法分析</strong>：词法分析器处理main.i文件。将字符串切割成一个个记号（mark），例如：sum&#x3D;2+1;会产生五个记号：“sum”、“&#x3D;”、“2”、“+”、“1”。</li>
+<li><strong>语法分析</strong>：语法分析器将产生的记号组织成一个个表达式，以表达式为节点，组织成一颗语法树。（如上图）</li>
+<li><strong>语义分析</strong>：语义分析器处理声明以及数据类型、给语法树的节点赋予数据类型。</li>
+<li><strong>中间代码</strong>：根据语法树生成中间代码，以上的步骤是硬件平台无关的，而中间代码之后的处理则需要根据程序运行的硬件平台来决定。</li>
+<li><strong>代码生成器</strong>：代码生成器将中间代码转换成对应硬件平台的汇编代码main.s</li>
+<li><strong>汇编器</strong>：汇编器根据 <strong>汇编指令与机器指令的对照表</strong> 将汇编代码翻译成机器指令，生成目标文件main.o。</li>
+<li><strong>链接器</strong>：合并输入的.o文件、确定符号内存地址、进行符号重定位，输出真正的可执行文件。</li>
+</ol>
+<p>编译过程做的总体上说就是<strong>将高级语言翻译成机器指令，分配指令和数据的在内存中地址</strong>，使CPU能从内存中的正确位置中取出正确的指令执行正确的数据读写操作。</p>
+<p><code>note：机器指令是CPU能够识别执行的二进制数据</code></p>
+<h2 id="二、目标文件的组成"><a href="#二、目标文件的组成" class="headerlink" title="二、目标文件的组成"></a>二、目标文件的组成</h2><p>目标文件就是汇编代码经过翻译生成的机器指令二进制代码，就是上面的main.o，可执行文件就是由这些个目标文件经过链接组成的。所以了解目标文件非常重要。</p>
+<p><strong>目标文件由若干个段（section）组成，每个段中存放不同的内容，下面介绍一个目标文件中的基本段类型：文件头、代码段、数据段、bss段、常量段、段表、符号表、重定位表。</strong></p>
+<p>其结构大概就是下图这么个情况：<br><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h3 id="1、文件头"><a href="#1、文件头" class="headerlink" title="1、文件头"></a>1、文件头</h3><p>文件头位于目标文件开始位置，它定义了elf魔数，目标文件的属性、运行的软硬件平台、程序入口地址、段表的位置及长度、段的数量。有了文件头的信息，链接器就能知道如何处理当前的目标文件。</p>
+<h3 id="2、段表"><a href="#2、段表" class="headerlink" title="2、段表"></a>2、段表</h3><p>段表：记录了目标文件中所有段的地址以及属性（读写or可执行）等信息。链接器通过文件头可找到段表，通过段表则能找到目标文件中所有段。</p>
+<h3 id="3、代码段、数据段、只读数据段、bss段"><a href="#3、代码段、数据段、只读数据段、bss段" class="headerlink" title="3、代码段、数据段、只读数据段、bss段"></a>3、代码段、数据段、只读数据段、bss段</h3><ul>
+<li>代码段中存放的就是<strong>机器指令</strong></li>
+<li>数据段中存放 <strong>已经初始化的全局变量以及静态变量</strong></li>
+<li>只读数据段存放字符串常量以及被const修饰的变量，通过硬件确保其不会被程序修改</li>
+<li>bss段存放<strong>未初始化的全局变量以及静态变量所占用的内存大小</strong></li>
+</ul>
+<blockquote>
+<p>问：为啥区分数据段和bss段？<br>    .<br>答：数据段保存了初始化了的全局变量和静态变量，可执行文件装载时需要这些数值。而未初始化的全局变量和静态变量是0，目标文件不需要记住他们的值，只需要知道这些变量占用的空间大小，在程序装载时预留出内存空间（这些空间默认是0）.</p>
+</blockquote>
+<h3 id="4、重定位表"><a href="#4、重定位表" class="headerlink" title="4、重定位表"></a>4、重定位表</h3><p>当一个段（代码段或数据段）中有需要重定位的符号时，就会有一个它专属的重定位表，重定位表记录了该段需要进行重定位所需的所有信息。（第三节详细介绍重定位）</p>
+<h3 id="5、符号表"><a href="#5、符号表" class="headerlink" title="5、符号表"></a>5、符号表</h3><p><strong>c代码中函数和变量统称为符号，符号的值就是函数或变量的地址</strong>，符号表中记录目标文件中所定义的可供外部使用的符号。</p>
+<h2 id="三、静态链接"><a href="#三、静态链接" class="headerlink" title="三、静态链接"></a>三、静态链接</h2><p>上一节分析了目标文件的组成，目标文件本质上是一个cpu能识别执行的可执行文件，那么他比真正的可执行文件差在哪里呢？本节通过简单的介绍静态链接，回答这个问题。</p>
+<p>静态链接分三步走：<strong>1、分配空间与地址；2、符号地址确定；3、符号重定位</strong></p>
+<h3 id="1、分配空间与地址"><a href="#1、分配空间与地址" class="headerlink" title="1、分配空间与地址"></a>1、分配空间与地址</h3><p>这里的<strong>空间是指可执行文件中每个段所在的地址及占用的空间大小</strong>。静态链接需要将若干个.o目标文件合并成一个可执行程序，合并的方式是将目标文件中相同属性的段合并到一起，如图所示：</p>
+<p>a.o、b.o、c.o的代码段合并到输出文件的代码段；数据段合并到输出文件的数据段；<br><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p><strong>地址是指可执行程序装载到内存上后，各个段在内存中的地址，当然这个地址是虚拟地址VMA.静态链接后，每个段在内存中的地址就被确定下来。</strong></p>
+<p><strong>连接器负责将相同属性的段合并，根据运行的平台（32位or64位）确定段在内存中的虚拟地址。</strong></p>
+<h3 id="2、确定符号地址"><a href="#2、确定符号地址" class="headerlink" title="2、确定符号地址"></a>2、确定符号地址</h3><p>在上一步中，我们能确定段在内存中的地址，<strong>接下来就能通过偏移量计算符号在内存中的地址</strong>。例如：</p>
+<blockquote>
+<p>假设main.o中定义了main函数，main符号在main.o中的.text段中的偏移地址是固定的（假设是0x1000），假设main.o段被装载到内存的虚拟地址为0x5800，那么main符号的虚拟地址也能通过计算偏移地址得到为：0x1000+0x5800&#x3D;0x6800。</p>
+</blockquote>
+<p>类似的，在地址空间分配完成后，<strong>所有符号的地址都能确定下来。</strong></p>
+<h3 id="3、符号重定位"><a href="#3、符号重定位" class="headerlink" title="3、符号重定位"></a>3、符号重定位</h3><p>首先允许我简单的引见你两个在重定位中最重要的表：</p>
+<ul>
+<li><strong>重定位表</strong>：在上一节提到，重定位表中包含了重定位所需要的所有信息，包括符号名称，重定位入口地址等。</li>
+<li><strong>全局符号表</strong>：链接器会读取所有输入的目标文件的符号表，合并所有符号表生成一个全局符号表。</li>
+</ul>
+<p>以一个例子来看符号重定位做了什么：</p>
+<blockquote>
+<p>假设main.o中在0x7000处调用了fuck.o中的fuck函数，在重定位之前，由于连接器不知道fuck函数的地址（定义在另一个文件中），故暂时将其符号值设置为0；当链接器开始重定位时，他读取main.o中的重定位表，得知需要重定位fuck，于是链接器到全局符号表中查找fuck，拿到fuck的地址（0x1100），然后到fuck的重定位入口(0x7000)，修改fuck符号的值为0x1100.</p>
+</blockquote>
+<p>所以，<strong>重定位解决了不同模块之间函数、变量引用时的地址不确定性问题，这也是链接器所做的最重要的工作</strong>。</p>
+<p>经过符号重定位后，可执行程序中所有的符号的虚拟地址都确定下来了，就能将程序装载到内存中运行，这就是目标文件与可执行文件的区别。</p>
+<h2 id="四、装载"><a href="#四、装载" class="headerlink" title="四、装载"></a>四、装载</h2><p>装载就是把在磁盘中的可执行文件，读取到内存中，CPU才能通过总线读取内存中的指令，程序才能真正的跑起来。</p>
+<p>现代的操作系统都采用了虚拟内存的管理策略。装载程序时采用动态装载的方式。</p>
+<p><strong>动态装载是指：<strong>由于</strong>程序运行的局部性原理</strong>，将程序运行时常用的部分驻留在内存中，其他不常用的数据则放入硬盘里面。当程序需要使用哪个模块时，就将该模块从硬盘中加载到内存，如果不用到，就把把放在硬盘里。	</p>
+<h2 id="五、动态链接"><a href="#五、动态链接" class="headerlink" title="五、动态链接"></a>五、动态链接</h2><h3 id="1、动态链接"><a href="#1、动态链接" class="headerlink" title="1、动态链接"></a>1、动态链接</h3><p>若a.o，b.o都需要使用lib.o中的函数，在静态链接时，a,b输出文件中都有一份lib.o，当同时运行a和b两个程序时，在内存中同时存在了两份lib.o，这就造成了内存的浪费。</p>
+<p>这只是静态链接的缺点之一，解决这些问题的办法就是本节的主角–动态链接。</p>
+<p><strong>动态链接的基本思想是：将程序拆分成若干个模块（.so），在程序运行时才将模块链接成一个完整的程序。</strong></p>
+<p><strong>动态链接器先将程序所需的所有共享模块装载到进程地址空间，确定符号的地址，然后将程序中未决议的符号绑定到共享文件进行重定位。即把在静态链接的过程延迟到装载模块之后。</strong></p>
+<p>动态链接如何解决以上问题？</p>
+<blockquote>
+<p>首先将a.o及其所需的模块装载到内存，包括lib.o，然后链接成完整的程序；当需要运行b程序时，将b及其所需的模块装载到内存，由于lib.o已经存在于内存中了，故不需要再装载lib.o，就能直接链接成完整程序。</p>
+</blockquote>
+<p>动态链接的优点有：</p>
+<ul>
+<li>节省内存空间，减少了内存数据的换入换出</li>
+<li>程序维护性：程序升级时只需要发布新模块，不需要重新编译整个程序</li>
+<li>兼容性：程序可使用由不同操作系统提供的动态链接库，不需要针对不同系统编写不同的代码。</li>
+</ul>
+<h3 id="地址无关代码"><a href="#地址无关代码" class="headerlink" title="地址无关代码"></a>地址无关代码</h3><p>但是这么做有一些问题。</p>
+<p><strong>问题是：静态链接时，在模块中的指令和数据中有一些绝对地址的引用，这就要求在链接产生输出文件时，要事先假设模块在虚拟内存中的地址。但是在动态链接时，不同模块的装载地址不能一样。</strong></p>
+<blockquote>
+<p>若A的装载地址是0x800，B的装载地址也是0x800，若一个程序同时使用A,B模块，则必然冲突。</p>
+</blockquote>
+<p>这就要求模块在编译时，不能假设自己在虚拟内存中的地址。</p>
+<p>**那么就等动态链接器把模块装进内存后，模块的虚拟地址就确定下来了，这时候再去修改程序中的绝对地址引用，**这样就解决了模块之间的地址冲突问题。因为已经装载的两个模块的地址肯定不一样。</p>
+<p>但这又产生了<strong>另一个问题：当多个程序使用同一个模块时（lib.o），同一个模块在不同进程的虚拟地址空间的地址是不一样的</strong>（例如在A程序中，lib.o模块的虚拟地址是0x100，在B程序中为0x200，通过MMU映射到同一个物理地址）。那么上述的修改绝对地址的修改是要改成0x100还是0x200呢？</p>
+<p>为了解决这个问题，就需要引入地址无关代码了。</p>
+<p>首先介绍一个事实：<strong>共享模块中的代码段是唯一的，而每一个进程都有一份共享模块数据段的副本</strong>（进程之间的数据肯定是不一样的啦）</p>
+<p><strong>那么可以将A程序的lib.o的虚拟地址0x100放在A的数据段，B程序的lib.o的虚拟地址0x200放在B的数据段中；当B程序要访问lib.o时，就通过数据段中的0x200找到B。</strong></p>
+<p>如图<br><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h3 id="2、延迟绑定"><a href="#2、延迟绑定" class="headerlink" title="2、延迟绑定"></a>2、延迟绑定</h3><p>动态链接情况下，程序开始执行之前都需要进行动态链接，这使得程序的启动变慢了。为了解决这个问题，<strong>将一部分函数的绑定工作（符号查找及重定位）延迟，即程序开始不对这些函数进行链接，只有当这些函数需要执行时，再进行绑定。</strong></p>
+<h3 id="3、动态链接器自举"><a href="#3、动态链接器自举" class="headerlink" title="3、动态链接器自举"></a>3、动态链接器自举</h3><p>动态链接器也是一个共享模块，他能帮助其他模块重定位，但是他却不能引用其他模块，因为在他起来之前，其他模块都不能重定位。<strong>所以动态链接器必须不依赖任何库，同时能完成自己对自己的符号重定位，这就是自举。</strong></p>
+<h2 id="六、程序的内存分布"><a href="#六、程序的内存分布" class="headerlink" title="六、程序的内存分布"></a>六、程序的内存分布</h2><p>可执行程序加载到内存后，内存的分布如图：（linux为例）<br><img src="/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBAa2lsbGVyLXA=,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"><br>该图示为4G的内存分布，其中0xffffffff-0xc0000000的1G划分给linux内核，其余的3G为用户空间。上面讲的可执行文件就放在readonly中。</p>
+<h3 id="栈"><a href="#栈" class="headerlink" title="栈"></a>栈</h3><p>栈在linux中是向下增长的，也就是说push操作使地址减少；ESP寄存器放的是栈顶的地址，EBP寄存器放的是栈基的地址。在一个函数中，栈基地址一般不会改变，栈顶地址会改变，通过栈基地址+偏移的方式，可访问栈内容。</p>
+<p>每一个函数都有一个属于自己的<strong>栈帧</strong>，用于保存函数的返回地址、参数、非静态局部变量和上下文。栈帧如图：<br><img src="/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBAa2lsbGVyLXA=,size_16,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"><br>函数调用时，使用栈来保存和传递参数，函数返回时，使用eax和edc寄存器(32位)来存储返回的结果。<strong>对于返回数据大于8个字节的，在调用函数时，会先在栈中留出块空间（可理解为参数），函数将执行结果复制到该空间，函数返回后，调用者就可以从该空间中读取到函数结果</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">demo</span>&#123;</span></span><br><span class="line">	<span class="type">char</span> c[<span class="number">32</span>];</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">struct</span> <span class="title function_">fuck</span><span class="params">(<span class="type">char</span> x)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">t</span>;</span> </span><br><span class="line">	<span class="comment">//将t数组的值全部设置为x+1</span></span><br><span class="line">	......</span><br><span class="line">	<span class="keyword">return</span> t;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">	<span class="type">char</span> x=<span class="string">&#x27;c&#x27;</span>;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">demo</span> <span class="title">d</span>=</span>fuck(x);</span><br><span class="line">	you();</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>上面代码中调用函数时栈的情况可大概由下图表示：</strong></p>
+<p><strong>EBP寄存器中放的是地址，这个地址里的值是上一个栈帧的EBP的值。通过EBP，程序就能正确地在函数返回时，回到上一个函数执行时的栈帧。</strong></p>
+<p>调用fuck函数时，首先将fuck()的下一个指令(you)的地址放入栈中，函数完成后返回就能继续执行main，然后将EBP的值入栈，接着是函数参数入栈，<strong>由于fuck函数的返回值大小大于8字节，所以在栈中留出32个字节的空间作为返回值的缓存</strong></p>
+<p>接着将一部分会被修改的寄存器入栈保存，然后跳转到fuck执行。</p>
+<p><strong>fuck函数返回时，将局部变量t的值复制到栈中留出的32个字节的地址中，然后弹出寄存器的值，并恢复EBP的值为main的EBP值，然后跳转到you执行。</strong></p>
+<p><strong>CPU返回main后，会将栈中缓存的返回值复制到局部变量d中。所以整个过程中，32字节的结果被复制了两次。</strong><br><img src="/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBAa2lsbGVyLXA=,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在上面的例子中，数据被复制了两次"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/C_CPP/complie/" data-id="cmbcy7rgq0003t8mtfwut9ra9" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/C_CPP/c_struct/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/Android/read_from_Mysql/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

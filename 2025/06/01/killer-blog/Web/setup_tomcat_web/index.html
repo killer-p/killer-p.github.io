@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="阿里云服务器装centos系统，安装jdk环境和tomcat@[toc] 准备：安装xftp6 用来与远程服务器进行文件传输 我使用的是阿里云的esc服务器xftp免费下载地址下载的过程比较慢，耐心等待。安装完成后 sftp连接上云服务器，就可以对云服务器的文件进行下载上传了；  一，安装git检查是否安装git：git --version一般先检查apt-get是否已经更新的下载源，如果下载源出">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/Web/setup_tomcat_web/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="阿里云服务器装centos系统，安装jdk环境和tomcat@[toc] 准备：安装xftp6 用来与远程服务器进行文件传输 我使用的是阿里云的esc服务器xftp免费下载地址下载的过程比较慢，耐心等待。安装完成后 sftp连接上云服务器，就可以对云服务器的文件进行下载上传了；  一，安装git检查是否安装git：git --version一般先检查apt-get是否已经更新的下载源，如果下载源出">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Web/setup_tomcat_web/20200227112506537.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Web/setup_tomcat_web/20200314104339768.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Web/setup_tomcat_web/20200314111708812.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Web/setup_tomcat_web/20200314112144966.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Web/setup_tomcat_web/2020022712451799.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Web/setup_tomcat_web/20200227131017895.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Web/setup_tomcat_web/20200227131453179.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Web/setup_tomcat_web/20200227141234988.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.651Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:26.890Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/Web/setup_tomcat_web/20200227112506537.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/Web/setup_tomcat_web" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/Web/setup_tomcat_web/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.651Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="阿里云服务器装centos系统，安装jdk环境和tomcat"><a href="#阿里云服务器装centos系统，安装jdk环境和tomcat" class="headerlink" title="阿里云服务器装centos系统，安装jdk环境和tomcat"></a>阿里云服务器装centos系统，安装jdk环境和tomcat</h2><p>@[toc]</p>
+<h2 id="准备：安装xftp6-用来与远程服务器进行文件传输"><a href="#准备：安装xftp6-用来与远程服务器进行文件传输" class="headerlink" title="准备：安装xftp6 用来与远程服务器进行文件传输"></a>准备：安装xftp6 用来与远程服务器进行文件传输</h2><blockquote>
+<p>我使用的是阿里云的esc服务器<br><a target="_blank" rel="noopener" href="https://www.netsarang.com/zh/free-for-home-school/">xftp免费下载地址</a><br>下载的过程比较慢，耐心等待。<br>安装完成后 sftp连接上云服务器，就可以对云服务器的文件进行下载上传了；</p>
+</blockquote>
+<h2 id="一，安装git"><a href="#一，安装git" class="headerlink" title="一，安装git"></a>一，安装git</h2><p>检查是否安装git：<code>git --version</code><br>一般先检查apt-get是否已经更新的下载源，如果下载源出问题，那么基本的软件都下载不来，其他都不用说了。<br>使用命令：<code>apt-get update</code>和<code>apt-get upgrade</code>更新apt-get。<br>然后使用<code>apt-get install git</code>安装git,安装完成后再执行一次检查。</p>
+<h2 id="二-安装jdk（jdk是java运行所需要的环境）"><a href="#二-安装jdk（jdk是java运行所需要的环境）" class="headerlink" title="二 安装jdk（jdk是java运行所需要的环境）"></a>二 安装jdk（jdk是java运行所需要的环境）</h2><h3 id="1-检查系统是否安装java"><a href="#1-检查系统是否安装java" class="headerlink" title="1. 检查系统是否安装java"></a>1. 检查系统是否安装java</h3><p>输入</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -version</span><br></pre></td></tr></table></figure>
+<p><img src="/2025/05/30/hello-world/Web/setup_tomcat_web/20200227112506537.png" alt="查看Java版本"><br>上图显示我的jdk版本是1.8.0_242,没有安装的朋友看下面</p>
+<h3 id="2-安装jdk"><a href="#2-安装jdk" class="headerlink" title="2. 安装jdk"></a>2. 安装jdk</h3><p> <strong>2.1</strong><br>  jdk-8u261-linux-64网盘下载：<br> 	链接：<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1FrfMS5hPQNK5CKrZ77pOrg">https://pan.baidu.com/s/1FrfMS5hPQNK5CKrZ77pOrg</a><br>	提取码：avfg</p>
+<p><strong>2.2</strong><br> 到<a target="_blank" rel="noopener" href="https://www.oracle.com/cn/java/technologies/javase-jdk8-downloads.html">jdk官网下载</a>，选择适合自己系统版本的jdk，我用的是阿里云服务器centos7 所以选了64位的linux版本，下载需要登陆Oracle的账号，而且晚上下载速度比较慢，建议早上下载，速度会快很多；<br> 	<img src="/2025/05/30/hello-world/Web/setup_tomcat_web/20200314104339768.png" alt="在这里插入图片描述"><br> 	下载完解压到自己创建的目录下，方便以后查找。<br> 	解压命令 <code>tar -zxvf</code> <strong>文件全称</strong><br> <strong>2.3. 配置环境变量</strong></p>
+<blockquote>
+<pre><code>	编辑etc文件夹下的profile文件 	
+方法一：远程连接服务器，用命令行编辑；
+	方法二：用xftp6打开profile文件，添加export内容；
+</code></pre>
+</blockquote>
+<p><strong>方法一：在命令行输入</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/profile</span><br></pre></td></tr></table></figure>
+<p>按a 在当前光标位置的右边添加文本<br>JAVA_HOME是你自己安装jdk的路径，我自己在root目录下新建了java文件夹来安装jdk<br><strong>注意！一定要替换成你自己的jdk安装路径</strong><br><strong>注意！一定要替换成你自己的jdk安装路径</strong><br><strong>注意！一定要替换成你自己的jdk安装路径</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> JAVA_HOME=/root/java/jdk1.8.0_241</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$JAVA_HOME</span>/bin:<span class="variable">$PATH</span></span><br><span class="line"><span class="built_in">export</span> CLASSPATH=.<span class="variable">$AVA_HOME</span>/lib/dt.jar:<span class="variable">$JAVA_HOME</span>/lib/tools.jar</span><br></pre></td></tr></table></figure>
+<p>输入后按Esc推出编辑模式，输入:wq退出并保存。<br><img src="/2025/05/30/hello-world/Web/setup_tomcat_web/20200314111708812.png" alt="在这里插入图片描述"><br><strong>方法二：</strong><br>xftp6连接服务器，在etc文件夹下找到profile文件，右键编辑，保存，退出。<br><img src="/2025/05/30/hello-world/Web/setup_tomcat_web/20200314112144966.png" alt="在这里插入图片描述"><br><strong>最后</strong><br>使用命令<code>source /etc/profile</code>使修改生效。</p>
+<blockquote>
+<p>如果出现<code>/etc/profile: line 26: syntax error: unexpected end of file</code>之类的错误，请检查profile文件里if对应的fi是否缺少</p>
+</blockquote>
+<p>随后输入<code>java -version</code>检查是否安装成功</p>
+<h2 id="三-安装tomcat"><a href="#三-安装tomcat" class="headerlink" title="三 安装tomcat"></a>三 安装tomcat</h2><p>关于tomcat内容请自行百度<br><a target="_blank" rel="noopener" href="https://tomcat.apache.org/download-80.cgi">tomcat8.5官网下载</a><br>tomcat8.5.57 蓝奏网盘下载 <a target="_blank" rel="noopener" href="https://wws.lanzous.com/ifP0Aggte2h">https://wws.lanzous.com/ifP0Aggte2h</a>
+ 	</p>
+<p><img src="/2025/05/30/hello-world/Web/setup_tomcat_web/2020022712451799.png" alt="在这里插入图片描述"><br>方法一：tar.gz压缩包下载到本地，再用xftp6上传到自定义的文件夹下。</p>
+<p>命令行 cd到压缩包目录下，解压；</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf apache-tomcat-8.5.51.tar.gz</span><br></pre></td></tr></table></figure>
+<p>cd到apache-tomcat-8.5.51目录下bin文件夹，启动 关闭tomcat；</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./startup.sh</span><br><span class="line">./shutdown.sh</span><br></pre></td></tr></table></figure>
+
+<p><strong>启动tomcat后，在浏览器输入：xxxxx:8080可看到tomcat页面就是成功（xxx是你的公网ip地址）；如果没看到页面就需要关闭防火墙或者放行8080端口；</strong></p>
+<p>centos7关闭防火墙：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl stop firewalld</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --zone=public --list-ports　　<span class="comment"># 查看防火墙开放的所有端口</span></span><br><span class="line">firewall-cmd --zone=public --add-port=8080/tcp --permanent　　<span class="comment"># 添加开放端口</span></span><br><span class="line">firewall-cmd --reload <span class="comment">#重启后就能访问</span></span><br></pre></td></tr></table></figure>
+<p><strong>注意：阿里云还需要添加安全组，添加8080&#x2F;8080，授权对象0.0.0.0&#x2F;0</strong><br><strong>注意：阿里云还需要添加安全组，添加8080&#x2F;8080，授权对象0.0.0.0&#x2F;0</strong><br><strong>注意：阿里云还需要添加安全组，添加8080&#x2F;8080，授权对象0.0.0.0&#x2F;0</strong><br><img src="/2025/05/30/hello-world/Web/setup_tomcat_web/20200227131017895.png" alt="在这里插入图片描述"><br><img src="/2025/05/30/hello-world/Web/setup_tomcat_web/20200227131453179.png" alt="在这里插入图片描述"></p>
+<h2 id="三-部署web项目"><a href="#三-部署web项目" class="headerlink" title="三 部署web项目"></a>三 部署web项目</h2><p>我们用xftp将在电脑开发的web项目上传到服务器<br>在eclipse打包web项目 右键项目-&gt;Export-&gt;war，将生成的war复制到root&#x2F;webapps&#x2F;目录下<br><strong>注意 一定要放在webapps下</strong><br>接着重新启动tomcat，就会自动生成项目文件。项目部署完成，在浏览器输入xxxxx：8080&#x2F;appname 就可以访问项目<br>（appname是你的项目的名称）<br><img src="/2025/05/30/hello-world/Web/setup_tomcat_web/20200227141234988.png" alt="在这里插入图片描述"></p>
+<h2 id="四-资料"><a href="#四-资料" class="headerlink" title="四 资料"></a>四 资料</h2><p>参考文章：<br><a target="_blank" rel="noopener" href="https://blog.51cto.com/14259192/2391301">https://blog.51cto.com/14259192/2391301</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/lei01/p/9911156.html">https://www.cnblogs.com/lei01/p/9911156.html</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44538107/article/details/88683530">https://blog.csdn.net/weixin_44538107/article/details/88683530</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/guarderming/p/11223817.html">linux防火墙设置指南</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/Web/setup_tomcat_web/" data-id="cmbcy7rhf0026t8mtft4ue38a" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/cJSON/4.cJSON_Parse()_parse_json_string/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/cJSON/2.create_json/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

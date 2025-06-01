@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="先看看我们的数据库我们要做的就是安卓app读取以上数据并显示部分数据 0，导入mysql-connector-java-5.1.28.jar到Androidstudio的lib文件夹下 jar包下载链接：链接：https:&#x2F;&#x2F;pan.baidu.com&#x2F;s&#x2F;1cNneqg1Ll4fTrEUd9EJFAA提取码：lco3   1，写一个ESP8266类来装载数据库的数据这是一个简单的类，我的想法是一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/Android/read_from_Mysql/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="先看看我们的数据库我们要做的就是安卓app读取以上数据并显示部分数据 0，导入mysql-connector-java-5.1.28.jar到Androidstudio的lib文件夹下 jar包下载链接：链接：https:&#x2F;&#x2F;pan.baidu.com&#x2F;s&#x2F;1cNneqg1Ll4fTrEUd9EJFAA提取码：lco3   1，写一个ESP8266类来装载数据库的数据这是一个简单的类，我的想法是一">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Android/read_from_Mysql/database.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Android/read_from_Mysql/view.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/Android/read_from_Mysql/like.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.633Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:27.010Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/Android/read_from_Mysql/database.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/Android/read_from_Mysql" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/Android/read_from_Mysql/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.633Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>先看看我们的数据库<br><img src="/2025/05/30/hello-world/Android/read_from_Mysql/database.png" alt="MQTTDATA，test2"><br>我们要做的就是安卓app读取以上数据并显示部分数据</p>
+<h2 id="0，导入mysql-connector-java-5-1-28-jar到Androidstudio的lib文件夹下"><a href="#0，导入mysql-connector-java-5-1-28-jar到Androidstudio的lib文件夹下" class="headerlink" title="0，导入mysql-connector-java-5.1.28.jar到Androidstudio的lib文件夹下"></a>0，导入mysql-connector-java-5.1.28.jar到Androidstudio的lib文件夹下</h2><blockquote>
+<p>jar包下载链接：链接：<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1cNneqg1Ll4fTrEUd9EJFAA">https://pan.baidu.com/s/1cNneqg1Ll4fTrEUd9EJFAA</a><br>提取码：lco3 </p>
+</blockquote>
+<h2 id="1，写一个ESP8266类来装载数据库的数据"><a href="#1，写一个ESP8266类来装载数据库的数据" class="headerlink" title="1，写一个ESP8266类来装载数据库的数据"></a>1，写一个ESP8266类来装载数据库的数据</h2><p>这是一个简单的类，我的想法是一行数据包括可变和固定数据，我用一个hashmap来存放可变数据。<br>可变数据就是它可以是temperature，也可以是on_off。<br>而固定数据是每行数据所必须的，包括设备的id，app的id，数据产生的时间，设备的类型，设备的网络状态，设备的备注信息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">public class ESP8266 &#123;</span><br><span class="line">    String app_id,device_id,state,type,remark,time;</span><br><span class="line">    int id;</span><br><span class="line">    HashMap data=new HashMap();</span><br><span class="line">    public int getId()&#123;</span><br><span class="line">        return id;</span><br><span class="line">    &#125;</span><br><span class="line">    public String getApp_id()&#123;</span><br><span class="line">        return app_id;</span><br><span class="line">    &#125;</span><br><span class="line">    public String getDevice_id()&#123;</span><br><span class="line">        return device_id;</span><br><span class="line">    &#125;</span><br><span class="line">    public String getState()&#123;</span><br><span class="line">        return state;</span><br><span class="line">    &#125;</span><br><span class="line">    public String getType()&#123;</span><br><span class="line">        return type;</span><br><span class="line">    &#125;</span><br><span class="line">    public String getRemark()&#123;</span><br><span class="line">        return remark;</span><br><span class="line">    &#125;</span><br><span class="line">    public String getTime()&#123;</span><br><span class="line">        return time;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Map getData() &#123;</span><br><span class="line">        return data;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2，再写一个DBUtils-java的类，实现对MySQL的具体操作"><a href="#2，再写一个DBUtils-java的类，实现对MySQL的具体操作" class="headerlink" title="2，再写一个DBUtils.java的类，实现对MySQL的具体操作"></a>2，再写一个DBUtils.java的类，实现对MySQL的具体操作</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br></pre></td><td class="code"><pre><span class="line">public class DBUtils &#123;</span><br><span class="line">    static List&lt;ESP8266&gt; ESPlist=new ArrayList&lt;&gt;();//存放设备的数组</span><br><span class="line">    private static ESP8266 Device=new ESP8266();//初始化数组</span><br><span class="line">    private static String driver = &quot;com.mysql.jdbc.Driver&quot;;// MySql驱动，需要驱动才能接入MySQL</span><br><span class="line"></span><br><span class="line">//    private static String url = &quot;jdbc:mysql://localhost:3306/map_designer_test_db&quot;;</span><br><span class="line"></span><br><span class="line">    private static String user = &quot;app&quot;;//  数据库的用户名</span><br><span class="line"></span><br><span class="line">    private static String password = &quot;123456&quot;;//用户名对应的 密码</span><br><span class="line"></span><br><span class="line">    //连接数据库的函数</span><br><span class="line">    private static Connection getConn(String dbName)&#123;</span><br><span class="line"></span><br><span class="line">        Connection connection = null;</span><br><span class="line">        try&#123;</span><br><span class="line">            Class.forName(driver);// 动态加载类</span><br><span class="line">            String ip = &quot;118.31.20.121&quot;;// 这是MySQL服务器的地址，因为我买的是云主机，所以这里填的是云主机的公网地址</span><br><span class="line"></span><br><span class="line">            // 尝试建立到给定数据库URL的连接，连接格式：驱动名称+ip地址+端口号+数据库名称+用户名+密码</span><br><span class="line">            connection = DriverManager.getConnection(&quot;jdbc:mysql://&quot; + ip + &quot;:3306/&quot; + dbName,</span><br><span class="line">                    user, password);</span><br><span class="line">            //Log.e(&quot;prx&quot;,&quot;url: &quot;+&quot;jdbc:mysql://&quot; + ip + &quot;:3306/&quot; + dbName);3306为MySQL接入固定端口</span><br><span class="line"></span><br><span class="line">        &#125;catch (Exception e)&#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        return connection;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static List&lt;ESP8266&gt; getInfoByID(String ID)&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        // 根据数据库名称，建立连接</span><br><span class="line">        Connection connection = getConn(&quot;MQTTDATA&quot;);</span><br><span class="line"></span><br><span class="line">        try &#123;</span><br><span class="line">            // mysql简单的查询语句。可以使用查询，更新，删除等等，？是一个变量，在后面可以对？进行赋值，可以设置多个？</span><br><span class="line">            String sql = &quot;select * from test2 where app_id=?&quot;;</span><br><span class="line"></span><br><span class="line">            if (connection != null)&#123;</span><br><span class="line">                // connection不为null表示与数据库建立了连接</span><br><span class="line">                //预编译sql 的，例如 preparedStatement(&quot;select * from t where id = ?&quot;);</span><br><span class="line">                //然后传入参数的时候 ？ 就会替换成你所需要的参数。</span><br><span class="line">                PreparedStatement ps = connection.prepareStatement(sql);</span><br><span class="line">                if (ps != null)&#123;</span><br><span class="line">                    // 设置上面的sql语句中第一个？的值为ID，如果有两个？，就再写一个ps.setString(2,String),</span><br><span class="line">                    //  ?会被替换成ID所代表的值</span><br><span class="line">                    ps.setString(1, ID);</span><br><span class="line">                    // 执行sql查询语句并返回结果集  resultset 表示数据库结果集的数据表，通常通过执行查询数据库的语句生成。</span><br><span class="line">                    ResultSet rs = ps.executeQuery();</span><br><span class="line">                    //Log.e(&quot;prx&quot;,&quot;结果集：&quot; + rs);</span><br><span class="line">                    if (rs != null)&#123;</span><br><span class="line">                        //如果结果集不为空，先获取列的总数</span><br><span class="line">                        int count = rs.getMetaData().getColumnCount();</span><br><span class="line">                        Log.e(&quot;prx&quot;,&quot;列总数：&quot; + count);</span><br><span class="line">                        //int x=0;</span><br><span class="line">                        // ResultSet对象保持一个光标指向其当前的数据行。 最初，光标位于第一行之前。 next方法将光标移动到下一行，</span><br><span class="line">                        // 并且由于在ResultSet对象中没有更多行时返回false ，因此可以在while循环中使用循环来遍历结果集。</span><br><span class="line">                        while (rs.next())&#123;</span><br><span class="line">                            // 注意：下标是从1开始的</span><br><span class="line">                            for (int i = 1;i &lt;= count;i++)&#123;</span><br><span class="line">                                //获取数据表的列的名称</span><br><span class="line">                                String field = rs.getMetaData().getColumnName(i);</span><br><span class="line">                                //Log.e(&quot;esp&quot;,&quot;键:  &quot;+field);</span><br><span class="line">                                Log.e(&quot;prx&quot;,&quot;值:  &quot;+rs.getString(field));</span><br><span class="line">                                //通过键值来赋值给对应的ESP8266的元素</span><br><span class="line">                                switch (field)&#123;</span><br><span class="line">                                    case    &quot;id&quot;:</span><br><span class="line">                                        Device.id=rs.getInt(field);</span><br><span class="line">                                    case    &quot;app_id&quot;:</span><br><span class="line">                                        Device.app_id=rs.getString(field);</span><br><span class="line">                                        break;</span><br><span class="line">                                    case    &quot;device_id&quot;:</span><br><span class="line">                                        Device.device_id=rs.getString(field);</span><br><span class="line">                                        break;</span><br><span class="line">                                    case    &quot;remark&quot;:</span><br><span class="line">                                        Device.remark=rs.getString(field);</span><br><span class="line">                                        break;</span><br><span class="line">                                    case &quot;state&quot;:</span><br><span class="line">                                        Device.state=rs.getString(field);</span><br><span class="line">                                        break;</span><br><span class="line">                                    case    &quot;type&quot;:</span><br><span class="line">                                        Device.type=rs.getString(field);</span><br><span class="line">                                        break;</span><br><span class="line">                                    case &quot;time&quot;:</span><br><span class="line">                                        Device.time=rs.getString(field);</span><br><span class="line"></span><br><span class="line">                                        break;</span><br><span class="line">                                        default:Device.data.put(field,rs.getString(field));</span><br><span class="line"></span><br><span class="line">                                &#125;</span><br><span class="line">                       &#125;</span><br><span class="line">                            //把每个设备的保存到数组中</span><br><span class="line">                            ESPlist.add(Device);</span><br><span class="line">                            //注意每次都要重新实例化Device！！！</span><br><span class="line">                            Device=new ESP8266();</span><br><span class="line"></span><br><span class="line">                            </span><br><span class="line">                            //Log.e(&quot;esp&quot;,&quot;x=&quot;+x+&quot; DEVICE_id&quot;+Device.getDevice_id());</span><br><span class="line">                            //ESP8266 ESP=ESPlist.get(x);</span><br><span class="line">                            //Log.e(&quot;esp&quot;,x+&quot;  LIST_ID&quot;+ESP.getDevice_id());</span><br><span class="line">                            //x++;</span><br><span class="line">                            //Log.e(&quot;ESP&quot;, String.valueOf(ESPlist.size()));</span><br><span class="line">                            //x=x+1;</span><br><span class="line">                            //Log.e(&quot;esp&quot;,&quot;list  &quot;+x);</span><br><span class="line">                        &#125;</span><br><span class="line"></span><br><span class="line">                        //关闭数据库连接</span><br><span class="line">                        connection.close();</span><br><span class="line">                        ps.close();</span><br><span class="line">                        //ESP8266 ESP=ESPlist.get(3);</span><br><span class="line">                        //Log.e(&quot;esp&quot;,&quot;LIST_ID&quot;+ESP.getDevice_id());</span><br><span class="line">                        return  ESPlist;</span><br><span class="line">                    &#125;else &#123;</span><br><span class="line">                        return null;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;else &#123;</span><br><span class="line">                    return  null;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;else &#123;</span><br><span class="line">                return  null;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;catch (Exception e)&#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">            Log.e(&quot;prx&quot;,&quot;异常：&quot; + e.getMessage());</span><br><span class="line">            return null;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="3-看看MainActivity"><a href="#3-看看MainActivity" class="headerlink" title="3.看看MainActivity"></a>3.看看MainActivity</h2><p>在oncreate方法里开启新线程来读取数据库数据，通过1234（这里暂时设1234为appid）来读取数据库中appid为1234的所有数据DBUtils.getInfoByID(“1234”)返回的是一个数组。通过handler把消息告诉主线程,主线程再根据设备集合对listview进行初始化</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">List&lt;ESP8266&gt; deviceslist=new ArrayList&lt;&gt;();//存放设备集合</span><br><span class="line">    List_Adapter adapter=null;</span><br><span class="line">    private ListView mlistview;//列表视图</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">new Thread(new Runnable() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public void run() &#123;</span><br><span class="line">                // 调用数据库工具类DBUtils的getInfoByName方法获取数据库表中数据</span><br><span class="line"></span><br><span class="line">                deviceslist=DBUtils.getInfoByID(&quot;1234&quot;);</span><br><span class="line">                //把得到设备集合的信息通知到主线程</span><br><span class="line">                Message message = handler.obtainMessage();</span><br><span class="line">                if (!deviceslist.isEmpty())&#123;</span><br><span class="line">                    message.what=0x11;</span><br><span class="line">                    handler.sendMessage(message);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;).start();</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">@SuppressLint(&quot;HandlerLeak&quot;)</span><br><span class="line">   private Handler handler = new Handler()&#123;</span><br><span class="line">       @Override</span><br><span class="line">       public void handleMessage(Message msg) &#123;</span><br><span class="line"></span><br><span class="line">           switch (msg.what)&#123;</span><br><span class="line">               case 0x11:</span><br><span class="line">                   //获得设备集合，开始列表初始化</span><br><span class="line">                   Initlistview();</span><br><span class="line">                   break;</span><br><span class="line">               case 0x12:</span><br><span class="line"></span><br><span class="line">                   break;</span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">       &#125;</span><br><span class="line">   &#125;;</span><br><span class="line"></span><br><span class="line">   private void Initlistview() &#123;</span><br><span class="line">       //初始化视图</span><br><span class="line">       adapter=new List_Adapter(MainActivity.this,deviceslist);</span><br><span class="line">       mlistview.setAdapter(adapter);</span><br><span class="line">       //初始化短按键功能</span><br><span class="line"></span><br><span class="line">       //初始化长按功能</span><br><span class="line">       </span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="4，最后附上我的list-adapter的代码"><a href="#4，最后附上我的list-adapter的代码" class="headerlink" title="4，最后附上我的list_adapter的代码"></a>4，最后附上我的list_adapter的代码</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line">public class List_Adapter extends BaseAdapter &#123;</span><br><span class="line">    private List&lt;ESP8266&gt; list;</span><br><span class="line">    private Context mcontext;</span><br><span class="line">    private LayoutInflater mlayoutinflater;</span><br><span class="line">    public List_Adapter (Context context,List&lt;ESP8266&gt; list)&#123;</span><br><span class="line">        this.list=list;</span><br><span class="line">        this.mcontext=context;</span><br><span class="line">        mlayoutinflater= (LayoutInflater) mcontext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);//完成赋值</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public int getCount() &#123;</span><br><span class="line">        return list.size();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Object getItem(int position) &#123;</span><br><span class="line">        return list.get(position);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public long getItemId(int position) &#123;</span><br><span class="line">        return 0;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public View getView(int position, View convertView, ViewGroup parent) &#123;</span><br><span class="line">        Log.e(&quot;list&quot;,&quot;enter adapter&quot;);</span><br><span class="line">        ESP8266 device=list.get(position);</span><br><span class="line">        viewholder holder=null;                   //创建一个中转站</span><br><span class="line">        if (convertView==null)&#123;                    //如果有新项目移入屏幕</span><br><span class="line">            convertView=mlayoutinflater.inflate(R.layout.list_layout,null);//就给他加载内容</span><br><span class="line">            holder=new viewholder();</span><br><span class="line">            holder.imageView=convertView.findViewById(R.id.list_iv);//把控件地址赋值给holder</span><br><span class="line">            holder.textView1=convertView.findViewById(R.id.list_tv1);</span><br><span class="line">            holder.textView2=convertView.findViewById(R.id.list_tv2);</span><br><span class="line">            convertView.setTag(holder);         //绑定项目视图和holder</span><br><span class="line">        &#125;</span><br><span class="line">        else&#123;</span><br><span class="line">            holder=(viewholder) convertView.getTag();</span><br><span class="line">        &#125;</span><br><span class="line">        //设置备注为设备的名称</span><br><span class="line">        holder.textView1.setText(device.getRemark());</span><br><span class="line">        //Log.e(&quot;state&quot;,device.getState());</span><br><span class="line">        //显示设备状态</span><br><span class="line">        if (device.getState().equals(&quot;online&quot;))&#123;</span><br><span class="line">            holder.textView2.setText(&quot;在线&quot;);</span><br><span class="line">        &#125;else if (device.getState().equals(&quot;offline&quot;))&#123;</span><br><span class="line">            holder.textView2.setText(&quot;离线&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        else holder.textView2.setText(&quot;错误！&quot;);</span><br><span class="line">        //根据设备类型设置相应图片</span><br><span class="line">        switch (device.getType()) &#123;</span><br><span class="line">            case &quot;aircondition&quot;:</span><br><span class="line">                holder.imageView.setImageResource(R.drawable.aircon);</span><br><span class="line">                break;</span><br><span class="line">            case &quot;light&quot;:</span><br><span class="line">                holder.imageView.setImageResource(R.drawable.light1);</span><br><span class="line">                break;</span><br><span class="line">            case &quot;sensor&quot;:</span><br><span class="line">                holder.imageView.setImageResource(R.drawable.sensor2);</span><br><span class="line">        &#125;</span><br><span class="line">        return convertView;</span><br><span class="line">    &#125;</span><br><span class="line">    static class viewholder&#123;     //暂时储存数据，中转站</span><br><span class="line">        public ImageView imageView;</span><br><span class="line">        public TextView textView1,textView2;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="5，效果如图，根据获取的设备数据进行展示"><a href="#5，效果如图，根据获取的设备数据进行展示" class="headerlink" title="5，效果如图，根据获取的设备数据进行展示"></a>5，效果如图，根据获取的设备数据进行展示</h2><p><img src="/2025/05/30/hello-world/Android/read_from_Mysql/view.png" alt="在这里插入图片描述"><br><img src="/2025/05/30/hello-world/Android/read_from_Mysql/like.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/Android/read_from_Mysql/" data-id="cmbcy7rgs0007t8mt8n6jf2zh" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/C_CPP/complie/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/Compiler/build_gcc_cross_compiler/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

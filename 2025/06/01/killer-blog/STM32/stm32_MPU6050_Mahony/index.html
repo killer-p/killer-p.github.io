@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="@[toc]项目地址：https:&#x2F;&#x2F;gitee.com&#x2F;killerp&#x2F;mpu6050_-mahony 1，理论分析1.1 MPU6050MPU6050是一个集成了陀螺仪和加速度计的传感器，它能输出在直角坐标系下的x，y，z轴的角速度和加速度数据。 陀螺仪输出的格式为：绕x轴的旋转角速度，绕y轴的角速度，绕z轴的角速度（分别称为roll角速度，pitch角速度和yaw角速度）。 加速度计输出的格">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/STM32/stm32_MPU6050_Mahony/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="@[toc]项目地址：https:&#x2F;&#x2F;gitee.com&#x2F;killerp&#x2F;mpu6050_-mahony 1，理论分析1.1 MPU6050MPU6050是一个集成了陀螺仪和加速度计的传感器，它能输出在直角坐标系下的x，y，z轴的角速度和加速度数据。 陀螺仪输出的格式为：绕x轴的旋转角速度，绕y轴的角速度，绕z轴的角速度（分别称为roll角速度，pitch角速度和yaw角速度）。 加速度计输出的格">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/stm32_MPU6050_Mahony/20210516164833222.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/stm32_MPU6050_Mahony/20210517203510626.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/stm32_MPU6050_Mahony/20210516234611509.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/stm32_MPU6050_Mahony/2021051623534746.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/stm32_MPU6050_Mahony/2021051618002479.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/stm32_MPU6050_Mahony/20210516235902902.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.648Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:27.055Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/STM32/stm32_MPU6050_Mahony/20210516164833222.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/STM32/stm32_MPU6050_Mahony" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/STM32/stm32_MPU6050_Mahony/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.648Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>@[toc]<br><strong>项目地址</strong>：<a target="_blank" rel="noopener" href="https://gitee.com/killerp/mpu6050_-mahony">https://gitee.com/killerp/mpu6050_-mahony</a></p>
+<h2 id="1，理论分析"><a href="#1，理论分析" class="headerlink" title="1，理论分析"></a>1，理论分析</h2><h3 id="1-1-MPU6050"><a href="#1-1-MPU6050" class="headerlink" title="1.1 MPU6050"></a>1.1 MPU6050</h3><p>MPU6050是一个集成了陀螺仪和加速度计的传感器，它能输出在直角坐标系下的x，y，z轴的角速度和加速度数据。</p>
+<p>陀螺仪输出的格式为：绕x轴的旋转角速度，绕y轴的角速度，绕z轴的角速度（分别称为roll角速度，pitch角速度和yaw角速度）。</p>
+<p>加速度计输出的格式为：x轴的加速度，y轴的加速度，z轴的加速度。</p>
+<p>另外还需要关注传感器的其他参数如：</p>
+<ul>
+<li>陀螺仪的量程：eg.+-2000dps</li>
+<li>加速度计的量程：eg.2g</li>
+<li>adc转换精度为16bit</li>
+<li>传感器采样率4-1000hz：eg.1000hz</li>
+</ul>
+<p>我们从MPU6050那就得到了陀螺仪数据gx,gy,gz，加速度数据az,ay,az</p>
+<p>螺仪转换精度<strong>2^16&#x3D;65536,65536&#x2F;{2000-(-2000)}&#x3D;16.4,实际1°等于adc值16.4</strong></p>
+<p>采样率就是数据的更新率，也就是我们每次读取数据的频率。</p>
+<h3 id="1-2-Mahony算法原理"><a href="#1-2-Mahony算法原理" class="headerlink" title="1.2 Mahony算法原理"></a>1.2 Mahony算法原理</h3><p>参考另一篇文章：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/108542178">基于Manony滤波算法的姿态解算</a></p>
+<h2 id="2，代码实现"><a href="#2，代码实现" class="headerlink" title="2，代码实现"></a>2，代码实现</h2><h3 id="1-1-MPU6050初始化及数据读取"><a href="#1-1-MPU6050初始化及数据读取" class="headerlink" title="1.1 MPU6050初始化及数据读取"></a>1.1 MPU6050初始化及数据读取</h3><p><strong>该部分代码参考了正点原子的MPU6050例程；主要修改以下初始化代码</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* MPU6050模块:绕x轴为roll，绕y轴为pitch，绕z轴为yaw</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">uint8_t</span> <span class="title function_">MPU_Init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123; </span><br><span class="line">	<span class="type">uint8_t</span> res;</span><br><span class="line">	IIC_Init();	<span class="comment">//初始化IIC总线</span></span><br><span class="line">	MPU_Write_Byte(MPU_PWR_MGMT1_REG,<span class="number">0X80</span>);	<span class="comment">//复位MPU6050	</span></span><br><span class="line">	<span class="comment">//等待复位完成</span></span><br><span class="line">  	delay_ms(<span class="number">100</span>);</span><br><span class="line">	MPU_Write_Byte(MPU_PWR_MGMT1_REG,<span class="number">0X00</span>);	<span class="comment">//唤醒MPU6050</span></span><br><span class="line">	MPU_Set_Gyro_Fsr(<span class="number">3</span>);	<span class="comment">//陀螺仪量程+-2000		</span></span><br><span class="line">	MPU_Set_Accel_Fsr(<span class="number">0</span>);	<span class="comment">//加速度计量程+-2g				</span></span><br><span class="line">	MPU_Set_Rate(<span class="number">1000</span>);		<span class="comment">//1khz采样率				</span></span><br><span class="line">	MPU_Write_Byte(MPU_INT_EN_REG,<span class="number">0X00</span>);	<span class="comment">//关闭中断</span></span><br><span class="line">	MPU_Write_Byte(MPU_USER_CTRL_REG,<span class="number">0X00</span>);	<span class="comment">//关闭IIC主模式</span></span><br><span class="line">	MPU_Write_Byte(MPU_FIFO_EN_REG,<span class="number">0X00</span>);	<span class="comment">//关闭FIFO</span></span><br><span class="line">	MPU_Write_Byte(MPU_INTBP_CFG_REG,<span class="number">0X80</span>);	<span class="comment">//关闭INT</span></span><br><span class="line">	res=MPU_Read_Byte(MPU_DEVICE_ID_REG);	<span class="comment">//读取设备id，AD0引脚接地 故id应该为0x68</span></span><br><span class="line">	<span class="keyword">if</span>(res==MPU_ADDR)</span><br><span class="line">	&#123;</span><br><span class="line">		MPU_Write_Byte(MPU_PWR_MGMT1_REG,<span class="number">0X01</span>);	<span class="comment">//设置x轴为时钟</span></span><br><span class="line">		MPU_Write_Byte(MPU_PWR_MGMT2_REG,<span class="number">0X00</span>);	<span class="comment">//开启陀螺仪加速度计</span></span><br><span class="line">		MPU_Set_Rate(<span class="number">1000</span>);						</span><br><span class="line"> 	&#125;<span class="keyword">else</span> <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>重新编写一个读取mpu6050数据的函数。使我们读取的数据是经过平均滤波的数据。</strong></p>
+<p>使用6个FIFO队列对数据(gx,gy,gz,ax,ay,az)进行缓存，每次读取一次数据，就将数据入队，并计算队列的平均值，对原始数据进行平滑滤波。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> Buf_SIZE  10	<span class="comment">//队列长度，越大，平滑性越高</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int16_t</span>  MPU6500_FIFO[<span class="number">6</span>][Buf_SIZE];	<span class="comment">//6个FIFO队列；0-2：陀螺仪数据；3-5：加速度计数据	</span></span><br><span class="line"></span><br><span class="line"><span class="type">int16_t</span> lastAx,lastAy,lastAz,lastGx,lastGy,lastGz;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">uint8_t</span> Wr_Index = <span class="number">0</span>;	<span class="comment">//当前FIFO的写入下标</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//将val入队</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">MPU6500_NewVal</span><span class="params">(<span class="type">int16_t</span>* buf,<span class="type">int16_t</span> val)</span> &#123;</span><br><span class="line">  	buf[Wr_Index] = val;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//计算FIFO中的平均值</span></span><br><span class="line"><span class="type">static</span> <span class="type">int16_t</span> <span class="title function_">MPU6500_GetAvg</span><span class="params">(<span class="type">int16_t</span>* buf)</span></span><br><span class="line">&#123;</span><br><span class="line">  	<span class="type">int</span> i;</span><br><span class="line">	<span class="type">int32_t</span>	sum = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span>(i=<span class="number">0</span>;i&lt;Buf_SIZE;i++)</span><br><span class="line">		sum += buf[i];</span><br><span class="line">	sum = sum / Buf_SIZE;</span><br><span class="line">	<span class="keyword">return</span> (<span class="type">int16_t</span>)sum;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//读取经过滤波的陀螺仪，加速度数据</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">MPU6500_readGyro_Acc</span><span class="params">(<span class="type">int16_t</span> *gyro,<span class="type">int16_t</span> *acc)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">static</span> <span class="type">short</span> buf[<span class="number">6</span>];	<span class="comment">//缓存原始数据：0-2：陀螺仪数据；3-5：加速度计数据	</span></span><br><span class="line">	<span class="type">static</span> <span class="type">int16_t</span> gx,gy,gz;</span><br><span class="line">	<span class="type">static</span> <span class="type">int16_t</span> ax,ay,az;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//正点原子的库函数，读取传感器原始数据</span></span><br><span class="line">	MPU_Get_Gyroscope(&amp;buf[<span class="number">0</span>],&amp;buf[<span class="number">1</span>],&amp;buf[<span class="number">2</span>]);	</span><br><span class="line">	MPU_Get_Accelerometer(&amp;buf[<span class="number">3</span>],&amp;buf[<span class="number">4</span>],&amp;buf[<span class="number">5</span>]);</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//将原始数据入队</span></span><br><span class="line">	MPU6500_NewVal(&amp;MPU6500_FIFO[<span class="number">0</span>][<span class="number">0</span>],buf[<span class="number">0</span>]);</span><br><span class="line">	MPU6500_NewVal(&amp;MPU6500_FIFO[<span class="number">1</span>][<span class="number">0</span>],buf[<span class="number">1</span>]);</span><br><span class="line">	MPU6500_NewVal(&amp;MPU6500_FIFO[<span class="number">2</span>][<span class="number">0</span>],buf[<span class="number">2</span>]);</span><br><span class="line"></span><br><span class="line">	MPU6500_NewVal(&amp;MPU6500_FIFO[<span class="number">3</span>][<span class="number">0</span>],buf[<span class="number">3</span>]);</span><br><span class="line">	MPU6500_NewVal(&amp;MPU6500_FIFO[<span class="number">4</span>][<span class="number">0</span>],buf[<span class="number">4</span>]);</span><br><span class="line">	MPU6500_NewVal(&amp;MPU6500_FIFO[<span class="number">5</span>][<span class="number">0</span>],buf[<span class="number">5</span>]);</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//更新FIFO入口指针</span></span><br><span class="line">	Wr_Index = (Wr_Index + <span class="number">1</span>) % Buf_SIZE;	</span><br><span class="line"></span><br><span class="line">	<span class="comment">//计算队列平均值</span></span><br><span class="line">	gx =  MPU6500_GetAvg(&amp;MPU6500_FIFO[<span class="number">4</span>][<span class="number">0</span>]);</span><br><span class="line">	gy =  MPU6500_GetAvg(&amp;MPU6500_FIFO[<span class="number">5</span>][<span class="number">0</span>]);</span><br><span class="line">	gz =  MPU6500_GetAvg(&amp;MPU6500_FIFO[<span class="number">6</span>][<span class="number">0</span>]);</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//陀螺仪数据要减去偏移量</span></span><br><span class="line">	gyro[<span class="number">0</span>] = gx - imu.Roll_offset;	<span class="comment">//gyro</span></span><br><span class="line">	gyro[<span class="number">1</span>] = gy - imu.Pitch_offset;</span><br><span class="line">	gyro[<span class="number">2</span>] = gz - imu.Yaw_offset;</span><br><span class="line">		</span><br><span class="line"></span><br><span class="line">	ax = 	MPU6500_GetAvg(&amp;MPU6500_FIFO[<span class="number">0</span>][<span class="number">0</span>]);</span><br><span class="line">	ay = 	MPU6500_GetAvg(&amp;MPU6500_FIFO[<span class="number">1</span>][<span class="number">0</span>]);</span><br><span class="line">	az = 	MPU6500_GetAvg(&amp;MPU6500_FIFO[<span class="number">2</span>][<span class="number">0</span>]);</span><br><span class="line">				</span><br><span class="line">	acc[<span class="number">0</span>] = ax; <span class="comment">//acc</span></span><br><span class="line">	acc[<span class="number">1</span>] = ay;</span><br><span class="line">	acc[<span class="number">2</span>] = az;	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-2-Mahony算法c语言实现"><a href="#1-2-Mahony算法c语言实现" class="headerlink" title="1.2 Mahony算法c语言实现"></a>1.2 Mahony算法c语言实现</h3><p>首先将陀螺仪的数据转换成角度，这里封装成一个函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//读取经过滤波的角速度，加速度</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">get_IMU_Values</span><span class="params">(<span class="type">float</span> *values)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int16_t</span> gyro[<span class="number">3</span>],acc[<span class="number">3</span>];</span><br><span class="line">	</span><br><span class="line">	MPU6500_readGyro_Acc(&amp;gyro[<span class="number">0</span>],&amp;acc[<span class="number">0</span>]);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">3</span>;i++)</span><br><span class="line">	&#123;</span><br><span class="line">		values[i]=((<span class="type">float</span>) gyro[i])/<span class="number">16.4f</span>;	<span class="comment">//这里结合理论分析思考</span></span><br><span class="line">		</span><br><span class="line">		values[<span class="number">3</span>+i]=(<span class="type">float</span>) acc[i];</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>然后编写函数实现计算姿态角的功能，使用四元数计算姿态角的公式在理论分析中推导：</strong></p>
+<p><strong>其中α为绕x轴旋转角即roll，β为绕y轴旋转角即pitch，γ为绕z轴旋转角即yaw。a,b,c,d即q0,q1,q2,q3.</strong></p>
+<p><img src="/2025/05/30/hello-world/STM32/stm32_MPU6050_Mahony/20210516164833222.png" alt="在这里插入图片描述"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//arcsin函数</span></span><br><span class="line"><span class="type">float</span> <span class="title function_">safe_asin</span><span class="params">(<span class="type">float</span> v)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span> (isnan(v)) &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0.0f</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (v &gt;= <span class="number">1.0f</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> PI/<span class="number">2</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (v &lt;= <span class="number">-1.0f</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> -PI/<span class="number">2</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="built_in">asin</span>(v);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//周期性的更新姿态角。</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">get_angle</span><span class="params">(<span class="type">void</span> )</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">static</span> <span class="type">float</span> q[<span class="number">4</span>];	<span class="comment">//四元数</span></span><br><span class="line">	<span class="type">float</span> getValue[<span class="number">6</span>];	<span class="comment">//缓存读取的传感器数据</span></span><br><span class="line">	get_IMU_Values(getValue);	<span class="comment">//读取滤波后的传感器数据	</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">//Mahony算法更新四元数</span></span><br><span class="line">	MahonyAHRSupdateIMU(getValue[<span class="number">0</span>] * PI/<span class="number">180</span>, getValue[<span class="number">1</span>] * PI/<span class="number">180</span>, getValue[<span class="number">2</span>] * PI/<span class="number">180</span>, getValue[<span class="number">3</span>], getValue[<span class="number">4</span>], getValue[<span class="number">5</span>]);			</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//到此，用读取的数据更新了 q0,q1,q2,q3是定义在Mahony.c的全局变量，保存当前四元数的值</span></span><br><span class="line">	q[<span class="number">0</span>] = q0;</span><br><span class="line">	q[<span class="number">1</span>] = q1;</span><br><span class="line">	q[<span class="number">2</span>] = q2;</span><br><span class="line">	q[<span class="number">3</span>] = q3;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//更新全局变量IMU的属性</span></span><br><span class="line">	imu.ax = getValue[<span class="number">3</span>];</span><br><span class="line">	imu.ay = getValue[<span class="number">4</span>];</span><br><span class="line">	imu.az = getValue[<span class="number">5</span>];</span><br><span class="line"></span><br><span class="line">	imu.Pitch_v = getValue[<span class="number">0</span>];</span><br><span class="line">	imu.Roll_v = getValue[<span class="number">1</span>];</span><br><span class="line">	imu.Yaw_v = getValue[<span class="number">2</span>];</span><br><span class="line"></span><br><span class="line">	<span class="comment">//通过四元数计算当前姿态角</span></span><br><span class="line">	imu.Roll = (<span class="built_in">atan2</span>(<span class="number">2.0f</span>*(q[<span class="number">0</span>]*q[<span class="number">1</span>] + q[<span class="number">2</span>]*q[<span class="number">3</span>]),<span class="number">1</span> - <span class="number">2.0f</span>*(q[<span class="number">1</span>]*q[<span class="number">1</span>] + q[<span class="number">2</span>]*q[<span class="number">2</span>])))* <span class="number">180</span>/PI;	</span><br><span class="line">	imu.Pitch = -safe_asin(<span class="number">2.0f</span>*(q[<span class="number">0</span>]*q[<span class="number">2</span>] - q[<span class="number">1</span>]*q[<span class="number">3</span>]))* <span class="number">180</span>/PI;</span><br><span class="line">	imu.Yaw = -<span class="built_in">atan2</span>(<span class="number">2</span> * q1 * q2 + <span class="number">2</span> * q0 * q3, <span class="number">-2</span> * q2*q2 - <span class="number">2</span> * q3 * q3 + <span class="number">1</span>)* <span class="number">180</span>/PI; <span class="comment">// yaw</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><strong>代码中MahonyAHRSupdateIMU()函数实现的就是四元数的更新算法。</strong></p>
+<p><em>逻辑上，首先用加速度计校准陀螺仪，方式是通过计算当前四元数姿态下的重力分量，与加速度计的重力分量作叉积，得到误差。<br>对误差作P(比例)和I(积分)运算后加到陀螺仪角速度上。最终由角速度计算新的四元数。</em></p>
+<p><strong>使用到的公式有：</strong></p>
+<p><strong>四元数重力分量计算：</strong></p>
+<p>四元数旋转矩阵的转置表示：从地理坐标系转换到机体坐标系的旋转。重力向量设为[0,0,1]，与四元数旋转矩阵的转置矩阵相乘，表示机体坐标系下的重力分量。</p>
+<p><img src="/2025/05/30/hello-world/STM32/stm32_MPU6050_Mahony/20210517203510626.jpg" alt="在这里插入图片描述"></p>
+<p>所以由四元数得到的机体坐标系下的重力向量为：<br><img src="/2025/05/30/hello-world/STM32/stm32_MPU6050_Mahony/20210516234611509.jpg" alt="在这里插入图片描述"><br><strong>由于加速度计测的是在机体坐标系下的重力向量，故将两个向量作叉积，即可得到他们之间的误差。</strong></p>
+<p><img src="/2025/05/30/hello-world/STM32/stm32_MPU6050_Mahony/2021051623534746.jpg" alt="在这里插入图片描述"></p>
+<p><strong>四元数更新方程：</strong></p>
+<p><img src="/2025/05/30/hello-world/STM32/stm32_MPU6050_Mahony/2021051618002479.jpg" alt="在这里插入图片描述"></p>
+<p><strong>代码中的 sampleFreq 即执行姿态解算的频率，这里用定时器，以500HZ的频率调用get_angle();</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">MahonyAHRSupdateIMU</span><span class="params">(<span class="type">float</span> gx, <span class="type">float</span> gy, <span class="type">float</span> gz, <span class="type">float</span> ax, <span class="type">float</span> ay, <span class="type">float</span> az)</span> &#123;</span><br><span class="line">	<span class="type">float</span> recipNorm;	</span><br><span class="line">	<span class="type">float</span> halfvx, halfvy, halfvz;	<span class="comment">//1/2 重力分量</span></span><br><span class="line">	<span class="type">float</span> halfex, halfey, halfez;	<span class="comment">//1/2 重力误差</span></span><br><span class="line">	<span class="type">float</span> qa, qb, qc;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//加速度数据有效时才进行校准</span></span><br><span class="line">	<span class="keyword">if</span>(!((ax == <span class="number">0.0f</span>) &amp;&amp; (ay == <span class="number">0.0f</span>) &amp;&amp; (az == <span class="number">0.0f</span>))) &#123;</span><br><span class="line"></span><br><span class="line">		<span class="comment">//对加速度数据归一化</span></span><br><span class="line">		recipNorm = invSqrt(ax * ax + ay * ay + az * az);</span><br><span class="line">		ax *= recipNorm;</span><br><span class="line">		ay *= recipNorm;</span><br><span class="line">		az *= recipNorm;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 由四元数计算重力分量</span></span><br><span class="line">		halfvx = q1 * q3 - q0 * q2;</span><br><span class="line">		halfvy = q0 * q1 + q2 * q3;</span><br><span class="line">		halfvz = q0 * q0 - <span class="number">0.5f</span> + q3 * q3;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 将四元数重力分量 与 加速度计重力分量 作叉积 得到误差</span></span><br><span class="line">		halfex = (ay * halfvz - az * halfvy);</span><br><span class="line">		halfey = (az * halfvx - ax * halfvz);</span><br><span class="line">		halfez = (ax * halfvy - ay * halfvx);</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 使用积分？</span></span><br><span class="line">		<span class="keyword">if</span>(twoKi &gt; <span class="number">0.0f</span>) &#123;</span><br><span class="line">			<span class="comment">//对误差作积分</span></span><br><span class="line">			integralFBx += twoKi * halfex * (<span class="number">1.0f</span> / sampleFreq);	<span class="comment">// integral error scaled by Ki</span></span><br><span class="line">			integralFBy += twoKi * halfey * (<span class="number">1.0f</span> / sampleFreq);</span><br><span class="line">			integralFBz += twoKi * halfez * (<span class="number">1.0f</span> / sampleFreq);</span><br><span class="line">			<span class="comment">//反馈到角速度</span></span><br><span class="line">			gx += integralFBx;	<span class="comment">// apply integral feedback</span></span><br><span class="line">			gy += integralFBy;</span><br><span class="line">			gz += integralFBz;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			integralFBx = <span class="number">0.0f</span>;	<span class="comment">// prevent integral windup</span></span><br><span class="line">			integralFBy = <span class="number">0.0f</span>;</span><br><span class="line">			integralFBz = <span class="number">0.0f</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 对误差作比例运算并反馈</span></span><br><span class="line">		gx += twoKp * halfex;</span><br><span class="line">		gy += twoKp * halfey;</span><br><span class="line">		gz += twoKp * halfez;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 计算1/2 dt</span></span><br><span class="line">	gx *= (<span class="number">0.5f</span> * (<span class="number">1.0f</span> / sampleFreq));		<span class="comment">// pre-multiply common factors</span></span><br><span class="line">	gy *= (<span class="number">0.5f</span> * (<span class="number">1.0f</span> / sampleFreq));</span><br><span class="line">	gz *= (<span class="number">0.5f</span> * (<span class="number">1.0f</span> / sampleFreq));</span><br><span class="line">	qa = q0;</span><br><span class="line">	qb = q1;</span><br><span class="line">	qc = q2;</span><br><span class="line">	<span class="comment">// 更新四元数</span></span><br><span class="line">	q0 += (-qb * gx - qc * gy - q3 * gz);</span><br><span class="line">	q1 += (qa * gx + qc * gz - q3 * gy);</span><br><span class="line">	q2 += (qa * gy - qb * gz + q3 * gx);</span><br><span class="line">	q3 += (qa * gz + qb * gy - qc * gx);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 四元数归一化</span></span><br><span class="line">	recipNorm = invSqrt(q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3);</span><br><span class="line">	q0 *= recipNorm;</span><br><span class="line">	q1 *= recipNorm;</span><br><span class="line">	q2 *= recipNorm;</span><br><span class="line">	q3 *= recipNorm;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+<h3 id="1-3-将代码移植到你的工程"><a href="#1-3-将代码移植到你的工程" class="headerlink" title="1.3 将代码移植到你的工程"></a>1.3 将代码移植到你的工程</h3><p>项目地址：<a target="_blank" rel="noopener" href="https://gitee.com/killerp/mpu6050_-mahony">https://gitee.com/killerp/mpu6050_-mahony</a></p>
+<p><strong>若是使用stm32的软件iic，则需要在myiic.h中修改IO引脚。</strong></p>
+<p><strong>若使用其他的芯片，则需要完成myiic.h中所有函数及延时函数的实现。</strong></p>
+<p><strong>注意修改Mahony.h中的sampleFreq为定时器回调函数执行的频率。</strong></p>
+<h2 id="3，补充"><a href="#3，补充" class="headerlink" title="3，补充"></a>3，补充</h2><p><strong>由于加速度计对水平方向的旋转无能为力，故用此程序得到的yaw角数据会一直漂移，无法得到校准；通常的解决方法是增加一个磁场传感器，来获得一个准确的水平方向角来校准陀螺仪的漂移。MPU6050支持扩展一个IIC接口到磁场传感器，可通过配置MPU6050的IIC MASTER 来读取磁场传感器的数据。</strong></p>
+<p>在Mahony中提供了包含磁场数据的融合函数：</p>
+<blockquote>
+<p>void MahonyAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);</p>
+</blockquote>
+<p><img src="/2025/05/30/hello-world/STM32/stm32_MPU6050_Mahony/20210516235902902.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/STM32/stm32_MPU6050_Mahony/" data-id="cmbcy7rha001nt8mthl9pbcya" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/STM32/stm32_MS5611/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/STM32/Stabilizer/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

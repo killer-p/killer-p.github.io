@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/page/14/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-killer-blog/IMX6/platform(pengding)" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/05/31/killer-blog/IMX6/platform(pengding)/" class="article-date">
+  <time class="dt-published" datetime="2025-05-31T02:36:45.802Z" itemprop="datePublished">2025-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="platform框架"><a href="#platform框架" class="headerlink" title="platform框架"></a>platform框架</h2><p>platform框架是在字符设备驱动的基础上实现的，它的目的是实现了驱动和设备的自动匹配。也就是说platform核心层会通过字符串匹配的方式，为设备树中的设备节点找到对应的驱动程序，然后执行驱动程序。以led驱动为例子。</p>
+<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>platform框架有三个对象：</p>
+<ul>
+<li>驱动程序：我们需要写的驱动代码</li>
+<li>设备节点：描述设备的信息</li>
+<li>框架自己：提供接口</li>
+</ul>
+<p>如何做一个platform驱动？首先需要准备好驱动程序和设备节点，写好驱动的底层代码（和字符驱动程序一样），然后分别注册到platform框架中，就可以了。</p>
+<h4 id="驱动程序"><a href="#驱动程序" class="headerlink" title="驱动程序"></a>驱动程序</h4><p>驱动程序的重点在于实现 <code>platform_driver</code>对象，例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">platform_driver</span> <span class="title">led_driver</span> =</span> &#123;</span><br><span class="line">    .driver = &#123;</span><br><span class="line">        .name = <span class="string">&quot;imx6ull-led&quot;</span>,</span><br><span class="line">        .of_match_table = led_of_match,</span><br><span class="line">    &#125;,</span><br><span class="line">    .probe = led_probe,</span><br><span class="line">    .remove = led_remove,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>其中的of_match_table 表示支持的设备，是一个字符串数组：里面的字符串要和设备树里设备的compatible属性相同。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">of_device_id</span> <span class="title">led_of_match</span>[] =</span>&#123;</span><br><span class="line">    &#123; .compatible = <span class="string">&quot;atkalpha-gpioled&quot;</span> &#125;,</span><br><span class="line">    &#123;&#125;  <span class="comment">//最后一个必须是空的</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>probe 函数会在驱动和设备匹配成功的时候被执行，一般会在其中进行初始化，如创建字符设备节点、注册字符设备。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">led_probe</span><span class="params">(<span class="keyword">struct</span> platform_device *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">    printk(<span class="string">&quot;led driver and device was matched!\r\n&quot;</span>);</span><br><span class="line">    <span class="comment">//获取设备号</span></span><br><span class="line">	<span class="keyword">if</span> (leddev.major) &#123;</span><br><span class="line">		leddev.devid = MKDEV(leddev.major, <span class="number">0</span>);</span><br><span class="line">		register_chrdev_region(leddev.devid, <span class="number">1</span>, <span class="string">&quot;dtsplatled&quot;</span>);</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		alloc_chrdev_region(&amp;leddev.devid, <span class="number">0</span>, <span class="number">1</span>, <span class="string">&quot;dtsplatled&quot;</span>);</span><br><span class="line">		leddev.major = MAJOR(leddev.devid);</span><br><span class="line">	&#125;</span><br><span class="line">    <span class="comment">//初始化字符设备</span></span><br><span class="line">    leddev.cdev.owner = THIS_MODULE;</span><br><span class="line">    cdev_init(&amp;leddev.cdev,&amp;leddev_fops);</span><br><span class="line">    cdev_add(&amp;leddev.cdev,leddev.devid,<span class="number">1</span>);</span><br><span class="line">    <span class="comment">//设置设备节点</span></span><br><span class="line">    leddev.class = class_create(THIS_MODULE, <span class="string">&quot;dtsplatled&quot;</span>);</span><br><span class="line">    leddev.device = device_create(leddev.class, <span class="literal">NULL</span>, leddev.devid, <span class="literal">NULL</span>, <span class="string">&quot;dtsplatled&quot;</span>);</span><br><span class="line">    <span class="comment">//初始化gpio</span></span><br><span class="line">    leddev.nd = of_find_node_by_path(<span class="string">&quot;/gpioled&quot;</span>);</span><br><span class="line">    leddev.gpio = of_get_named_gpio(leddev.nd,<span class="string">&quot;led-gpio&quot;</span>,<span class="number">0</span>);</span><br><span class="line">    gpio_request(leddev.gpio,<span class="string">&quot;led0&quot;</span>);</span><br><span class="line">    gpio_direction_output(leddev.gpio,<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完成驱动的实现后就要注册到platform框架中去：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">leddriver_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> platform_driver_register(&amp;led_driver);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> __exit <span class="title function_">leddriver_exit</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	platform_driver_unregister(&amp;led_driver);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module_init(leddriver_init);</span><br><span class="line">module_exit(leddriver_exit);</span><br></pre></td></tr></table></figure>
+
+
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/05/31/killer-blog/IMX6/platform(pengding)/" data-id="cmbcy7rhd001yt8mt8xg57mch" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-killer-blog/IMX6/sync_io" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/05/31/killer-blog/IMX6/sync_io/" class="article-date">
+  <time class="dt-published" datetime="2025-05-31T02:36:45.802Z" itemprop="datePublished">2025-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="阻塞IO"><a href="#阻塞IO" class="headerlink" title="阻塞IO"></a>阻塞IO</h2><p>当我们的应用程序使用read()函数读取时，如下设置，则应用程序会一直访问驱动，占用cpu。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">fd = open(filename, O_RDWR);</span><br><span class="line">	<span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">		ret = read(fd, &amp;data, <span class="keyword">sizeof</span>(data));</span><br><span class="line">		<span class="keyword">if</span> (ret &lt; <span class="number">0</span>) &#123;  <span class="comment">/* 数据读取错误或者无效 */</span></span><br><span class="line">			</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;		<span class="comment">/* 数据读取正确 */</span></span><br><span class="line">			<span class="keyword">if</span> (data)	<span class="comment">/* 读取到数据 */</span></span><br><span class="line">				<span class="built_in">printf</span>(<span class="string">&quot;key value = %#X\r\n&quot;</span>, data);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们不希望应用持续的占用cpu，而是希望当没有数据时，进程阻塞，有数据来时再唤醒进程。</p>
+<h3 id="等待队列"><a href="#等待队列" class="headerlink" title="等待队列"></a>等待队列</h3><p>为此，需要在驱动中使用一个等待队列，当没有数据时，把进程放到等待队列中阻塞等待，有数据时再从队列中唤醒运行。</p>
+<p>添加一个等待队列变量：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">wait_queue_head_t</span> r_wait;</span><br><span class="line"></span><br><span class="line">init_waitqueue_head(&amp;keyirq.r_wait);<span class="comment">//初始化队列头</span></span><br></pre></td></tr></table></figure>
+
+<p>当应用程序调用read时，我们要判断按键是否按下，若按下则直接返回按键值。若无按下，就把应用进程挂起阻塞：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">keyirq_read</span><span class="params">(<span class="keyword">struct</span> file *filp,<span class="type">char</span> __user *buf,<span class="type">size_t</span> cnt,<span class="type">loff_t</span> *lofft)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> data; <span class="comment">//为什么必须是unsigned char类型？int类型会返回-22</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//把当前的用户进程声明为一个队列项</span></span><br><span class="line">    DECLARE_WAITQUEUE(wait, current);</span><br><span class="line">    <span class="keyword">if</span>(<span class="type">atomic_read</span>(&amp;keyirq.keyvalue) == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//没有按键按下，把用户程序放到队列</span></span><br><span class="line">        add_wait_queue(&amp;keyirq.r_wait,&amp;wait);</span><br><span class="line">        <span class="comment">//设置进程状态</span></span><br><span class="line">        __set_current_state(TASK_INTERRUPTIBLE);</span><br><span class="line">        schedule();<span class="comment">//调度进程</span></span><br><span class="line">        <span class="comment">//进程被唤醒，设置新的状态</span></span><br><span class="line">        __set_current_state(TASK_RUNNING);  </span><br><span class="line">        <span class="comment">//移出队列</span></span><br><span class="line">        remove_wait_queue(&amp;keyirq.r_wait, &amp;wait); </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    data = <span class="type">atomic_read</span>(&amp;keyirq.keyvalue);</span><br><span class="line">    <span class="keyword">if</span>(data == <span class="number">1</span>)&#123;</span><br><span class="line">        <span class="comment">//有按键按下</span></span><br><span class="line">        copy_to_user(buf,&amp;data,<span class="keyword">sizeof</span>(data));</span><br><span class="line">        <span class="type">atomic_set</span>(&amp;keyirq.keyvalue,<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> -EINVAL;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>那么应用程序应该如何被唤醒呢？应该当按键按下时，就唤醒。这个部分由timer_func()来完成判断：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">timer_func</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//printk(&quot;fliting ... \r\n&quot;);</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mykey</span> *<span class="title">keyirq</span> =</span> (<span class="keyword">struct</span> mykey *)arg;</span><br><span class="line">    <span class="comment">//读取引脚电平作为按键值</span></span><br><span class="line">    <span class="keyword">if</span>(gpio_get_value(keyirq-&gt;gpio) == KEY_PRESS)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//按键按下</span></span><br><span class="line">        <span class="type">atomic_set</span>(&amp;keyirq-&gt;keystatus,<span class="number">0</span>);</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="comment">//按键松开</span></span><br><span class="line">        <span class="type">atomic_set</span>(&amp;keyirq-&gt;keystatus,<span class="number">1</span>);</span><br><span class="line">        <span class="comment">//标记一次按键按下</span></span><br><span class="line">        <span class="type">atomic_set</span>(&amp;keyirq-&gt;keyvalue,<span class="number">1</span>);</span><br><span class="line">        <span class="comment">//printk(&quot;set keyvalue = 1\r\n&quot;);</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//按键按下唤醒进程</span></span><br><span class="line">    <span class="keyword">if</span>(<span class="type">atomic_read</span>(&amp;keyirq-&gt;keyvalue) == <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        wake_up_interruptible(&amp;keyirq-&gt;r_wait);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/05/31/killer-blog/IMX6/sync_io/" data-id="cmbcy7rhd001zt8mtd5ur7zcx" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-killer-blog/IMX6/regmap(pengding)" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/05/31/killer-blog/IMX6/regmap(pengding)/" class="article-date">
+  <time class="dt-published" datetime="2025-05-31T02:36:45.802Z" itemprop="datePublished">2025-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_44182115/article/details/123331499">Linux regmap机制（一）_铁头小哥的博客-CSDN博客_linux regmap</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/05/31/killer-blog/IMX6/regmap(pengding)/" data-id="cmbcy7rhe0020t8mt2ny50fis" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-killer-blog/IMX6/async" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/05/31/killer-blog/IMX6/async/" class="article-date">
+  <time class="dt-published" datetime="2025-05-31T02:36:45.799Z" itemprop="datePublished">2025-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="异步通知"><a href="#异步通知" class="headerlink" title="异步通知"></a>异步通知</h2><p>当我们的应用程序使用read()函数读取时，如下设置，则应用程序会一直访问驱动，占用cpu。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">fd = open(filename, O_RDWR);</span><br><span class="line">	<span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">		ret = read(fd, &amp;data, <span class="keyword">sizeof</span>(data));</span><br><span class="line">		<span class="keyword">if</span> (ret &lt; <span class="number">0</span>) &#123;  <span class="comment">/* 数据读取错误或者无效 */</span></span><br><span class="line">			</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;		<span class="comment">/* 数据读取正确 */</span></span><br><span class="line">			<span class="keyword">if</span> (data)	<span class="comment">/* 读取到数据 */</span></span><br><span class="line">				<span class="built_in">printf</span>(<span class="string">&quot;key value = %#X\r\n&quot;</span>, data);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们不希望应用持续的占用cpu，而是希望当驱动有数据到来时，再唤醒进程。这时候就需要使用异步通知了。</p>
+<p>异步通知的实现是信号。信号类似于中断，由驱动程序产生信号，发送给应用程序，应用程序需要把自身的进程id传递给驱动程序，并设置信号的处理函数。</p>
+<h3 id="应用程序"><a href="#应用程序" class="headerlink" title="应用程序"></a>应用程序</h3><p>当我们的应用程序按下面的方式开启异步通知：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">fd = open(filename, O_RDWR);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 设置信号SIGIO的处理函数 */</span></span><br><span class="line">signal(SIGIO, sigio_signal_func);</span><br><span class="line"></span><br><span class="line">fcntl(fd, F_SETOWN, getpid());		<span class="comment">/* 获取当前进程id并设置到fd 	*/</span></span><br><span class="line">flags = fcntl(fd, F_GETFL);			<span class="comment">/* 获取当前的进程状态 */</span></span><br><span class="line">fcntl(fd, F_SETFL, flags | FASYNC);	<span class="comment">/* 设置进程启用异步通知功能 */</span>	</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(<span class="number">1</span>) &#123;</span><br><span class="line">	sleep(<span class="number">2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在驱动程序中，按键状态更新后，会产生信号给应用，让应用来读取按键状态。所以在信号处理函数中，我们使用read函数来读取驱动的数据：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">sigio_signal_func</span><span class="params">(<span class="type">int</span> signum)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> err = <span class="number">0</span>;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> keyvalue = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	err = read(fd, &amp;keyvalue, <span class="keyword">sizeof</span>(keyvalue));</span><br><span class="line">	<span class="keyword">if</span>(err &lt; <span class="number">0</span>) &#123;</span><br><span class="line">		<span class="comment">/* 读取错误 */</span></span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;sigio signal! key value=%d\r\n&quot;</span>, keyvalue);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="驱动程序"><a href="#驱动程序" class="headerlink" title="驱动程序"></a>驱动程序</h3><p>首先增加一个<code>struct fasync_struct *async_queue;</code>变量来异步通知</p>
+<p>然后在file_operations中实现 <code>.fasync = keysig_fasync,</code>函数，当应用程序调用 <code>fcntl(fd, F_SETFL, flags | FASYNC);</code>时，fasync 函数就会调用，初始化async_queue。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">keysig_fasync</span><span class="params">(<span class="type">int</span> fd, <span class="keyword">struct</span> file *filp, <span class="type">int</span> on)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mykey</span> *<span class="title">dev</span> =</span> (<span class="keyword">struct</span> mykey *)filp-&gt;private_data;</span><br><span class="line">    <span class="comment">//初始化async_queue 会把应用进程的进程号和async_queue绑定，调用kill_fasync()时会给对应进程号的进程发送信号</span></span><br><span class="line">	<span class="keyword">return</span> fasync_helper(fd, filp, on, &amp;dev-&gt;async_queue);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当按键的状态改变时，发送信号给应用：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">timer_func</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//printk(&quot;fliting ... \r\n&quot;);</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mykey</span> *<span class="title">keyirq</span> =</span> (<span class="keyword">struct</span> mykey *)arg;</span><br><span class="line">    <span class="comment">//读取引脚电平作为按键值</span></span><br><span class="line">    <span class="keyword">if</span>(gpio_get_value(keyirq-&gt;gpio) == KEY_PRESS)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//按键按下</span></span><br><span class="line">        <span class="type">atomic_set</span>(&amp;keyirq-&gt;keystatus,<span class="number">0</span>);</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="comment">//按键松开</span></span><br><span class="line">        <span class="type">atomic_set</span>(&amp;keyirq-&gt;keystatus,<span class="number">1</span>);</span><br><span class="line">        <span class="comment">//标记一次按键按下</span></span><br><span class="line">        <span class="type">atomic_set</span>(&amp;keyirq-&gt;keyvalue,<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(<span class="type">atomic_read</span>(&amp;keyirq-&gt;keyvalue)==<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(keyirq-&gt;async_queue)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//发送信号给应用</span></span><br><span class="line">            kill_fasync(&amp;keyirq-&gt;async_queue,SIGIO,POLL_IN);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此时，应用程序的信号处理函数调用read函数读取数据，我们的read函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">keyirq_read</span><span class="params">(<span class="keyword">struct</span> file *filp, <span class="type">char</span> __user *buf, <span class="type">size_t</span> cnt, <span class="type">loff_t</span> *offt)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> data;</span><br><span class="line">    data = <span class="type">atomic_read</span>(&amp;keyirq.keyvalue);</span><br><span class="line">    <span class="keyword">if</span>(data == <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//有按键按下</span></span><br><span class="line">        copy_to_user(buf,&amp;data,<span class="keyword">sizeof</span>(data));</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> -EINVAL;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/05/31/killer-blog/IMX6/async/" data-id="cmbcy7rha001pt8mt7ctpgcrj" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-killer-blog/IMX6/device_tree(pending)" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/05/31/killer-blog/IMX6/device_tree(pending)/" class="article-date">
+  <time class="dt-published" datetime="2025-05-31T02:36:45.799Z" itemprop="datePublished">2025-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/05/31/killer-blog/IMX6/device_tree(pending)/" data-id="cmbcy7rhb001qt8mt5f5u2rvi" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-killer-blog/IMX6/gpio" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/05/31/killer-blog/IMX6/gpio/" class="article-date">
+  <time class="dt-published" datetime="2025-05-31T02:36:45.799Z" itemprop="datePublished">2025-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="gpio"><a href="#gpio" class="headerlink" title="gpio"></a>gpio</h2><p>以gpio1控制器为例，来分析gpio子系统。首先从设备树节点入手</p>
+<h3 id="设备树节点"><a href="#设备树节点" class="headerlink" title="设备树节点"></a>设备树节点</h3><ul>
+<li>compatible：表示该gpio控制器的类型，fsl使用一个同用的驱动程序来设置gpio控制器</li>
+<li>reg：表示gpio1的起始地址和范围</li>
+<li>interrupts：表示中断类型、中断号、触发方式，每16个gpio口共用一个中断号，所以有32&#x2F;16&#x3D;2个中断号</li>
+<li>gpio-controller：表示节点是一个gpio-controller，可以被gpio子系统识别</li>
+<li>interrupt-controller：表示节点是一个interrupt-controller，会被中断子系统识别。</li>
+<li>#interrupt-cells &#x3D; &lt;2&gt;;表示需要用2个cell描述一个gpio中断请求的信息</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">gpio1: gpio@<span class="number">0209</span>c000 &#123;</span><br><span class="line">	compatible = <span class="string">&quot;fsl,imx6ul-gpio&quot;</span>, <span class="string">&quot;fsl,imx35-gpio&quot;</span>;</span><br><span class="line">	reg = &lt;<span class="number">0x0209c000</span> <span class="number">0x4000</span>&gt;;</span><br><span class="line">	interrupts = &lt;GIC_SPI <span class="number">66</span> IRQ_TYPE_LEVEL_HIGH&gt;,</span><br><span class="line">		     &lt;GIC_SPI <span class="number">67</span> IRQ_TYPE_LEVEL_HIGH&gt;;</span><br><span class="line">	gpio-controller;</span><br><span class="line">	<span class="meta">#gpio-cells = <span class="string">&lt;2&gt;</span>;</span></span><br><span class="line">	interrupt-controller;</span><br><span class="line">	<span class="meta">#interrupt-cells = <span class="string">&lt;2&gt;</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="驱动程序"><a href="#驱动程序" class="headerlink" title="驱动程序"></a>驱动程序</h3><p>gpio驱动的代码在drivers\gpio\gpio-mxc.c，可以发现其是一个platform_driver</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">platform_driver</span> <span class="title">mxc_gpio_driver</span> =</span> &#123;</span><br><span class="line">	.driver		= &#123;</span><br><span class="line">		.name	= <span class="string">&quot;gpio-mxc&quot;</span>,</span><br><span class="line">		.of_match_table = mxc_gpio_dt_ids,</span><br><span class="line">	&#125;,</span><br><span class="line">	.probe		= mxc_gpio_probe,</span><br><span class="line">	.id_table	= mxc_gpio_devtype,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>在linux中，一般将gpio控制器看成是 一个gpio芯片和一个中断控制芯片，所以开发gpio控制器需要对接linux的gpio子系统和中断子系统。</p>
+<p>主要的代码在probe函数，初始化一个gpio控制器有以下部分：</p>
+<ul>
+<li>获取设备树资源</li>
+<li>设置gpio_chip，接入gpio子系统</li>
+<li>设置中断回调函数，irq_chip_generic，接入中断子系统</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">mxc_gpio_probe</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">device_node</span> *<span class="title">np</span> =</span> pdev-&gt;dev.of_node;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">mxc_gpio_port</span> *<span class="title">port</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">resource</span> *<span class="title">iores</span>;</span></span><br><span class="line">	<span class="type">int</span> irq_base;</span><br><span class="line">	<span class="type">int</span> err;</span><br><span class="line">	<span class="comment">//获取fsl,imx35-gpio对应的硬件信息</span></span><br><span class="line">	mxc_gpio_get_hw(pdev);</span><br><span class="line">	<span class="comment">//申请一个mxc_gpio_port 结构体，代表一个gpio端口</span></span><br><span class="line">	port = devm_kzalloc(&amp;pdev-&gt;dev, <span class="keyword">sizeof</span>(*port), GFP_KERNEL);</span><br><span class="line">	<span class="keyword">if</span> (!port)</span><br><span class="line">		<span class="keyword">return</span> -ENOMEM;</span><br><span class="line">	<span class="comment">//获取gpio控制器的内存地址 并转换成虚拟地址</span></span><br><span class="line">	iores = platform_get_resource(pdev, IORESOURCE_MEM, <span class="number">0</span>);</span><br><span class="line">	port-&gt;base = devm_ioremap_resource(&amp;pdev-&gt;dev, iores);</span><br><span class="line">	<span class="keyword">if</span> (IS_ERR(port-&gt;base))</span><br><span class="line">		<span class="keyword">return</span> PTR_ERR(port-&gt;base);</span><br><span class="line"></span><br><span class="line">	<span class="comment">//获取gpio控制器在GIC控制器中的两个中断号</span></span><br><span class="line">	port-&gt;irq_high = platform_get_irq(pdev, <span class="number">1</span>);</span><br><span class="line">	port-&gt;irq = platform_get_irq(pdev, <span class="number">0</span>);</span><br><span class="line">	<span class="keyword">if</span> (port-&gt;irq &lt; <span class="number">0</span>)</span><br><span class="line">		<span class="keyword">return</span> port-&gt;irq;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//关闭中断，清除中断标志位</span></span><br><span class="line">	writel(<span class="number">0</span>, port-&gt;base + GPIO_IMR);</span><br><span class="line">	writel(~<span class="number">0</span>, port-&gt;base + GPIO_ISR);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/*给GPIO控制器设置中断处理函数 mx2_gpio_irq_handler</span></span><br><span class="line"><span class="comment">	  GPIO控制器的中断处理函数是chained类型，就是不能request、probe、thread</span></span><br><span class="line"><span class="comment">	  当gpio控制器产生中断时，中断函数会触发执行，在中断函数中检查是具体那个控制器那个引脚产生的中断</span></span><br><span class="line"><span class="comment">	*/</span></span><br><span class="line">	<span class="keyword">if</span> (mxc_gpio_hwtype == IMX21_GPIO) &#123;</span><br><span class="line">		irq_set_chained_handler(port-&gt;irq, mx2_gpio_irq_handler);</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		irq_set_chained_handler(port-&gt;irq, mx3_gpio_irq_handler);</span><br><span class="line">		irq_set_handler_data(port-&gt;irq, port);</span><br><span class="line">		<span class="keyword">if</span> (port-&gt;irq_high &gt; <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="comment">/* setup handler for GPIO 16 to 31 */</span></span><br><span class="line">			irq_set_chained_handler(port-&gt;irq_high,</span><br><span class="line">						mx3_gpio_irq_handler);</span><br><span class="line">			irq_set_handler_data(port-&gt;irq_high, port);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//初始化bgpio_chip，初始化gpio_chip的函数，因为这些函数就是操作寄存器，所有有很大的通用性，故抽象成bgpio</span></span><br><span class="line">	err = bgpio_init(&amp;port-&gt;bgc, &amp;pdev-&gt;dev, <span class="number">4</span>,</span><br><span class="line">			 port-&gt;base + GPIO_PSR,</span><br><span class="line">			 port-&gt;base + GPIO_DR, <span class="literal">NULL</span>,</span><br><span class="line">			 port-&gt;base + GPIO_GDIR, <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line">	<span class="keyword">if</span> (err)</span><br><span class="line">		<span class="keyword">goto</span> out_bgio;</span><br><span class="line">	<span class="comment">//设置函数</span></span><br><span class="line">	port-&gt;bgc.gc.to_irq = mxc_gpio_to_irq;</span><br><span class="line">	port-&gt;bgc.gc.base = (pdev-&gt;id &lt; <span class="number">0</span>) ? of_alias_get_id(np, <span class="string">&quot;gpio&quot;</span>) * <span class="number">32</span> :</span><br><span class="line">					     pdev-&gt;id * <span class="number">32</span>;</span><br><span class="line">	<span class="comment">//将gpio_chip添加到gpio子系统</span></span><br><span class="line">	err = gpiochip_add(&amp;port-&gt;bgc.gc);</span><br><span class="line">	<span class="keyword">if</span> (err)</span><br><span class="line">		<span class="keyword">goto</span> out_bgpio_remove;</span><br><span class="line">	<span class="comment">//动态申请中断描述符，一共32个，对应32个gpio，从0到31</span></span><br><span class="line">	irq_base = irq_alloc_descs(<span class="number">-1</span>, <span class="number">0</span>, <span class="number">32</span>, numa_node_id());</span><br><span class="line">	<span class="keyword">if</span> (irq_base &lt; <span class="number">0</span>) &#123;</span><br><span class="line">		err = irq_base;</span><br><span class="line">		<span class="keyword">goto</span> out_gpiochip_remove;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 添加注册一个irq domian来代表gpio中断控制器</span></span><br><span class="line"><span class="comment">	 np:表示中断控制器节点</span></span><br><span class="line"><span class="comment">	 32表示domain支持的irq_number的数量</span></span><br><span class="line"><span class="comment">	 irq_base 是第一个irq_number</span></span><br><span class="line"><span class="comment">     0 第一个hw_irq</span></span><br><span class="line"><span class="comment">	 irq_domain_simple_ops 映射回调函数</span></span><br><span class="line"><span class="comment">	*/</span></span><br><span class="line">	port-&gt;domain = irq_domain_add_legacy(np, <span class="number">32</span>, irq_base, <span class="number">0</span>,</span><br><span class="line">					     &amp;irq_domain_simple_ops, <span class="literal">NULL</span>);</span><br><span class="line">	<span class="keyword">if</span> (!port-&gt;domain) &#123;</span><br><span class="line">		err = -ENODEV;</span><br><span class="line">		<span class="keyword">goto</span> out_irqdesc_free;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	</span><br><span class="line">    <span class="comment">//初始化GPIO控制器对应的irq_chip_generic结构体</span></span><br><span class="line">	mxc_gpio_init_gc(port, irq_base);</span><br><span class="line"></span><br><span class="line">	<span class="comment">//插入gpio端口列表</span></span><br><span class="line">	list_add_tail(&amp;port-&gt;node, &amp;mxc_gpio_ports);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">out_irqdesc_free:</span><br><span class="line">	irq_free_descs(irq_base, <span class="number">32</span>);</span><br><span class="line">out_gpiochip_remove:</span><br><span class="line">	gpiochip_remove(&amp;port-&gt;bgc.gc);</span><br><span class="line">out_bgpio_remove:</span><br><span class="line">	bgpio_remove(&amp;port-&gt;bgc);</span><br><span class="line">out_bgio:</span><br><span class="line">	dev_info(&amp;pdev-&gt;dev, <span class="string">&quot;%s failed with errno %d\n&quot;</span>, __func__, err);</span><br><span class="line">	<span class="keyword">return</span> err;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="gpio-chip"><a href="#gpio-chip" class="headerlink" title="gpio_chip"></a>gpio_chip</h3><p>为了使用gpio子系统，需要完成gpio_chip结构体。gpio_chip用于描述gpio控制器，驱动程序需要实现该gpio_chip结构体的成员，并添加到gpio子系统中。</p>
+<p>由于不同gpio控制器其实有许多相同的地方，所以可以使用gpio-generic.c中提供的<code>bgpio_init</code>来辅助完成gpio_chip对象。该函数声明如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> 初始化bgc</span></span><br><span class="line"><span class="comment"> sz: 8 * sz 为寄存器的位数 一般为32位</span></span><br><span class="line"><span class="comment"> dat:gpio状态寄存器</span></span><br><span class="line"><span class="comment"> set:设置gpio状态</span></span><br><span class="line"><span class="comment"> clr:清除gpio</span></span><br><span class="line"><span class="comment"> dirout:设置gpio为输出</span></span><br><span class="line"><span class="comment"> dirin:设置gpio为输入</span></span><br><span class="line"><span class="comment"> flag:标志</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">bgpio_init</span><span class="params">(<span class="keyword">struct</span> bgpio_chip *bgc, <span class="keyword">struct</span> device *dev,</span></span><br><span class="line"><span class="params">	       <span class="type">unsigned</span> <span class="type">long</span> sz, <span class="type">void</span> __iomem *dat, <span class="type">void</span> __iomem *<span class="built_in">set</span>,</span></span><br><span class="line"><span class="params">	       <span class="type">void</span> __iomem *clr, <span class="type">void</span> __iomem *dirout, <span class="type">void</span> __iomem *dirin,</span></span><br><span class="line"><span class="params">	       <span class="type">unsigned</span> <span class="type">long</span> flags)</span></span><br></pre></td></tr></table></figure>
+
+<p>不同的CPU的GPIO控制器是可以抽象出许多共同点的，一般来说，一个控制器会控制若干个PIN，主要由以下的寄存器：</p>
+<ul>
+<li>输出寄存器：每一位表示PIN脚的输出电平</li>
+<li>输入寄存器：每一位表示PIN脚的输入电平</li>
+<li>方向寄存器：每一位表示PIN脚是输出&#x2F;输入</li>
+<li>中断配置寄存器：配置PIN脚中断触发方式</li>
+<li>中断使能寄存器：每一位表示PIN脚的中断使能开关</li>
+<li>中断状态寄存器：每一位表示PIN脚的中断状态</li>
+</ul>
+<p>gpio_chip结构体的成员函数本质就是通过读写这些寄存器来实现的。</p>
+<p>所以驱动开发只需要提供寄存器的相关信息，并了解bgpio的函数接口，就能完成gpio_chip对象的实现。例如上面的probe函数:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//初始化bgpio_chip，其实就是初始化gpio_chip的成员</span></span><br><span class="line">err = bgpio_init(&amp;port-&gt;bgc, &amp;pdev-&gt;dev, <span class="number">4</span>,</span><br><span class="line">		 port-&gt;base + GPIO_PSR,</span><br><span class="line">		 port-&gt;base + GPIO_DR, <span class="literal">NULL</span>,</span><br><span class="line">		 port-&gt;base + GPIO_GDIR, <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line"><span class="comment">//设置函数</span></span><br><span class="line">port-&gt;bgc.gc.to_irq = mxc_gpio_to_irq;</span><br><span class="line">port-&gt;bgc.gc.base = (pdev-&gt;id &lt; <span class="number">0</span>) ? of_alias_get_id(np, <span class="string">&quot;gpio&quot;</span>) * <span class="number">32</span> :</span><br><span class="line">				     pdev-&gt;id * <span class="number">32</span>;</span><br><span class="line"><span class="comment">//将gpio_chip添加到gpio子系统</span></span><br><span class="line">err = gpiochip_add(&amp;port-&gt;bgc.gc);</span><br></pre></td></tr></table></figure>
+
+
+
+<p>当我们开发按键驱动程序时，需要使用GPIO子系统的接口，就可以直接使用：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//申请一个gpio，设置为输入，传入gpio的引脚编号作为参数</span></span><br><span class="line">gpio_request(keyirq.gpio,<span class="string">&quot;keyirq&quot;</span>);</span><br><span class="line">gpio_direction_input(keyirq.gpio);</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="gpio中断控制器"><a href="#gpio中断控制器" class="headerlink" title="gpio中断控制器"></a>gpio中断控制器</h3><p>当我们使用中断时，往往只需要以下代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//把硬件中断hw_irq映射到irq_number</span></span><br><span class="line">keyirq.irq_num = irq_of_parse_and_map(keyirq.nd,<span class="number">0</span>);</span><br><span class="line"><span class="comment">//注册中断函数</span></span><br><span class="line"><span class="keyword">if</span>(request_irq(keyirq.irq_num,key0_handler,IRQF_TRIGGER_FALLING|IRQF_TRIGGER_RISING,<span class="string">&quot;keyirq&quot;</span>,&amp;keyirq) &lt; <span class="number">0</span> )</span><br><span class="line">&#123;</span><br><span class="line">    printk(<span class="string">&quot;request_irq fail\r\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> -EFAULT;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>理解这些需要比较深入了解linux的驱动子系统。推荐: <a target="_blank" rel="noopener" href="http://www.wowotech.net/irq_subsystem/interrupt_subsystem_architecture.html">Linux kernel的中断子系统之（一）：综述 (wowotech.net)</a></p>
+<p>先把上面的代码搁置，首先从硬件来了解中断的处理：</p>
+<p>中断信号一般由这样的过程构成：</p>
+<ol>
+<li>中断源，比如按键</li>
+<li>gpio控制器</li>
+<li>GIC，通用中断控制器</li>
+<li>CPU</li>
+</ol>
+<p>而软件上的中断需要经过这样的处理：</p>
+<ol>
+<li>CPU产生IRQ中断，跳转到IRQ_Handler</li>
+<li>IRQ_Handler中读取GIC寄存器，判断是gpio控制器产生的中断，跳转到gpio_handler</li>
+<li>gpio_handler读取gpio控制器的寄存器，判断是哪个PIN产生的中断</li>
+<li>跳转到特点PIN的中断处理函数</li>
+</ol>
+<p>软件的中断处理就是硬件中断信号的逆过程。实际上可以把gpio控制器也看成是一个类似于GIC的中断控制器，linux中正是这么做的。这样就像把多个GIC串联起来。</p>
+<h4 id="中断号"><a href="#中断号" class="headerlink" title="中断号"></a>中断号</h4><p>这里补充一个中断号的点。假设有一个GIC，他能处理120个中断，那么他就会把中断编号成0-119，假设系统有另一个相同的GIC，他也有一样的中断编号0-119，但是所对应的硬件显然是不一样的。这对于软件开发而言是很麻烦的，我们需要去区别这个中断编号是哪个GIC下的。</p>
+<p>对于软件开发来说，最理想的情况就是，一个中断源对应一个中断号，一个中断号有一个中断处理函数。而实际的硬件中断编号是无法满足我们的要求的。</p>
+<p>linux提出了domain的结构体来应对这个情况。domain的作用就是把硬件中断号转换成一个虚拟的中断号。linux把硬件中断号称为hw_irq，虚拟中断号称为irq_number。一般来说，一个中断控制器就拥有一个domain，在GIC1的domain1下，有0-119中断号，在GIC2的domain2下，有0-119中断号.domain1和domain2把这些hw_irq转换成唯一的irq_number。</p>
+<p>有了这个机制，软件使用中断时，只需要把设备树中的hw_irq转换到irq_number，然后注册中断服务函数到irq_number就可以。非常方便</p>
+<h4 id="初始化中断服务函数"><a href="#初始化中断服务函数" class="headerlink" title="初始化中断服务函数"></a>初始化中断服务函数</h4><p>而对于中断控制器来说，中断的初始化就复杂了些。</p>
+<p>前面说过，gpio端口控制器也是一个中断控制器，可以设置中断，查看中断状态。所以，就需要创建一个domain，来将hw_irq转换成irq_number。这一部分，在probe函数中的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//动态申请中断描述符，一共32个，对应32个gpio，从0到31，返回irq_number的第一个</span></span><br><span class="line">irq_base = irq_alloc_descs(<span class="number">-1</span>, <span class="number">0</span>, <span class="number">32</span>, numa_node_id());</span><br><span class="line"><span class="keyword">if</span> (irq_base &lt; <span class="number">0</span>) &#123;</span><br><span class="line">	err = irq_base;</span><br><span class="line">	<span class="keyword">goto</span> out_gpiochip_remove;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> 添加注册一个irq domian来将hw_irq转换成irq_number</span></span><br><span class="line"><span class="comment"> np:表示中断控制器节点</span></span><br><span class="line"><span class="comment"> 32表示domain支持的irq_number的数量</span></span><br><span class="line"><span class="comment"> irq_base 是第一个irq_number</span></span><br><span class="line"><span class="comment">    0 第一个hw_irq</span></span><br><span class="line"><span class="comment"> irq_domain_simple_ops 映射回调函数</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">port-&gt;domain = irq_domain_add_legacy(np, <span class="number">32</span>, irq_base, <span class="number">0</span>,</span><br><span class="line">				     &amp;irq_domain_simple_ops, <span class="literal">NULL</span>);</span><br></pre></td></tr></table></figure>
+
+<p>linux中使用中断描述符来表示一个具体的中断，一个gpio端口有32个中断源，所以需要32个中断描述符。</p>
+<p>irq_alloc_descs()返回的是创建的中断描述符的irq_number</p>
+<p>irq_domain_add_legacy 则创建一个domain，并建立irq_number和hw_irq的关系，irq_domain_simple_ops 结构体中含有把hw_irq转换成irq_number的代码。</p>
+<p>除此之外，还要实现第三点 <strong>gpio_handler读取gpio控制器的寄存器，判断是哪个PIN产生的中断</strong>，所以需要设置gpio控制器的中断处理函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*给GPIO控制器设置中断处理函数 mx2_gpio_irq_handler</span></span><br><span class="line"><span class="comment">  GPIO控制器的中断处理函数是chained类型，就是不能request、probe、thread</span></span><br><span class="line"><span class="comment">  当gpio控制器产生中断时，中断函数会触发执行，在中断函数中检查是具体那个控制器那个引脚产生的中断</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">if</span> (mxc_gpio_hwtype == IMX21_GPIO) &#123;</span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * Setup one handler for all GPIO interrupts. Actually setting</span></span><br><span class="line"><span class="comment">	 * the handler is needed only once, but doing it for every port</span></span><br><span class="line"><span class="comment">	 * is more robust and easier.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	irq_set_chained_handler(port-&gt;irq, mx2_gpio_irq_handler);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">	<span class="comment">/* setup one handler for each entry */</span></span><br><span class="line">	irq_set_chained_handler(port-&gt;irq, mx3_gpio_irq_handler);</span><br><span class="line">	irq_set_handler_data(port-&gt;irq, port);</span><br><span class="line">	<span class="keyword">if</span> (port-&gt;irq_high &gt; <span class="number">0</span>) &#123;</span><br><span class="line">		<span class="comment">/* setup handler for GPIO 16 to 31 */</span></span><br><span class="line">		irq_set_chained_handler(port-&gt;irq_high,</span><br><span class="line">					mx3_gpio_irq_handler);</span><br><span class="line">		irq_set_handler_data(port-&gt;irq_high, port);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>gpio端口中断函数：</p>
+<p>在gpio端口中断函数中，需要读取状态寄存器，确定哪个PIN脚产生的中断，以及其对应的hw_irq。然后使用gpio端口的domain，将hw_irq转换成irq_number，进而调用对应的中断描述符的中断服务函数，例如按键中断服务函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//gpio端口中断处理函数</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">mx3_gpio_irq_handler</span><span class="params">(u32 irq, <span class="keyword">struct</span> irq_desc *desc)</span></span><br><span class="line">&#123;</span><br><span class="line">	u32 irq_stat;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">mxc_gpio_port</span> *<span class="title">port</span> =</span> irq_get_handler_data(irq);</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">irq_chip</span> *<span class="title">chip</span> =</span> irq_get_chip(irq);</span><br><span class="line"></span><br><span class="line">	chained_irq_enter(chip, desc);</span><br><span class="line">	<span class="comment">//读取端口的中断状态</span></span><br><span class="line">	irq_stat = readl(port-&gt;base + GPIO_ISR) &amp; readl(port-&gt;base + GPIO_IMR);</span><br><span class="line">	<span class="comment">//处理具体PIN的中断</span></span><br><span class="line">	mxc_gpio_irq_handler(port, irq_stat);</span><br><span class="line"></span><br><span class="line">	chained_irq_exit(chip, desc);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//处理端口上的PIN中断</span></span><br><span class="line"><span class="comment">//irq_stat 保存的是中断状态寄存器的值</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">mxc_gpio_irq_handler</span><span class="params">(<span class="keyword">struct</span> mxc_gpio_port *port, u32 irq_stat)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//处理端口上所有PIN脚的中断</span></span><br><span class="line">	<span class="keyword">while</span> (irq_stat != <span class="number">0</span>) &#123;</span><br><span class="line">		<span class="type">int</span> irqoffset = fls(irq_stat) - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (port-&gt;both_edges &amp; (<span class="number">1</span> &lt;&lt; irqoffset))</span><br><span class="line">			mxc_flip_edge(port, irqoffset);</span><br><span class="line"></span><br><span class="line">		<span class="comment">//irq_find_mapping 使用domain将hw_irq转换成irq_number</span></span><br><span class="line">		generic_handle_irq(irq_find_mapping(port-&gt;domain, irqoffset));</span><br><span class="line"></span><br><span class="line">		irq_stat &amp;= ~(<span class="number">1</span> &lt;&lt; irqoffset);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">generic_handle_irq</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> irq)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//通过irq_number找到中断描述符</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">irq_desc</span> *<span class="title">desc</span> =</span> irq_to_desc(irq);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!desc)</span><br><span class="line">		<span class="keyword">return</span> -EINVAL;</span><br><span class="line">    <span class="comment">//调用描述符中的处理函数，这个函数应该是在request_irq的时候设置的</span></span><br><span class="line">	generic_handle_irq_desc(irq, desc);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">generic_handle_irq_desc</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> irq, <span class="keyword">struct</span> irq_desc *desc)</span></span><br><span class="line">&#123;</span><br><span class="line">	desc-&gt;handle_irq(irq, desc);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="初始化中断芯片对象"><a href="#初始化中断芯片对象" class="headerlink" title="初始化中断芯片对象"></a>初始化中断芯片对象</h4><p>以上只是设置了中断的调用流程，还需要实现中断的配置，就是实现irq_chip_generic结构体。</p>
+<p>irq_chip_generic 是属于中断子系统的一部分，用于抽象的描述一个中断控制器，一个中断控制器能控制中断的开关、触发方式等，所以驱动需要实现这个对象，上层的驱动才能通过中断子系统来设置gpio中断。</p>
+<p>对于gpio控制器 ，本质上就是读写ISR、IMR寄存器就能完成中断的控制</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//初始化GPIO控制器对应的irq_chip_generic结构体</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> __init <span class="title function_">mxc_gpio_init_gc</span><span class="params">(<span class="keyword">struct</span> mxc_gpio_port *port, <span class="type">int</span> irq_base)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">irq_chip_generic</span> *<span class="title">gc</span>;</span>  <span class="comment">//中断芯片</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">irq_chip_type</span> *<span class="title">ct</span>;</span>  <span class="comment">//中断芯片的流控</span></span><br><span class="line">	<span class="comment">//动态申请一个中断芯片对象，他控制的linux中断号为irq_base,芯片基地址，以及中断芯片处理函数</span></span><br><span class="line">	gc = irq_alloc_generic_chip(<span class="string">&quot;gpio-mxc&quot;</span>, <span class="number">1</span>, irq_base,</span><br><span class="line">				    port-&gt;base, handle_level_irq);</span><br><span class="line">	gc-&gt;private = port;</span><br><span class="line">	<span class="comment">//初始化irq_chip 即GPIO控制器的中断控制的函数</span></span><br><span class="line">	ct = gc-&gt;chip_types;</span><br><span class="line">	ct-&gt;chip.irq_ack = irq_gc_ack_set_bit;  <span class="comment">//设置中断状态寄存器</span></span><br><span class="line">	ct-&gt;chip.irq_mask = irq_gc_mask_clr_bit;  <span class="comment">//关闭某个中断</span></span><br><span class="line">	ct-&gt;chip.irq_unmask = irq_gc_mask_set_bit;  <span class="comment">//开启中断</span></span><br><span class="line">	ct-&gt;chip.irq_set_type = gpio_set_irq_type;  <span class="comment">//设置中断触发方式</span></span><br><span class="line">	ct-&gt;chip.irq_set_wake = gpio_set_wake_irq;  <span class="comment">//设置中断电源的管理</span></span><br><span class="line">	<span class="comment">//本质上上面的函数都是通过对ISR、IMR寄存器的操作就能完成</span></span><br><span class="line">	ct-&gt;regs.ack = GPIO_ISR;</span><br><span class="line">	ct-&gt;regs.mask = GPIO_IMR;</span><br><span class="line">	<span class="comment">//初始化gc</span></span><br><span class="line">	irq_setup_generic_chip(gc, IRQ_MSK(<span class="number">32</span>), IRQ_GC_INIT_NESTED_LOCK,</span><br><span class="line">			       IRQ_NOREQUEST, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/05/31/killer-blog/IMX6/gpio/" data-id="cmbcy7rhb001rt8mt8wim4bsc" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-killer-blog/IMX6/input_subsystem" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/05/31/killer-blog/IMX6/input_subsystem/" class="article-date">
+  <time class="dt-published" datetime="2025-05-31T02:36:45.799Z" itemprop="datePublished">2025-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="input框架"><a href="#input框架" class="headerlink" title="input框架"></a>input框架</h2><p>input框架是在字符设备驱动的基础上实现的</p>
+<p>驱动层-&gt;核心层-&gt;事件层</p>
+<p>input核心层会向驱动注册一个字符设备，该驱动定义在drivers&#x2F;input&#x2F;input.c，该字符设备住设备号为13，所以我们用input框架实现的输入设备不需要申请主设备号了。重点是实现input_dev结构体，以及熟悉input子系统提供的api函数。</p>
+<h3 id="input-event"><a href="#input-event" class="headerlink" title="input_event"></a>input_event</h3><p>linux将所有的输入事件的定义如下，在include&#x2F;uapi&#x2F;linux&#x2F;input.h中：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">input_event</span> &#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">timeval</span> <span class="title">time</span>;</span>    <span class="comment">//事件产生的时间</span></span><br><span class="line">	__u16 type;    <span class="comment">//事件类型</span></span><br><span class="line">	__u16 code;    <span class="comment">//事件编号</span></span><br><span class="line">	__s32 value;   <span class="comment">//事件值</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>事件类型定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Event types</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_SYN			0x00</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_KEY			0x01</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_REL			0x02</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_ABS			0x03</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_MSC			0x04</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_SW			0x05</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_LED			0x11</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_SND			0x12</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_REP			0x14</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_FF			0x15</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_PWR			0x16</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_FF_STATUS		0x17</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_MAX			0x1f</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_CNT			(EV_MAX+1)</span></span><br></pre></td></tr></table></figure>
+
+<p>事件编号比较多，都在include&#x2F;uapi&#x2F;linux&#x2F;input.h中定义，以部分KEY为例：</p>
+<p>可以看出是对键盘上按键进行编号。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Keys and buttons</span></span><br><span class="line"><span class="comment"> * Abbreviations in the comments:</span></span><br><span class="line"><span class="comment"> * AC - Application Control</span></span><br><span class="line"><span class="comment"> * AL - Application Launch Button</span></span><br><span class="line"><span class="comment"> * SC - System Control</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> KEY_RESERVED		0</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> KEY_ESC			1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> KEY_1			2</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> KEY_2			3</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> KEY_3			4</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> KEY_4			5</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> KEY_5			6</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> KEY_6			7</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> KEY_7			8</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> KEY_8			9</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> KEY_9			10</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> KEY_0			11</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> KEY_MINUS		12</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> KEY_EQUAL		13</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> KEY_BACKSPACE		14</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>绝对位移的编号：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Absolute axes</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ABS_X			0x00</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ABS_Y			0x01</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ABS_Z			0x02</span></span><br></pre></td></tr></table></figure>
+
+<p>事件值应该就是由我们来自定义。</p>
+<h3 id="input-dev"><a href="#input-dev" class="headerlink" title="input_dev"></a>input_dev</h3><p>搞清楚事件类型、事件代码、事件值，这三个东西的含义后，就需要input_dev结构体来产生上述的事件。</p>
+<p>首先需要初始化一个input_dev，指定它能产生什么类型的事件，以及事件的编号</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//申请input_dev</span></span><br><span class="line">keyinput.inputdev = input_allocate_device();</span><br><span class="line">keyinput.inputdev-&gt;name = <span class="string">&quot;keyinput&quot;</span>;</span><br><span class="line"><span class="comment">//设置事件类型</span></span><br><span class="line">keyinput.inputdev-&gt;evbit[<span class="number">0</span>] = BIT_MASK(EV_KEY) | BIT_MASK(EV_REP);</span><br><span class="line"><span class="comment">//设置事件类型和code</span></span><br><span class="line">input_set_capability(keyinput.inputdev, EV_KEY, KEY_0);</span><br><span class="line"><span class="comment">//注册到input子系统</span></span><br><span class="line">input_register_device(keyinput.inputdev);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>我们使用的是按键，所以input_dev设置为EV_KEY，若是触摸屏，则选择EV_ABS和EV_ABS。</p>
+<p>当我们在驱动中确定按键按下后，就可以给input子系统上报按键事件。例如，在定时器回调函数中，经过消抖我们确定了按键的状态，于是使用下面的代码上报事件：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">timer_func</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">keyinput_dev</span> *<span class="title">dev</span> =</span> (<span class="keyword">struct</span> keyinput_dev *)arg;</span><br><span class="line">    <span class="comment">//读取引脚电平作为按键值</span></span><br><span class="line">    <span class="keyword">if</span>(gpio_get_value(dev-&gt;gpio) == KEY_PRESS)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//按下，上报按下事件</span></span><br><span class="line">        input_report_key(dev-&gt;inputdev,KEY_0,KEY0_ACTIVE);</span><br><span class="line">        input_sync(dev-&gt;inputdev);</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="comment">//未按下，上报事件</span></span><br><span class="line">        input_report_key(dev-&gt;inputdev,KEY_0,KEY0_INACTIVE);</span><br><span class="line">        input_sync(dev-&gt;inputdev);        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>input_sync表示事件上报完成，作用类似于一个句子里的句号。</p>
+<h3 id="应用程序"><a href="#应用程序" class="headerlink" title="应用程序"></a>应用程序</h3><p>应用程序如何获取事件呢？前面说了所有的输入设备都要归input子系统管理，所以应用程序也应该到input子系统去获取事件。input子系统在驱动中的节点是&#x2F;dev&#x2F;input&#x2F;event0，所以可用以下代码获取事件：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">fd = open(<span class="string">&quot;/dev/input/event0&quot;</span>, O_RDWR);</span><br><span class="line">read(fd, &amp;inputevent, <span class="keyword">sizeof</span>(inputevent));</span><br><span class="line">			<span class="keyword">switch</span> (inputevent.type) &#123;</span><br><span class="line"></span><br><span class="line">				<span class="keyword">case</span> EV_KEY:</span><br><span class="line">					<span class="keyword">if</span> (inputevent.code &lt; BTN_MISC) &#123; <span class="comment">/* 键盘键值 */</span></span><br><span class="line">						<span class="built_in">printf</span>(<span class="string">&quot;key %d %s\r\n&quot;</span>, inputevent.code, inputevent.value ? <span class="string">&quot;press&quot;</span> : <span class="string">&quot;release&quot;</span>);</span><br><span class="line">					&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">						<span class="built_in">printf</span>(<span class="string">&quot;button %d %s\r\n&quot;</span>, inputevent.code, inputevent.value ? <span class="string">&quot;press&quot;</span> : <span class="string">&quot;release&quot;</span>);</span><br><span class="line">					&#125;</span><br><span class="line">					<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">				<span class="comment">/* 其他类型的事件，自行处理 */</span></span><br><span class="line">				<span class="keyword">case</span> EV_REL:</span><br><span class="line">					<span class="keyword">break</span>;</span><br><span class="line">				<span class="keyword">case</span> EV_ABS:</span><br><span class="line">					<span class="keyword">break</span>;</span><br><span class="line">				<span class="keyword">case</span> EV_MSC:</span><br><span class="line">					<span class="keyword">break</span>;</span><br><span class="line">				<span class="keyword">case</span> EV_SW:</span><br><span class="line">					<span class="keyword">break</span>;</span><br><span class="line">			&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/05/31/killer-blog/IMX6/input_subsystem/" data-id="cmbcy7rhc001tt8mt60453i6h" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-killer-blog/IMX6/key_isr" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/05/31/killer-blog/IMX6/key_isr/" class="article-date">
+  <time class="dt-published" datetime="2025-05-31T02:36:45.799Z" itemprop="datePublished">2025-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="按键中断"><a href="#按键中断" class="headerlink" title="按键中断"></a>按键中断</h2><p>主要是熟悉中断的使用，简单的逻辑：当按下按键时，GPIO1_IO18为低电平。所以设置边沿触发的中断，再中断函数中，设置10ms的定时器用于消抖，在定时器回调函数中主动读取IO电平，以此为根据判断按键的状态。用户可通过read函数读取按键的状态。</p>
+<h3 id="设备树"><a href="#设备树" class="headerlink" title="设备树"></a>设备树</h3><p>在设备树根节点中定义一个key节点，指定他的中断父母就是gpio1中断控制器，触发方式是边沿触发。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">	pinctrl_key: keygrp &#123;</span><br><span class="line">		fsl,pins = &lt;</span><br><span class="line">			MX6UL_PAD_UART1_CTS_B__GPIO1_IO18		<span class="number">0xF080</span>	<span class="comment">/* KEY0 */</span></span><br><span class="line">		&gt;;</span><br><span class="line">	&#125;;</span><br><span class="line"></span><br><span class="line">   key &#123;</span><br><span class="line">	<span class="meta">#address-cells = <span class="string">&lt;1&gt;</span>;</span></span><br><span class="line">	<span class="meta">#size-cells = <span class="string">&lt;1&gt;</span>;</span></span><br><span class="line">	compatible = <span class="string">&quot;atkalpha-key&quot;</span>;</span><br><span class="line">	pinctrl-names = <span class="string">&quot;default&quot;</span>;</span><br><span class="line">	pinctrl<span class="number">-0</span> = &lt;&amp;pinctrl_key&gt;;</span><br><span class="line">	key-gpio = &lt;&amp;gpio1 <span class="number">18</span> GPIO_ACTIVE_LOW&gt;; <span class="comment">/* KEY0 */</span></span><br><span class="line">	interrupt-parent = &lt;&amp;gpio1&gt;;</span><br><span class="line">	interrupts = &lt;<span class="number">18</span> IRQ_TYPE_EDGE_BOTH&gt;; <span class="comment">/* FALLING RISING */</span></span><br><span class="line">	status = <span class="string">&quot;okay&quot;</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="驱动初始化"><a href="#驱动初始化" class="headerlink" title="驱动初始化"></a>驱动初始化</h3><p>驱动中关于中断的内容包括：</p>
+<ul>
+<li>从设备树中获取gpio的中断号：irq_of_parse_and_map</li>
+<li>注册中断服务函数 request_irq</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">key_irq_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//初始化按键值</span></span><br><span class="line">    <span class="type">atomic_set</span>(&amp;keyirq.keyvalue,KEY0_INACTIVE);</span><br><span class="line"></span><br><span class="line">    keyirq.nd = of_find_node_by_path(<span class="string">&quot;/key&quot;</span>);</span><br><span class="line">	<span class="keyword">if</span> (keyirq.nd== <span class="literal">NULL</span>)&#123;</span><br><span class="line">		printk(<span class="string">&quot;key node not find!\r\n&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> -EINVAL;</span><br><span class="line">	&#125; </span><br><span class="line">    keyirq.gpio = of_get_named_gpio(keyirq.nd, <span class="string">&quot;key-gpio&quot;</span>,<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//申请一个gpio，设置为输入</span></span><br><span class="line">    gpio_request(keyirq.gpio,<span class="string">&quot;keyirq&quot;</span>);</span><br><span class="line">    gpio_direction_input(keyirq.gpio);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//根据设备树的信息申请中断号</span></span><br><span class="line">    keyirq.irq_num = irq_of_parse_and_map(keyirq.nd,<span class="number">0</span>);</span><br><span class="line">    printk(<span class="string">&quot;get keyirq irq_num = %d \r\n&quot;</span>,keyirq.irq_num);</span><br><span class="line">    <span class="comment">//注册中断服务函数</span></span><br><span class="line">    <span class="keyword">if</span>(request_irq(keyirq.irq_num,key0_handler,IRQF_TRIGGER_FALLING|IRQF_TRIGGER_RISING,<span class="string">&quot;keyirq&quot;</span>,&amp;keyirq) &lt; <span class="number">0</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        printk(<span class="string">&quot;request_irq fail\r\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> -EFAULT;</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">//初始化定时器</span></span><br><span class="line">    init_timer(&amp;keyirq.timer);</span><br><span class="line">    keyirq.timer.function = timer_func;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建字符设备</span></span><br><span class="line">    alloc_chrdev_region(&amp;keyirq.devid,<span class="number">0</span>,<span class="number">1</span>,<span class="string">&quot;keyirq&quot;</span>);</span><br><span class="line">    keyirq.major = MAJOR(keyirq.devid);</span><br><span class="line">    keyirq.minor = MINOR(keyirq.devid);</span><br><span class="line"></span><br><span class="line">    cdev_init(&amp;keyirq.cdev,&amp;keyirq_fops);</span><br><span class="line">    cdev_add(&amp;keyirq.cdev,keyirq.devid,<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    keyirq.class= class_create(THIS_MODULE,<span class="string">&quot;keyirq&quot;</span>);</span><br><span class="line">    keyirq.device = device_create(keyirq.class,<span class="literal">NULL</span>,keyirq.devid,<span class="literal">NULL</span>,<span class="string">&quot;keyirq&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="中断服务函数"><a href="#中断服务函数" class="headerlink" title="中断服务函数"></a>中断服务函数</h3><p>为了完成消抖，我们需要在中断产生后，大约10ms再去读取IO引脚的电平。所以在中断服务函数中使用定时器来延时，在定时器的回调函数中去读取IO引脚电平。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">irqreturn_t</span> <span class="title function_">key0_handler</span><span class="params">(<span class="type">int</span> irq, <span class="type">void</span> *dev_id)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mykey</span> *<span class="title">keyirq</span> =</span> (<span class="keyword">struct</span> mykey *)dev_id;</span><br><span class="line">    keyirq-&gt;timer.data = keyirq;</span><br><span class="line">    <span class="comment">//开启定时器，等一段时间后再去读引脚电平</span></span><br><span class="line">    mod_timer(&amp;keyirq-&gt;timer,jiffies+msecs_to_jiffies(<span class="number">10</span>));<span class="comment">//10ms</span></span><br><span class="line">    <span class="keyword">return</span> IRQ_RETVAL(IRQ_HANDLED);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">timer_func</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//printk(&quot;fliting ... \r\n&quot;);</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mykey</span> *<span class="title">keyirq</span> =</span> (<span class="keyword">struct</span> mykey *)arg;</span><br><span class="line">    <span class="comment">//读取引脚电平作为按键值</span></span><br><span class="line">    <span class="keyword">if</span>(gpio_get_value(keyirq-&gt;gpio) == KEY_PRESS)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//按键按下</span></span><br><span class="line">        <span class="type">atomic_set</span>(&amp;keyirq-&gt;keystatus,<span class="number">0</span>);</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="comment">//按键松开</span></span><br><span class="line">        <span class="type">atomic_set</span>(&amp;keyirq-&gt;keystatus,<span class="number">1</span>);</span><br><span class="line">        <span class="comment">//标记一次按键按下</span></span><br><span class="line">        <span class="type">atomic_set</span>(&amp;keyirq-&gt;keyvalue,<span class="number">1</span>);</span><br><span class="line">        <span class="comment">//printk(&quot;set keyvalue = 1\r\n&quot;);</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="读取按键"><a href="#读取按键" class="headerlink" title="读取按键"></a>读取按键</h3><p>为此我们编写一个key_irq的字符设备驱动，他实现了一个file_operation结构体，主要实现其中的read函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">keyirq_read</span><span class="params">(<span class="keyword">struct</span> file *filp,<span class="type">char</span> __user *buf,<span class="type">size_t</span> cnt,<span class="type">loff_t</span> *lofft)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//为什么必须是unsigned char类型？int类型会返回-22</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> data;</span><br><span class="line">    data = <span class="type">atomic_read</span>(&amp;keyirq.keyvalue);</span><br><span class="line">    <span class="keyword">if</span>(data == <span class="number">1</span>)&#123;</span><br><span class="line">        <span class="comment">//有按键按下</span></span><br><span class="line">        copy_to_user(buf,&amp;data,<span class="keyword">sizeof</span>(data));</span><br><span class="line">        <span class="type">atomic_set</span>(&amp;keyirq.keyvalue,<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> -EINVAL;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>按键的状态保存在原子变量keyvalue中，需要使用原子操作函数完成对按键状态的读取。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/05/31/killer-blog/IMX6/key_isr/" data-id="cmbcy7rhc001ut8mt1gwzd29z" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-killer-blog/IMX6/led" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/05/31/killer-blog/IMX6/led/" class="article-date">
+  <time class="dt-published" datetime="2025-05-31T02:36:45.799Z" itemprop="datePublished">2025-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="imx6点亮led"><a href="#imx6点亮led" class="headerlink" title="imx6点亮led"></a>imx6点亮led</h2><p>配置GPIO的步骤：</p>
+<ul>
+<li>使能对应GPIOx的时钟</li>
+<li>设置GPIOx_IOx的复用功能</li>
+<li>配置IO的物理参数：上下拉、速度</li>
+<li>设置GPIO的属性：方向、中断</li>
+</ul>
+<h3 id="GPIO的时钟"><a href="#GPIO的时钟" class="headerlink" title="GPIO的时钟"></a>GPIO的时钟</h3><p>由CCM模块管理所有外设的时钟，GPIO作为一组外设，也有其时钟。GPIO1-GPIO5都需要配置。</p>
+<h3 id="IO复用"><a href="#IO复用" class="headerlink" title="IO复用"></a>IO复用</h3><p>IO和GPIO是不同的概念，IO是指引脚，她有许多复用的功能。GPIO只是其中的一种。</p>
+<p>由IOMUX负责实现IO复用功能,寄存器名称：IOMUXC_SW_MUX_CTL_PAD_GPIO1_IO00</p>
+<h3 id="IO物理参数"><a href="#IO物理参数" class="headerlink" title="IO物理参数"></a>IO物理参数</h3><p>每一个IO都有共同的物理参数，包括上下拉、引脚速度。无论复用为哪种模式，都需要设置这些。这些配置在寄存器:IOMUXC_SW_PAD_CTL_PAD_GPIO1_IO00</p>
+<p>PAD是指配置IO端口参数、MUX是指配置IO复用</p>
+<h3 id="GPIO配置"><a href="#GPIO配置" class="headerlink" title="GPIO配置"></a>GPIO配置</h3><p>配置GPIO外设，输入输出方向、中断，默认输出状态等。</p>
+<h3 id="实现代码"><a href="#实现代码" class="headerlink" title="实现代码"></a>实现代码</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">.global _start  //全局标号，程序入口</span><br><span class="line"></span><br><span class="line">//初始化所有时钟，初始化GPIO，输出低电平</span><br><span class="line">_start:</span><br><span class="line">    //将所有CCGRx都设置为0xffffffff</span><br><span class="line">    ldr r0, =0X020C4068</span><br><span class="line">    ldr r1, =0xffffffff</span><br><span class="line">    str r1, [r0]    //*(0X020C4068)=0xffffffff，向地址0X020C4068上写入0xffffffff</span><br><span class="line"></span><br><span class="line">    ldr r0, =0X020C406C</span><br><span class="line">    str r1, [r0]</span><br><span class="line"></span><br><span class="line">    ldr r0, =0X020C4070</span><br><span class="line">    str r1, [r0]</span><br><span class="line"></span><br><span class="line">    ldr r0, =0X020C4074</span><br><span class="line">    str r1, [r0]</span><br><span class="line"></span><br><span class="line">    ldr r0, =0X020C4078</span><br><span class="line">    str r1, [r0]</span><br><span class="line"></span><br><span class="line">    ldr r0, =0X020C407C</span><br><span class="line">    str r1, [r0]</span><br><span class="line"></span><br><span class="line">    ldr r0, =0X020C4080</span><br><span class="line">    str r1, [r0]</span><br><span class="line"></span><br><span class="line">    //复用gpio1_io3为gpio模式</span><br><span class="line">    ldr r0, =0X020E0068</span><br><span class="line">    ldr r1, =0x5</span><br><span class="line">    str r1, [r0]</span><br><span class="line"></span><br><span class="line">    //配置io 的 pad属性</span><br><span class="line">    ldr r0, =0X020E02F4</span><br><span class="line">    ldr r1, =0X10B0 //关闭HYS，100k下拉，keeper、使能keeper1，关闭drain、io速率200mhz</span><br><span class="line">    str r1,[r0]</span><br><span class="line"></span><br><span class="line">    //配置gpio属性</span><br><span class="line">    //配置GPIO为输出</span><br><span class="line">    ldr r0, =0x0209c004</span><br><span class="line">    ldr r1, =0x8</span><br><span class="line">    str r1, [r0]</span><br><span class="line"></span><br><span class="line">    //输出低电平</span><br><span class="line">    ldr r0, =0x0209c000</span><br><span class="line">    ldr r1, =0</span><br><span class="line">    str r1, [r0]</span><br><span class="line"></span><br><span class="line">    loop:</span><br><span class="line">        b loop</span><br><span class="line"></span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/05/31/killer-blog/IMX6/led/" data-id="cmbcy7rhc001vt8mt4hlh09be" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-killer-blog/IMX6/led_char_dev" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/05/31/killer-blog/IMX6/led_char_dev/" class="article-date">
+  <time class="dt-published" datetime="2025-05-31T02:36:45.799Z" itemprop="datePublished">2025-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="字符设备驱动"><a href="#字符设备驱动" class="headerlink" title="字符设备驱动"></a>字符设备驱动</h2><p>字符设备驱动是一大类的基础的驱动框架，这种驱动的实现就是file_operations为核心，实现open,release,write,read等函数。</p>
+<p>一个字符设备驱动需要具备什么东西？一个file_operations，一个设备节点（在文件系统中），驱动的初始化。</p>
+<h3 id="驱动入口"><a href="#驱动入口" class="headerlink" title="驱动入口"></a>驱动入口</h3><p>首先驱动程序不是一个进程，它肯定要被其他的进程调用，我们就需要有一个入口函数。</p>
+<p>module_init();和module_exit();分别用于定义入口和出口函数，一般在入口函数中，完成字符设备驱动的初始化。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">led_dts_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//一定要返回0 表示成功</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module_init(led_dts_init);</span><br><span class="line">module_exit(led_dts_exit);</span><br></pre></td></tr></table></figure>
+
+<p>初始化做什么？下面一步步来看：</p>
+<h3 id="确定设备号"><a href="#确定设备号" class="headerlink" title="确定设备号"></a>确定设备号</h3><p>设备号可以分为两个部分：</p>
+<ul>
+<li>主设备号：表示一个驱动代码</li>
+<li>次设备号：表示这个驱动代码对应的设备</li>
+</ul>
+<p>linux使用设备号的目的是为了方便管理驱动程序，设备。设备号可以通过函数<code>alloc_chrdev_region()</code>获取</p>
+<h3 id="初始化字符设备"><a href="#初始化字符设备" class="headerlink" title="初始化字符设备"></a>初始化字符设备</h3><p>字符设备驱动程序的重点就是实现file_operations，例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> <span class="title">gpioled_fops</span> =</span> &#123;</span><br><span class="line">    .owner = THIS_MODULE,</span><br><span class="line">    .open = gpioled_open,</span><br><span class="line">    .release = gpioled_release,</span><br><span class="line">    .write = gpioled_write,</span><br><span class="line">    .read = gpioled_read,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>然后将这个结构体添加到字符设备驱动系统中：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cdev_init(&amp;gpioled.cdev,&amp;gpioled_fops);  <span class="comment">//使用gpioled_fops初始化gpioled.cdev</span></span><br><span class="line">cdev_add(&amp;gpioled.cdev,gpioled.devid,<span class="number">1</span>);  <span class="comment">//将gpioled.cdev添加到驱动系统</span></span><br></pre></td></tr></table></figure>
+
+<p>这样驱动系统就能管理这个字符设备驱动。</p>
+<h3 id="创建设备在文件系统中的节点"><a href="#创建设备在文件系统中的节点" class="headerlink" title="创建设备在文件系统中的节点"></a>创建设备在文件系统中的节点</h3><p>为了让用户应用能访问到字符设备驱动，可以在&#x2F;dev&#x2F;目录下创建驱动程序的一个节点，也就是一个文件。用户程序可以通过对这个文件的操作，来访问这个驱动程序的file_operations，从而控制驱动程序。</p>
+<p>创建设备节点需要设置该节点的名称：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">   <span class="comment">//创建设备节点</span></span><br><span class="line">   <span class="comment">//创建类</span></span><br><span class="line">   gpioled.class = class_create(THIS_MODULE, GPIOLED_NAME);</span><br><span class="line"><span class="keyword">if</span> (IS_ERR(gpioled.class)) &#123;</span><br><span class="line">	<span class="keyword">return</span> PTR_ERR(gpioled.class);</span><br><span class="line">&#125;    </span><br><span class="line">   <span class="comment">//创建设备</span></span><br><span class="line">   gpioled.device = device_create(gpioled.class, <span class="literal">NULL</span>, gpioled.devid, <span class="literal">NULL</span>, GPIOLED_NAME);</span><br><span class="line"><span class="keyword">if</span> (IS_ERR(gpioled.device)) &#123;</span><br><span class="line">	<span class="keyword">return</span> PTR_ERR(gpioled.device);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/05/31/killer-blog/IMX6/led_char_dev/" data-id="cmbcy7rhd001wt8mt7ik88w99" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/page/13/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><a class="page-number" href="/page/13/">13</a><span class="page-number current">14</span><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/15/">Next &raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

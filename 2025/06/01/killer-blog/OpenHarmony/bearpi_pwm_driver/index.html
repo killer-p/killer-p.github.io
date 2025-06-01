@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="小熊派micro HDF PWM驱动开发本文介绍如何在HDF PWM框架中开发stm32mp1的pwm外设。 stm32mp1的大部分外设可以使用st提供的HAL库来开发。hal库是st官网为所有st芯片提供的sdk包，使开发者可以免去操作寄存器的操作，直接使用库函数完成芯片外设的配置。 STM32MP1 HAL库地址：mirrors_STMicroelectronics&#x2F;STM32Cu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/OpenHarmony/bearpi_pwm_driver/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="小熊派micro HDF PWM驱动开发本文介绍如何在HDF PWM框架中开发stm32mp1的pwm外设。 stm32mp1的大部分外设可以使用st提供的HAL库来开发。hal库是st官网为所有st芯片提供的sdk包，使开发者可以免去操作寄存器的操作，直接使用库函数完成芯片外设的配置。 STM32MP1 HAL库地址：mirrors_STMicroelectronics&#x2F;STM32Cu">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/OpenHarmony/bearpi_pwm_driver/image-20220328211723596.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.645Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:27.110Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/OpenHarmony/bearpi_pwm_driver/image-20220328211723596.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/OpenHarmony/bearpi_pwm_driver" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/OpenHarmony/bearpi_pwm_driver/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.645Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="小熊派micro-HDF-PWM驱动开发"><a href="#小熊派micro-HDF-PWM驱动开发" class="headerlink" title="小熊派micro HDF PWM驱动开发"></a>小熊派micro HDF PWM驱动开发</h2><p>本文介绍如何在HDF PWM框架中开发stm32mp1的pwm外设。</p>
+<p>stm32mp1的大部分外设可以使用st提供的HAL库来开发。hal库是st官网为所有st芯片提供的sdk包，使开发者可以免去操作寄存器的操作，直接使用库函数完成芯片外设的配置。</p>
+<p>STM32MP1 HAL库地址：<a target="_blank" rel="noopener" href="https://gitee.com/mirrors_STMicroelectronics/STM32CubeMP1">mirrors_STMicroelectronics&#x2F;STM32CubeMP1 (gitee.com)</a></p>
+<p>为了使STM32MP1 的PWM驱动适配到HDF框架，就需要了解PWM框架如何开发，可参考官网文档：</p>
+<p><a target="_blank" rel="noopener" href="https://gitee.com/openharmony/docs/blob/master/zh-cn/device-dev/driver/driver-platform-pwm-develop.md">zh-cn&#x2F;device-dev&#x2F;driver&#x2F;driver-platform-pwm-develop.md · OpenHarmony&#x2F;docs - 码云 - 开源中国 (gitee.com)</a></p>
+<p>综上所述，可以将整个开发步骤分三步走：</p>
+<p>1、导入STM32HAL库</p>
+<p>2、使能HDF PWM驱动</p>
+<p>3、编写PWM驱动</p>
+<h3 id="1、导入stm32mp1-HAL库文件"><a href="#1、导入stm32mp1-HAL库文件" class="headerlink" title="1、导入stm32mp1 HAL库文件"></a>1、导入stm32mp1 HAL库文件</h3><p>下载HAL库完成后，将HAL库中的以下文件添加到<code>bearpi-micro\device\st\drivers\stm32mp1xx_hal\STM32MP1xx_HAL_Driver</code>的Inc目录中。</p>
+<ul>
+<li>stm32mp1xx_hal_tim.h</li>
+<li>stm32mp1xx_hal_tim_ex.h</li>
+<li>stm32mp1xx_hal_dma.h</li>
+<li>stm32mp1xx_hal_dma_ex.h</li>
+</ul>
+<p>将 以下文件添加到<code>bearpi-micro\device\st\drivers\stm32mp1xx_hal\STM32MP1xx_HAL_Driver</code>的Src目录中:</p>
+<ul>
+<li>stm32mp1xx_hal_tim.c</li>
+<li>stm32mp1xx_hal_tim_ex.c</li>
+<li>stm32mp1xx_hal_dma.c</li>
+<li>stm32mp1xx_hal_dma_ex.c</li>
+</ul>
+<p>然后将四个源文件加入编译构建体系：编辑<code>bearpi-micro\device\st\drivers\stm32mp1xx_hal\STM32MP1xx_HAL_Driver\BUILD.gn</code></p>
+<p>在sources添加如下两项：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_tim_ex.c&quot;</span>,</span><br><span class="line"><span class="string">&quot;STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_tim.c&quot;</span>,</span><br><span class="line"><span class="string">&quot;STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_dma_ex.c&quot;</span>,</span><br><span class="line"><span class="string">&quot;STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_dma.c&quot;</span>,</span><br></pre></td></tr></table></figure>
+
+<p>添加后如下所示，这样编译系统就会编译这两个文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">import(<span class="string">&quot;//drivers/adapter/khdf/liteos/hdf.gni&quot;</span>)</span><br><span class="line">module_name = <span class="string">&quot;hdf_stm32mp1xx_hal&quot;</span></span><br><span class="line">hdf_driver(module_name) &#123;</span><br><span class="line">  sources = [</span><br><span class="line">    <span class="string">&quot;STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_tim_ex.c&quot;</span>,</span><br><span class="line">    <span class="string">&quot;STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_tim.c&quot;</span>,</span><br><span class="line">    <span class="string">&quot;STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_dma_ex.c&quot;</span>,</span><br><span class="line">    <span class="string">&quot;STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_dma.c&quot;</span>,</span><br><span class="line">    <span class="string">&quot;STM32MP1xx_HAL_Driver/Src/system_stm32mp1xx.c&quot;</span>,</span><br><span class="line">    <span class="string">&quot;STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal.c&quot;</span>,</span><br><span class="line">    <span class="string">&quot;STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_gpio.c&quot;</span>,</span><br><span class="line">    <span class="string">&quot;STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_i2c.c&quot;</span>,</span><br><span class="line">    <span class="string">&quot;STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_exti.c&quot;</span>,</span><br><span class="line">    <span class="string">&quot;STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_ltdc.c&quot;</span>,</span><br><span class="line">    <span class="string">&quot;STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_rcc.c&quot;</span>,</span><br><span class="line">    <span class="string">&quot;STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_rcc_ex.c&quot;</span>,</span><br><span class="line"></span><br><span class="line">  ]</span><br><span class="line">  include_dirs = [</span><br><span class="line">    <span class="string">&quot;.&quot;</span>,</span><br><span class="line">    <span class="string">&quot;//device/st/drivers/stm32mp1xx_hal/STM32MP1xx_HAL_Driver/Inc&quot;</span>,</span><br><span class="line"></span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后，还需要配置一个宏定义，来使能TIM，编辑 <code>STM32MP1xx_HAL_Driver\Inc\stm32mp1xx_hal_conf.h</code>，将 <code>HAL_TIM_MODULE_ENABLED</code> 和<code>HAL_DMA_MODULE_ENABLED</code>使能 ，如下所示：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#define HAL_TIM_MODULE_ENABLED   </span></span><br><span class="line"><span class="comment">#define HAL_DMA_MODULE_ENABLED   </span></span><br></pre></td></tr></table></figure>
+
+<p>到此，我们就能使用stm32mp1xx_hal_tim.h 提供的函数来开发PWM驱动。</p>
+<h3 id="2、使能HDF-PWM框架"><a href="#2、使能HDF-PWM框架" class="headerlink" title="2、使能HDF PWM框架"></a>2、使能HDF PWM框架</h3><p>由于HDF 框架是在内核中的，需要在内核中使能PWM驱动。</p>
+<p>编辑 <code>vendor/bearpi/bearpi_hm_micro/kernel_configs/debug_tee.config</code>，将 <code>LOSCFG_DRIVERS_HDF_PLATFORM_PWM</code>设置为y，如下所示：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOSCFG_DRIVERS_HDF_PLATFORM_PWM = y</span><br></pre></td></tr></table></figure>
+
+<p>开启该宏之后，就会编译HDF 的PWM框架，就能在驱动中使用PWM框架的pwm_core.h和pwm_if.h。</p>
+<h3 id="3、编写驱动代码"><a href="#3、编写驱动代码" class="headerlink" title="3、编写驱动代码"></a>3、编写驱动代码</h3><p>按照官网文档的指示进行编写：<a target="_blank" rel="noopener" href="https://gitee.com/openharmony/docs/blob/master/zh-cn/device-dev/driver/driver-platform-pwm-develop.md">PWM框架开发</a></p>
+<p>同样分为三步走。</p>
+<h4 id="1、配置文件"><a href="#1、配置文件" class="headerlink" title="1、配置文件"></a>1、配置文件</h4><p>一共需要修改两个hcs文件，分别是：device_info.hcs和pwm_config.hcs</p>
+<p>首先 编辑<code>st\bearpi_hm_micro\liteos_a\hdf_config\device_info\device_info.hcs</code>增加pwm节点，如下所示：</p>
+<p>该节点应该是在 <code>platform :: host</code>节点下创建。其中policy&#x3D;1表示只对内核发布驱动服务，moduleName必须为HDF_PLATFORM_PWM，serviceName必须以HDF_PLATFORM_PWM_开头，后面的数字用来区别不同的pwm外设。</p>
+<p>这里我设置为2是因为我使用TIM2作为PWM的源。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">device_pwm :: device&#123;</span><br><span class="line">    device0 :: deviceNode&#123;</span><br><span class="line">        policy = 1;</span><br><span class="line">        priority = 12;</span><br><span class="line">        permission = 0777;</span><br><span class="line">        moduleName = <span class="string">&quot;HDF_PLATFORM_PWM&quot;</span>;</span><br><span class="line">        serviceName = <span class="string">&quot;HDF_PLATFORM_PWM_2&quot;</span>;</span><br><span class="line">        deviceMatchAttr = <span class="string">&quot;st_stm32mp157_pwm_2&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第二个配置文件就是自己创建的，在<code>\bearpi_hm_micro\liteos_a\hdf_config\</code>录下创建pwm目录，在目录中创建 pwm_config.hcs，并在其中添加以下内容：</p>
+<p>其中PWM的计数频率是1MHZ，在代码中写死，可以修改；physics_register表示TIM的寄存器基地址，根据STM32MP1参考手册可知TIM2的寄存器地址是<code>x40000000</code>寄存器地址范围是0x70。</p>
+<p>下面的配置表示：使用TIM2 Channel 1作为PWM输出，周期是1ms，占空比是50%</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">root &#123;</span><br><span class="line">    platform &#123;</span><br><span class="line">        pwm_config &#123;</span><br><span class="line">            <span class="comment">//1mhz</span></span><br><span class="line">            template pwm_device &#123;</span><br><span class="line">                Period = <span class="number">1000</span>;	<span class="comment">//1000*0.1us=100us=10khz</span></span><br><span class="line">                Pulse = <span class="number">500</span>; 	<span class="comment">//500</span></span><br><span class="line">                Polarity = <span class="number">0</span>;   <span class="comment">//high</span></span><br><span class="line">                IdleState = <span class="number">0</span>;  <span class="comment">//reset</span></span><br><span class="line">                channel = <span class="number">0</span>;    <span class="comment">//channel_1 PA5</span></span><br><span class="line">                match_attr = <span class="string">&quot;&quot;</span>;</span><br><span class="line">                num = <span class="number">0</span>;</span><br><span class="line">                physics_register = <span class="number">0X40000000</span>;</span><br><span class="line">                register_size = <span class="number">0X70</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            device_0X40000000 :: pwm_device &#123;</span><br><span class="line">                match_attr = <span class="string">&quot;st_stm32mp157_pwm_2&quot;</span>;</span><br><span class="line">                num = <span class="number">2</span>;</span><br><span class="line">                physics_register = <span class="number">0X40000000</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>将上诉两个文件编辑完成后，在<code>t\bearpi_hm_micro\liteos_a\hdf_config\hdf.hcs</code>添加一行：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;pwm/pwm_config.hcs&quot;</span></span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2、编写驱动"><a href="#2、编写驱动" class="headerlink" title="2、编写驱动"></a>2、编写驱动</h4><p>在<code>bearpi-micro\device\st\drivers</code>录下新建pwm目录，并创建驱动源文件stm32mp1_pwm.c，以及BUILD.gn</p>
+<p>首先定义驱动入口对象：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义驱动入口的对象，必须为HdfDriverEntry（在hdf_device_desc.h中定义）类型的全局变量</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">HdfDriverEntry</span> <span class="title">g_pwmDriverEntry</span> =</span> &#123;</span><br><span class="line">    .moduleVersion = <span class="number">1</span>,</span><br><span class="line">    .moduleName = <span class="string">&quot;HDF_PLATFORM_PWM&quot;</span>,	<span class="comment">//必须与device_info.hcs中的字段一样，用于与驱动设备资源匹配</span></span><br><span class="line">    .Bind = HdfPwmDriverBind,</span><br><span class="line">    .Init = HdfPwmDriverInit,</span><br><span class="line">    .Release = HdfPwnDriverRelease,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调用HDF_INIT将驱动入口注册到HDF框架中</span></span><br><span class="line">HDF_INIT(g_pwmDriverEntry);</span><br></pre></td></tr></table></figure>
+
+<p>以及自定义一个PWM对象：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//私有pwm结构体</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">StmPwm</span> &#123;</span></span><br><span class="line">    TIM_HandleTypeDef htim;		<span class="comment">//HAL TIM必须</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">PwmDev</span> <span class="title">dev</span>;</span>			<span class="comment">//HDF PWM核心层必须</span></span><br><span class="line">    TIM_OC_InitTypeDef sConfig; <span class="comment">//HAL PWM必须 </span></span><br><span class="line">    <span class="type">uint32_t</span> physics_register;  <span class="comment">//TIM基地址</span></span><br><span class="line">    <span class="type">uint32_t</span> register_size;		<span class="comment">//地址范围</span></span><br><span class="line">    <span class="type">uint32_t</span> channel;			<span class="comment">//pwm channel</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>初始化函数逻辑很简单，就是使用 struct StmPwm 对象中的成员去调用各个库的初始化函数。</p>
+<p>首先引入PWM所需的头文件：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//stm hal库</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;stm32mp1xx_hal.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;stm32mp1xx_hal_tim.h&quot;</span></span></span><br><span class="line"><span class="comment">//hdf pwm</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;pwm_core.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;pwm_if.h&quot;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>驱动初始化函数：首先读取上文所配置的信息到StmPwm对象中，然后将PwmDev添加到HDF PWM框架中，这样就能使用HDF PWM框架的功能；最后调用STM32MP1 HAL库函数，初始化TIM2的PWM模式，设置对应的GPIO复用功能，开始输出PWM。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 驱动自身业务初始的接口（设置IO口为输出） HDF框架在加载驱动的时候，会将私有配置信息保存在HdfDeviceObject 中的property里面</span></span><br><span class="line"><span class="type">int32_t</span> <span class="title function_">HdfPwmDriverInit</span><span class="params">(<span class="keyword">struct</span> HdfDeviceObject *device)</span></span><br><span class="line">&#123;</span><br><span class="line">    dprintf(<span class="string">&quot;%s enter\r\n&quot;</span>,__func__);</span><br><span class="line"></span><br><span class="line">    RCC_ClkInitTypeDef    clkconfig;</span><br><span class="line">    <span class="type">uint32_t</span>              pFLatency;</span><br><span class="line">    <span class="type">uint32_t</span>              uwTimclock;</span><br><span class="line"></span><br><span class="line">    sp = (<span class="keyword">struct</span> StmPwm *)OsalMemCalloc(<span class="keyword">sizeof</span>(*sp));</span><br><span class="line"></span><br><span class="line">    <span class="comment">//读取配置文件</span></span><br><span class="line">    readHcs(device);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//获取时钟频率</span></span><br><span class="line">    HAL_RCC_GetClockConfig(&amp;clkconfig, &amp;pFLatency);   </span><br><span class="line">    __HAL_RCC_TIM2_CLK_ENABLE();</span><br><span class="line">    uwTimclock = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_TIMG1);</span><br><span class="line">    <span class="comment">//dprintf(&quot; uwTimclock = %d\r\n&quot;,uwTimclock);</span></span><br><span class="line">	<span class="comment">//配置TIM的计数频率为10MHZ</span></span><br><span class="line">    sp-&gt;htim.Init.Prescaler = (<span class="type">uint32_t</span>) ((uwTimclock / <span class="number">10000000U</span>) - <span class="number">1U</span>);    </span><br><span class="line">    sp-&gt;htim.Init.CounterMode = TIM_COUNTERMODE_UP;</span><br><span class="line">    sp-&gt;htim.Init.ClockDivision = <span class="number">0U</span>;</span><br><span class="line">    sp-&gt;htim.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;</span><br><span class="line">    sp-&gt;sConfig.OCMode = TIM_OCMODE_PWM1;</span><br><span class="line">    sp-&gt;sConfig.OCFastMode = TIM_OCFAST_DISABLE;</span><br><span class="line"></span><br><span class="line">    sp-&gt;dev.method = &amp;g_pwmOps;</span><br><span class="line">    sp-&gt;dev.cfg.duty = sp-&gt;sConfig.Pulse;  </span><br><span class="line">    sp-&gt;dev.cfg.period = sp-&gt;htim.Init.Period;    </span><br><span class="line">    sp-&gt;dev.cfg.polarity = sp-&gt;sConfig.OCPolarity;    </span><br><span class="line">    sp-&gt;dev.cfg.status = PWM_ENABLE_STATUS;</span><br><span class="line">    sp-&gt;dev.cfg.number = <span class="number">10000</span>; </span><br><span class="line"></span><br><span class="line">    sp-&gt;dev.busy = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//添加到核心层</span></span><br><span class="line">    <span class="keyword">if</span> (PwmDeviceAdd(device, &amp;(sp-&gt;dev)) != HDF_SUCCESS) &#123;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> HDF_FAILURE;</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">//对TIM2寄存器基地址进行映射</span></span><br><span class="line">    sp-&gt;htim.Instance = (TIM_TypeDef *)OsalIoRemap(sp-&gt;physics_register, sp-&gt;register_size);</span><br><span class="line">    <span class="keyword">if</span> (sp-&gt;htim.Instance == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        dprintf(<span class="string">&quot;error OsalIoRemap for htim \r\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//初始化PWM寄存器</span></span><br><span class="line">    <span class="keyword">if</span> (HAL_TIM_PWM_Init(&amp;sp-&gt;htim) == HAL_OK)</span><br><span class="line">    &#123;</span><br><span class="line">        dprintf(<span class="string">&quot;pwm init ok config channel \r\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">        HAL_TIM_PWM_ConfigChannel(&amp;sp-&gt;htim, &amp;sp-&gt;sConfig, sp-&gt;channel);</span><br><span class="line">		<span class="comment">//初始化gpio</span></span><br><span class="line">        HAL_TIM_MspPostInit(&amp;sp-&gt;htim);</span><br><span class="line">        <span class="comment">//开始输出PWM</span></span><br><span class="line">        HAL_TIM_PWM_Start(&amp;sp-&gt;htim,sp-&gt;channel);</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> HDF_SUCCESS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>读取上诉配置文件到StmPwm对象：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//读取配置文件   pa5 tim2 channel 1</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">readHcs</span><span class="params">(<span class="keyword">struct</span> HdfDeviceObject *obj)</span></span><br><span class="line">&#123;</span><br><span class="line">    dprintf(<span class="string">&quot;%s enter\r\n&quot;</span>,__func__);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">DeviceResourceIface</span> *<span class="title">iface</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);</span><br><span class="line">    <span class="keyword">if</span> (iface == <span class="literal">NULL</span> || iface-&gt;GetUint32 == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        HDF_LOGE(<span class="string">&quot;%s: face is invalid&quot;</span>, __func__);</span><br><span class="line">        <span class="keyword">return</span> HDF_FAILURE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (iface-&gt;GetUint32(obj-&gt;property, <span class="string">&quot;Period&quot;</span>, &amp;sp-&gt;htim.Init.Period, <span class="number">0</span>) != HDF_SUCCESS) &#123;</span><br><span class="line">        HDF_LOGE(<span class="string">&quot;%s: read num fail&quot;</span>, __func__);</span><br><span class="line">        <span class="keyword">return</span> HDF_FAILURE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (iface-&gt;GetUint32(obj-&gt;property, <span class="string">&quot;Pulse&quot;</span>, &amp;sp-&gt;sConfig.Pulse, <span class="number">0</span>) != HDF_SUCCESS) &#123;</span><br><span class="line">        HDF_LOGE(<span class="string">&quot;%s: read num fail&quot;</span>, __func__);</span><br><span class="line">        <span class="keyword">return</span> HDF_FAILURE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (iface-&gt;GetUint32(obj-&gt;property, <span class="string">&quot;physics_register&quot;</span>, &amp;sp-&gt;physics_register, <span class="number">0</span>) != HDF_SUCCESS) &#123;</span><br><span class="line">        HDF_LOGE(<span class="string">&quot;%s: read num fail&quot;</span>, __func__);</span><br><span class="line">        <span class="keyword">return</span> HDF_FAILURE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (iface-&gt;GetUint32(obj-&gt;property, <span class="string">&quot;register_size&quot;</span>, &amp;sp-&gt;register_size, <span class="number">0</span>) != HDF_SUCCESS) &#123;</span><br><span class="line">        HDF_LOGE(<span class="string">&quot;%s: read num fail&quot;</span>, __func__);</span><br><span class="line">        <span class="keyword">return</span> HDF_FAILURE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (iface-&gt;GetUint32(obj-&gt;property, <span class="string">&quot;channel&quot;</span>, &amp;sp-&gt;channel, <span class="number">0</span>) != HDF_SUCCESS) &#123;</span><br><span class="line">        HDF_LOGE(<span class="string">&quot;%s: read num fail&quot;</span>, __func__);</span><br><span class="line">        <span class="keyword">return</span> HDF_FAILURE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (iface-&gt;GetUint32(obj-&gt;property, <span class="string">&quot;Polarity&quot;</span>, &amp;sp-&gt;sConfig.OCPolarity , <span class="number">0</span>) != HDF_SUCCESS) &#123;</span><br><span class="line">        HDF_LOGE(<span class="string">&quot;%s: read num fail&quot;</span>, __func__);</span><br><span class="line">        <span class="keyword">return</span> HDF_FAILURE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (iface-&gt;GetUint32(obj-&gt;property, <span class="string">&quot;IdleState&quot;</span>, &amp;sp-&gt;sConfig.OCIdleState , <span class="number">0</span>) != HDF_SUCCESS) &#123;</span><br><span class="line">        HDF_LOGE(<span class="string">&quot;%s: read num fail&quot;</span>, __func__);</span><br><span class="line">        <span class="keyword">return</span> HDF_FAILURE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (iface-&gt;GetUint32(obj-&gt;property, <span class="string">&quot;IdleState&quot;</span>, &amp;sp-&gt;dev.num , <span class="number">0</span>) != HDF_SUCCESS) &#123;</span><br><span class="line">        HDF_LOGE(<span class="string">&quot;%s: read num fail&quot;</span>, __func__);</span><br><span class="line">        <span class="keyword">return</span> HDF_FAILURE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>GPIOA_5 复用为PWM模式</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//初始化gpio口</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">HAL_TIM_MspPostInit</span><span class="params">(TIM_HandleTypeDef* htim)</span></span><br><span class="line">&#123;</span><br><span class="line">    __HAL_RCC_GPIOA_CLK_ENABLE();</span><br><span class="line">    dprintf(<span class="string">&quot;%s enter\r\n&quot;</span>,__func__);</span><br><span class="line">    GPIO_InitTypeDef GPIO_InitStruct;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//gpioa addr</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> *gpioa= (<span class="type">unsigned</span> <span class="type">char</span> *)OsalIoRemap(GPIOA_PHYADDR, GPIOA_SIZE);</span><br><span class="line">    <span class="comment">/**TIM2 GPIO Configuration    </span></span><br><span class="line"><span class="comment">    PA5     ------&gt; TIM2_CH1 </span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    GPIO_InitStruct.Pin = GPIO_PIN_5;</span><br><span class="line">    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;</span><br><span class="line">    GPIO_InitStruct.Pull = GPIO_NOPULL;</span><br><span class="line">    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;</span><br><span class="line">    GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;</span><br><span class="line">    HAL_GPIO_Init((GPIO_TypeDef *)gpioa, &amp;GPIO_InitStruct);</span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>到此初始化任务就基本完成，那么HDF PWM框架如何来使用我们的PWM驱动呢？这就要提到 PwmMethod，通过设置PwmMethod的函数，提供接口给PWM框架，主要是提供StmPwmSetConfig。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">PwmMethod</span> <span class="title">g_pwmOps</span> =</span> &#123;</span><br><span class="line">    .setConfig = StmPwmSetConfig,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>HDF_PWM框架是通过pwm_if.h文件给内核提供PWM功能的，我们来看pwm_if.h给内核提供了什么。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获取pwm句柄</span></span><br><span class="line">DevHandle <span class="title function_">PwmOpen</span><span class="params">(<span class="type">uint32_t</span> num)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">PwmClose</span><span class="params">(DevHandle handle)</span>;</span><br><span class="line"><span class="comment">//设置pwm周期</span></span><br><span class="line"><span class="type">int32_t</span> <span class="title function_">PwmSetPeriod</span><span class="params">(DevHandle handle, <span class="type">uint32_t</span> period)</span>;</span><br><span class="line"><span class="comment">//设置占空比</span></span><br><span class="line"><span class="type">int32_t</span> <span class="title function_">PwmSetDuty</span><span class="params">(DevHandle handle, <span class="type">uint32_t</span> duty)</span>;</span><br><span class="line"><span class="comment">//设置极性</span></span><br><span class="line"><span class="type">int32_t</span> <span class="title function_">PwmSetPolarity</span><span class="params">(DevHandle handle, <span class="type">uint8_t</span> polarity)</span>;</span><br><span class="line"><span class="comment">//使能pwm</span></span><br><span class="line"><span class="type">int32_t</span> <span class="title function_">PwmEnable</span><span class="params">(DevHandle handle)</span>;</span><br><span class="line"><span class="type">int32_t</span> <span class="title function_">PwmDisable</span><span class="params">(DevHandle handle)</span>;</span><br><span class="line"><span class="comment">//设置pwm</span></span><br><span class="line"><span class="type">int32_t</span> <span class="title function_">PwmSetConfig</span><span class="params">(DevHandle handle, <span class="keyword">struct</span> PwmConfig *config)</span>;</span><br><span class="line"><span class="type">int32_t</span> <span class="title function_">PwmGetConfig</span><span class="params">(DevHandle handle, <span class="keyword">struct</span> PwmConfig *config)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到PWM框架提供给内核设置PWM参数的接口，这些接口最终会调用我们编写的驱动，那么我们的驱动应该如何实现上述的功能？答案就在:StmPwmSetConfig，所有的接口最终都会调用PwmSetConfig()而间接调用我们编写的StmPwmSetConfig()。</p>
+<p>在StmPwmSetConfig()中会对config参数进行检查，然后根据config参数去操作PWM外设，具体而言就是调用HAL库的PWM函数去实现：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//给pwm框架注册的函数</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">PwmMethod</span> <span class="title">g_pwmOps</span> =</span> &#123;</span><br><span class="line">    .setConfig = StmPwmSetConfig,</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//设置pwm</span></span><br><span class="line"><span class="type">static</span> <span class="type">int32_t</span> <span class="title function_">StmPwmSetConfig</span><span class="params">(<span class="keyword">struct</span> PwmDev *pwm, <span class="keyword">struct</span> PwmConfig *config)</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (pwm-&gt;cfg.polarity != config-&gt;polarity ) &#123;</span><br><span class="line">        HDF_LOGE(<span class="string">&quot;%s: not support set pwm polarity&quot;</span>, __func__);</span><br><span class="line">        <span class="keyword">return</span> HDF_ERR_NOT_SUPPORT;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (config-&gt;status == PWM_DISABLE_STATUS) &#123;</span><br><span class="line"></span><br><span class="line">        StmPwmDisable();</span><br><span class="line">        <span class="keyword">return</span> HDF_SUCCESS;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (config-&gt;polarity != PWM_NORMAL_POLARITY &amp;&amp; config-&gt;polarity != PWM_INVERTED_POLARITY) &#123;</span><br><span class="line">        HDF_LOGE(<span class="string">&quot;%s: polarity %u is invalid&quot;</span>, __func__, config-&gt;polarity);</span><br><span class="line">        <span class="keyword">return</span> HDF_ERR_INVALID_PARAM;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (config-&gt;period &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        HDF_LOGE(<span class="string">&quot;%s: period %u is not support, min period %u&quot;</span>, __func__, config-&gt;period, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> HDF_ERR_INVALID_PARAM;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (config-&gt;duty &lt; <span class="number">1</span> || config-&gt;duty &gt; config-&gt;period) &#123;</span><br><span class="line">        HDF_LOGE(<span class="string">&quot;%s: duty %u is not support, min dutyCycle 1 max dutyCycle %u&quot;</span>,</span><br><span class="line">            __func__, config-&gt;duty, config-&gt;period);</span><br><span class="line">        <span class="keyword">return</span> HDF_ERR_INVALID_PARAM;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//暂停pwm，更新配置</span></span><br><span class="line">    StmPwmDisable();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (pwm-&gt;cfg.polarity != config-&gt;polarity) &#123;</span><br><span class="line">        StmPwmSetPolarity( config-&gt;polarity);</span><br><span class="line">    &#125;</span><br><span class="line">    StmPwmSetPeriod( config-&gt;period);</span><br><span class="line">    StmPwmSetDuty( config-&gt;duty);</span><br><span class="line">    <span class="comment">//继续输出</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (config-&gt;number == <span class="number">0</span>) &#123;</span><br><span class="line">        StmPwmAlwaysOutput();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        StmPwmOutputNumberSquareWaves( config-&gt;number);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> HDF_SUCCESS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>HAL库实现配置PWM的方法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">StmPwmDisable</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    HAL_TIM_PWM_Stop(&amp;sp-&gt;htim, sp-&gt;channel);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">StmPwmSetPeriod</span><span class="params">(<span class="type">uint32_t</span> us)</span></span><br><span class="line">&#123;</span><br><span class="line">    sp-&gt;htim.Init.Period = us;</span><br><span class="line">    TIM_Base_SetConfig(sp-&gt;htim.Instance, &amp;sp-&gt;htim.Init);</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">StmPwmSetDuty</span><span class="params">(<span class="type">uint32_t</span> us)</span></span><br><span class="line">&#123;</span><br><span class="line">    sp-&gt;sConfig.Pulse = us;</span><br><span class="line">    HAL_TIM_PWM_ConfigChannel(&amp;sp-&gt;htim, &amp;sp-&gt;sConfig, sp-&gt;channel);</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">StmPwmSetPolarity</span><span class="params">(<span class="type">uint32_t</span> polarity)</span></span><br><span class="line">&#123;</span><br><span class="line">    sp-&gt;sConfig.OCPolarity = polarity;</span><br><span class="line">    HAL_TIM_PWM_ConfigChannel(&amp;sp-&gt;htim, &amp;sp-&gt;sConfig, sp-&gt;channel);    </span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">StmPwmAlwaysOutput</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    HAL_TIM_PWM_Start(&amp;sp-&gt;htim, sp-&gt;channel);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">StmPwmOutputNumberSquareWaves</span><span class="params">(<span class="type">uint32_t</span> num)</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    HAL_TIM_PWM_Start(&amp;sp-&gt;htim, sp-&gt;channel);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3、编写构建脚本"><a href="#3、编写构建脚本" class="headerlink" title="3、编写构建脚本"></a>3、编写构建脚本</h4><p>最后要将我们编写好的驱动文件加入到编译构建系统中：</p>
+<p>编辑BUILD.gn：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">import(<span class="string">&quot;//drivers/adapter/khdf/liteos/hdf.gni&quot;</span>)</span><br><span class="line">module_switch = defined(LOSCFG_DRIVERS_HDF_PLATFORM_PWM)</span><br><span class="line">hdf_driver(<span class="string">&quot;hdf_pwm&quot;</span>) &#123;</span><br><span class="line">    sources = [</span><br><span class="line">    <span class="string">&quot;stm32mp1_pwm.c&quot;</span>,</span><br><span class="line">    ]</span><br><span class="line">    include_dirs = [</span><br><span class="line">     <span class="string">&quot;.&quot;</span> ,</span><br><span class="line">     <span class="string">&quot;//device/st/drivers/stm32mp1xx_hal/STM32MP1xx_HAL_Driver/Inc&quot;</span>,</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>并修改device&#x2F;st&#x2F;drivers&#x2F;BUILD.gn，在dep添加pwm：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">group(<span class="string">&quot;drivers&quot;</span>) &#123;</span><br><span class="line">  deps = [</span><br><span class="line">    <span class="string">&quot;pwm&quot;</span>,</span><br><span class="line">    <span class="string">&quot;uart&quot;</span>,</span><br><span class="line">    <span class="string">&quot;iwdg&quot;</span>,</span><br><span class="line">    <span class="string">&quot;i2c&quot;</span>,</span><br><span class="line">    <span class="string">&quot;gpio&quot;</span>,</span><br><span class="line">    <span class="string">&quot;led&quot;</span>,</span><br><span class="line">    <span class="string">&quot;button&quot;</span>,</span><br><span class="line">    <span class="string">&quot;sample&quot;</span>,</span><br><span class="line">    <span class="string">&quot;mem&quot;</span>,</span><br><span class="line">    <span class="string">&quot;stm32mp1xx_hal&quot;</span>,</span><br><span class="line">    <span class="string">&quot;wifi/driver/hi3881&quot;</span>,</span><br><span class="line">    <span class="string">&quot;wifi/driver:hdf_vendor_wifi&quot;</span>,</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4、效果"><a href="#4、效果" class="headerlink" title="4、效果"></a>4、效果</h3><p>完成PWM驱动的编写后，就可以使用<code>bearpi-micro\drivers\framework\include\platform\pwm_if.h</code>里的函数来控制PWM波。如图是使用逻辑分析测量到的GPIOA_5引脚上的PWM信号：</p>
+<p>计数频率10MHZ，计数值1000，那么PWM的频率就是10MHZ&#x2F;1000&#x3D;10KHZ：</p>
+<p><img src="/2025/05/30/hello-world/OpenHarmony/bearpi_pwm_driver/image-20220328211723596.png" alt="image-20220328211723596"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/OpenHarmony/bearpi_pwm_driver/" data-id="cmbcy7rho002lt8mthzug5x7t" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/OpenHarmony/WLAN_Model/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/OpenHarmony/dsoftbus_sdk/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

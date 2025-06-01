@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="WLAN message来自HDI client端的命令主要分三个类型：BaseCommands、APCommands、STACommands。 针对不同类型的CMD，也有三个服务来响应这些命令，分别是base feature、ap feature、sta feature。这三个feature定义在&#x2F;drivers&#x2F;framework&#x2F;model&#x2F;netwo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/05/31/killer-blog/OpenHarmony/WLAN_Message/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="WLAN message来自HDI client端的命令主要分三个类型：BaseCommands、APCommands、STACommands。 针对不同类型的CMD，也有三个服务来响应这些命令，分别是base feature、ap feature、sta feature。这三个feature定义在&#x2F;drivers&#x2F;framework&#x2F;model&#x2F;netwo">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-31T02:36:45.816Z">
+<meta property="article:modified_time" content="2025-06-01T00:19:46.462Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/OpenHarmony/WLAN_Message" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/05/31/killer-blog/OpenHarmony/WLAN_Message/" class="article-date">
+  <time class="dt-published" datetime="2025-05-31T02:36:45.816Z" itemprop="datePublished">2025-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="WLAN-message"><a href="#WLAN-message" class="headerlink" title="WLAN message"></a>WLAN message</h2><p>来自HDI client端的命令主要分三个类型：BaseCommands、APCommands、STACommands。</p>
+<p>针对不同类型的CMD，也有三个服务来响应这些命令，分别是base feature、ap feature、sta feature。这三个feature定义在&#x2F;drivers&#x2F;framework&#x2F;model&#x2F;network&#x2F;wifi&#x2F;core&#x2F;components下。</p>
+<h3 id="一、ServiceDef"><a href="#一、ServiceDef" class="headerlink" title="一、ServiceDef"></a>一、ServiceDef</h3><p>驱动设计了一套message机制来响应来自HDI的命令，我们先把HDI的命令理解为message，才能使用这套机制，本文用于了解wlan message。</p>
+<p>MessageDef：把HDI client命令理解成message，其成员MessageHandler是函数指针，指向处理命令的函数，pri是函数参数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">MessageDef</span> &#123;</span></span><br><span class="line">    MessageHandler handler;</span><br><span class="line">    <span class="type">uint8_t</span> pri;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>在wlan 驱动中定义了三个MessageDef数组，分别用于处理三种类型的HDI message。例如sta.c中定义了5个成员的数组，用于处理5个具体的sta命令。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//messagedef of servicedef</span></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">MessageDef</span> <span class="title">g_wifiStaFeatureCmds</span>[] =</span> &#123;</span><br><span class="line">    <span class="comment">//DUEMessage(index,MessageHandler,pri)</span></span><br><span class="line">    DUEMessage(CMD_STA_CONNECT, WifiCmdAssoc, <span class="number">0</span>),</span><br><span class="line">    DUEMessage(CMD_STA_DISCONNECT, WifiCmdDisconnect, <span class="number">0</span>),</span><br><span class="line">    DUEMessage(CMD_STA_SCAN, WifiCmdScan, <span class="number">0</span>),</span><br><span class="line">    DUEMessage(CMD_STA_ABORT_SCAN, WifiCmdAbortScan, <span class="number">0</span>),</span><br><span class="line">    DUEMessage(CMD_STA_SET_SCAN_MAC_ADDR, WifiCmdSetScanningMacAddress, <span class="number">0</span>)</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>同时还要注意到g_wifiStaFeatureCmds下方有一句宏定义：将该宏定义展开，可得到函数CreateServiceSTAService()，该函数创建了一个ServiceDef结构体，并调用InitService()函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">ServiceDefine(STAService, STA_SERVICE_ID, g_wifiStaFeatureCmds);</span><br><span class="line"><span class="comment">/**               </span></span><br><span class="line"><span class="comment">    Service *CreateServiceSTAService(const ServiceCfg *cfg)                </span></span><br><span class="line"><span class="comment">    &#123;                                                                         </span></span><br><span class="line"><span class="comment">        static struct ServiceDef serviceDef = &#123;                               </span></span><br><span class="line"><span class="comment">            .serviceId = STA_SERVICE_ID,                                          </span></span><br><span class="line"><span class="comment">            .messagesLength = sizeof(g_wifiStaFeatureCmds) / sizeof(struct MessageDef), </span></span><br><span class="line"><span class="comment">            .messages = g_wifiStaFeatureCmds                                            </span></span><br><span class="line"><span class="comment">        &#125;;                                                                    </span></span><br><span class="line"><span class="comment">        return InitService(&amp;serviceDef, cfg);                                 </span></span><br><span class="line"><span class="comment">    &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+<p>这里就引入了ServiceDef对象，他不仅包含MessageDef，还有ServiceId，以及messagesLength。整个驱动一共有三个ServiceDef，分别为三种类型的message提供服务响应。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ServiceDef</span> &#123;</span></span><br><span class="line">    ServiceId serviceId;	<span class="comment">//DispatcherId dispatcherId，用于指示是baseservice,staservice,apservice</span></span><br><span class="line">    <span class="type">uint8_t</span> messagesLength;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">MessageDef</span> *<span class="title">messages</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="二、RemoteService"><a href="#二、RemoteService" class="headerlink" title="二、RemoteService()"></a>二、RemoteService()</h3><p>InitService()函数在sidecar.c中，其主要作用就是创建Service结构体，调用RegistLocalService()</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//create sidecar service and remote service,the cfg is defaultid </span></span><br><span class="line">Service *<span class="title function_">InitService</span><span class="params">(<span class="keyword">struct</span> ServiceDef *def, <span class="type">const</span> ServiceCfg *cfg)</span></span><br><span class="line">&#123;</span><br><span class="line">    Service *service = (Service *)OsalMemCalloc(<span class="keyword">sizeof</span>(Service));</span><br><span class="line">	<span class="comment">//init some funcs</span></span><br><span class="line">    service-&gt;SendAsyncMessage = SideCarSendAsyncMessage;</span><br><span class="line">    service-&gt;SendSyncMessage = SideCarSendSyncMessage;</span><br><span class="line">    service-&gt;SendOneWayMessage = SideCarSendOneWayMessage;</span><br><span class="line">    service-&gt;Destroy = DestroyService;</span><br><span class="line"></span><br><span class="line">    SideCarPrivateData *privateData = (SideCarPrivateData *)OsalMemCalloc(<span class="keyword">sizeof</span>(SideCarPrivateData));</span><br><span class="line">    privateData-&gt;serviceId = def-&gt;serviceId;</span><br><span class="line">    privateData-&gt;dispatcherId = cfg-&gt;dispatcherId;</span><br><span class="line">    service-&gt;privateData = (<span class="type">void</span> *)privateData;</span><br><span class="line">    privateData = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//init remote service</span></span><br><span class="line">    ErrorCode errCode = RegistLocalService(cfg-&gt;dispatcherId, def);</span><br><span class="line">    <span class="keyword">return</span> service;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>RegistLocalService调用RegistServiceInner。主要完成RemoteService的创建。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//create remote service</span></span><br><span class="line"><span class="type">static</span> ErrorCode <span class="title function_">RegistServiceInner</span><span class="params">(<span class="type">const</span> NodeId nodeId, <span class="type">const</span> DispatcherId dispatcherId, <span class="keyword">struct</span> ServiceDef *mapper)</span></span><br><span class="line">&#123;</span><br><span class="line">    HDF_STATUS status = OsalMutexTimedLock(&amp;g_routerMutex, HDF_WAIT_FOREVER);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//get default message node</span></span><br><span class="line">    MessageNode *node = RefMessageNode(nodeId, <span class="literal">false</span>);</span><br><span class="line">    </span><br><span class="line">    RemoteService *remoteService = <span class="literal">NULL</span>;</span><br><span class="line">    MessageDispatcher *dispatcher = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="comment">//get default dispatch</span></span><br><span class="line">        dispatcher = RefDispatcherInner(dispatcherId, <span class="literal">false</span>);</span><br><span class="line">		<span class="comment">// CreateLocalNodeService(node,dispatcher, mapper)</span></span><br><span class="line">        remoteService = node-&gt;CreateRemoteService(node, dispatcher, mapper);</span><br><span class="line"></span><br><span class="line">        errCode = NotifyAllNodesServiceAdd(nodeId, mapper);</span><br><span class="line">		<span class="comment">//add remoteService to g_servicesIndex[]</span></span><br><span class="line">        errCode = DoRegistService(nodeId, dispatcherId, remoteService);</span><br><span class="line"></span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">    status = OsalMutexUnlock(&amp;g_routerMutex);</span><br><span class="line">    <span class="keyword">if</span> (dispatcher != <span class="literal">NULL</span> &amp;&amp; dispatcher-&gt;Disref != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="comment">//realease dispatcher</span></span><br><span class="line">        dispatcher-&gt;Disref(dispatcher);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (node != <span class="literal">NULL</span> &amp;&amp; node-&gt;Disref != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        node-&gt;Disref(node);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> errCode;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里一个新的重要的结构体 RemoteService，但我们先暂时按下不表，来看他是如何被创建的。</p>
+<h4 id="2-1、MessageNode"><a href="#2-1、MessageNode" class="headerlink" title="2.1、MessageNode"></a>2.1、MessageNode</h4><p>创建 RemoteService的方式是调用node-&gt;CreateRemoteService()函数，所以这个函数执行的前提是MessageNode先被创建出来，我们需要先知道MessageNode是如何被创建的，才能知道RemoteService被创建时的参数。</p>
+<p>MessageNode的创建函数是CreateLocalNode()，定义在local_node.c中，这里我们仅需要关注CreateRemoteService函数指针的实现：CreateLocalNodeService()</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">ErrorCode <span class="title function_">CreateLocalNode</span><span class="params">(MessageNode **node)</span></span><br><span class="line">&#123;</span><br><span class="line">    LocalMessageNode *newNode = (LocalMessageNode *)OsalMemCalloc(<span class="keyword">sizeof</span>(LocalMessageNode));</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        newNode-&gt;status = ME_STATUS_STOPPED;</span><br><span class="line">        newNode-&gt;Init = InitLocalNode;</span><br><span class="line">        <span class="comment">//创建remote service的方法</span></span><br><span class="line">        newNode-&gt;CreateRemoteService = CreateLocalNodeService;</span><br><span class="line">        newNode-&gt;SyncService = <span class="literal">NULL</span>;</span><br><span class="line">        newNode-&gt;NotifyServiceAdd = <span class="literal">NULL</span>;</span><br><span class="line">        newNode-&gt;NotifyServiceDel = <span class="literal">NULL</span>;</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="literal">false</span>);</span><br><span class="line">    <span class="keyword">return</span> errCode;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2、LocalNodeService"><a href="#2-2、LocalNodeService" class="headerlink" title="2.2、LocalNodeService"></a>2.2、LocalNodeService</h4><p>CreateLocalNodeService()创建了RemoteService的超集LocalNodeService。这里实现了RemoteService中的许多函数，并把之前定义的ServiceDef，和dispatch赋值给LocalNodeService。（dispatch在后面介绍）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">RemoteService *<span class="title function_">CreateLocalNodeService</span><span class="params">(MessageNode *node, MessageDispatcher *dispatcher, <span class="keyword">struct</span> ServiceDef *mapper)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//create local node service</span></span><br><span class="line">    LocalNodeService *service = (LocalNodeService *)OsalMemCalloc(<span class="keyword">sizeof</span>(LocalNodeService));</span><br><span class="line"></span><br><span class="line">    ErrorCode errCode;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="comment">//realize some funcs</span></span><br><span class="line">        service-&gt;status = ME_STATUS_RUNNING;</span><br><span class="line">        <span class="comment">//重点</span></span><br><span class="line">        service-&gt;ExecRequestMsg = HandleRequestMessage;</span><br><span class="line">        service-&gt;ExecResponseMsg = HandleResponseMessage;</span><br><span class="line">        service-&gt;SendMessage = SendMessageLocalNode;</span><br><span class="line">        service-&gt;Shutdown = ShutdownLocalService;</span><br><span class="line">        service-&gt;serviceId = mapper-&gt;serviceId;</span><br><span class="line">        service-&gt;mapper = mapper;</span><br><span class="line">        service-&gt;dispatcher = dispatcher-&gt;Ref(dispatcher);</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="literal">false</span>);</span><br><span class="line">    <span class="keyword">return</span> (RemoteService *)service;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>LocalNodeService 展开宏定义后，可见LocalNodeService 就是RemoteService再加上MessageDispatcher和ServiceDef。</p>
+<p>所以本质上也是创建RemoteService。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//展开宏定义后</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">LocalNodeService</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">enum</span> <span class="title">MessageEngineStatus</span> <span class="title">status</span>;</span>                </span><br><span class="line">    OsalAtomic refCount;                            </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">RemoteService</span> *(*<span class="title">Ref</span>)(<span class="keyword">struct</span> <span class="title">RemoteService</span> * <span class="title">obj</span>);</span> </span><br><span class="line">    <span class="type">void</span> (*Disref)(<span class="keyword">struct</span> RemoteService * obj);          </span><br><span class="line">    <span class="type">void</span> (*Destroy)(<span class="keyword">struct</span> RemoteService * obj);</span><br><span class="line">    <span class="comment">//发送请求消息</span></span><br><span class="line">    <span class="type">void</span> (*ExecRequestMsg)(<span class="type">const</span> <span class="keyword">struct</span> RemoteService *service, MessageContext *context);  </span><br><span class="line">    <span class="comment">//发送响应消息</span></span><br><span class="line">    <span class="type">void</span> (*ExecResponseMsg)(<span class="type">const</span> <span class="keyword">struct</span> RemoteService *service, MessageContext *context);  </span><br><span class="line">    <span class="comment">//发送消息</span></span><br><span class="line">    ErrorCode (*SendMessage)(<span class="type">const</span> <span class="keyword">struct</span> RemoteService *service, MessageContext *context); </span><br><span class="line">    <span class="type">void</span> (*Shutdown)(<span class="keyword">struct</span> RemoteService * service);   </span><br><span class="line">    <span class="comment">//service类型：base、ap、sta</span></span><br><span class="line">    ServiceId serviceId;    </span><br><span class="line">    <span class="comment">//dispatch用于缓存消息</span></span><br><span class="line">    MessageDispatcher *dispatcher;</span><br><span class="line">    <span class="comment">//响应消息的服务</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ServiceDef</span> *<span class="title">mapper</span>;</span></span><br><span class="line">&#125; LocalNodeService;</span><br></pre></td></tr></table></figure>
+
+<p>到此我们创建了一个响应HDI层命令所需的结构体。</p>
+<h3 id="三、MessageDispatcher"><a href="#三、MessageDispatcher" class="headerlink" title="三、MessageDispatcher"></a>三、MessageDispatcher</h3><p>其作用主要是缓存message，实现的方法是使用优先级队列来缓存message，在RunDispatcher线程中处理message。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">MessageDispatcher</span> &#123;</span></span><br><span class="line">    SHARED_OBJ(MessageDispatcher); </span><br><span class="line">    OSAL_DECLARE_MUTEX(mutex); </span><br><span class="line">    ErrorCode (*AppendMessage)(<span class="keyword">struct</span> MessageDispatcher *, <span class="type">const</span> <span class="type">uint8_t</span> priority, MessageContext * context); 	<span class="comment">//将message缓存</span></span><br><span class="line">    ErrorCode (*Start)(<span class="keyword">struct</span> MessageDispatcher * dispatcher);                        </span><br><span class="line">    <span class="type">void</span> (*Shutdown)(<span class="keyword">struct</span> MessageDispatcher * dispatcher);                          </span><br><span class="line">    PriorityQueue *messageQueue</span><br><span class="line">&#125; MessageDispatcher;</span><br></pre></td></tr></table></figure>
+
+<p>RunDispatcher线程:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">RunDispatcher</span><span class="params">(<span class="type">void</span> *para)</span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (dispatcher-&gt;status == ME_STATUS_RUNNING) &#123;</span><br><span class="line">        <span class="comment">//pop message</span></span><br><span class="line">        MessageContext *context = PopPriorityQueue(dispatcher-&gt;messageQueue, QUEUE_OPER_TIMEOUT);</span><br><span class="line">        <span class="keyword">if</span> (context == <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        HandleMessage(context);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">HandleMessage</span><span class="params">(MessageContext *context)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (context != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="keyword">switch</span> (context-&gt;requestType) &#123;</span><br><span class="line">            <span class="keyword">case</span> MESSAGE_TYPE_SYNC_REQ:</span><br><span class="line">            <span class="keyword">case</span> MESSAGE_TYPE_ASYNC_REQ:</span><br><span class="line">                HandleRequestMessage(context);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MESSAGE_TYPE_SYNC_RSP:</span><br><span class="line">                HandleSyncResponse(context);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MESSAGE_TYPE_ASYNC_RSP:</span><br><span class="line">                HandleAsyncResponse(context);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                HDF_LOGE(<span class="string">&quot;Unsupported message type %u&quot;</span>, context-&gt;requestType);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">HandleSyncResponse</span><span class="params">(MessageContext *context)</span></span><br><span class="line">&#123;</span><br><span class="line">    HDF_STATUS status = OsalSemPost(&amp;context-&gt;rspSemaphore);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//调用remoteservice-&gt;ExecRequestMsg和SendMessage</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">HandleRequestMessage</span><span class="params">(MessageContext *context)</span></span><br><span class="line">&#123;</span><br><span class="line">    RemoteService *targetService = RefRemoteService(context-&gt;receiverId);</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        targetService-&gt;ExecRequestMsg(targetService, context);</span><br><span class="line">        <span class="comment">// Convert to response message</span></span><br><span class="line">        SetToResponse(context);</span><br><span class="line">        rspService = RefRemoteService(context-&gt;receiverId);</span><br><span class="line">        errCode = rspService-&gt;SendMessage(rspService, context);</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="literal">false</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>CreateLocalDispatcher用于创建MessageDispatcher，这里我们关注AppendMessage的实现：AppendToLocalDispatcher()，其本质就是将message推入指定的queue，然后在RunDispatcher线程中会弹出队列中的message，对message进行响应。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">ErrorCode <span class="title function_">CreateLocalDispatcher</span><span class="params">(MessageDispatcher **dispatcher, <span class="type">const</span> DispatcherConfig *config)</span></span><br><span class="line">&#123;</span><br><span class="line">    LocalMessageDispatcher *localDispatcher = (LocalMessageDispatcher *)OsalMemCalloc(<span class="keyword">sizeof</span>(LocalMessageDispatcher));</span><br><span class="line">    ErrorCode errCode;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="comment">//realize some func</span></span><br><span class="line">        localDispatcher-&gt;status = ME_STATUS_STOPPED;</span><br><span class="line">        localDispatcher-&gt;AppendMessage = AppendToLocalDispatcher;</span><br><span class="line">        localDispatcher-&gt;Shutdown = ShutdownDispatcher;</span><br><span class="line">        localDispatcher-&gt;Start = StartDispatcher;</span><br><span class="line">		<span class="comment">//create queues</span></span><br><span class="line">        localDispatcher-&gt;messageQueue = CreatePriorityQueue(config-&gt;queueSize, config-&gt;priorityLevelCount);</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="literal">false</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ErrorCode <span class="title function_">AppendToLocalDispatcher</span><span class="params">(MessageDispatcher *dispatcher, <span class="type">const</span> <span class="type">uint8_t</span> priority, MessageContext *context)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> PushPriorityQueue(dispatcher-&gt;messageQueue, priority, context);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int32_t</span> <span class="title function_">PushPriorityQueue</span><span class="params">(PriorityQueue *<span class="built_in">queue</span>, <span class="type">const</span> <span class="type">uint8_t</span> priority, <span class="type">void</span> *context)</span></span><br><span class="line">&#123;</span><br><span class="line">    queueImpl = (PriorityQueueImpl *)<span class="built_in">queue</span>;</span><br><span class="line">    pri = priority;</span><br><span class="line">    ret = PushQueue(queueImpl-&gt;queues[pri], context);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="四、sidecar"><a href="#四、sidecar" class="headerlink" title="四、sidecar"></a>四、sidecar</h3><p>创建完成以上结构体后，wifi驱动框架究竟如何来响应来自HDI层的命令呢？也就是说我们上面所做的一切为了什么？</p>
+<p>在HDF_WIFI驱动的dispatch函数中，调用的是DispatchToMessage()函数，该函数定义在sidecar.c中。sidecar.c就是封装了上面的结构体，提供接口给HDF_WIFI驱动使用，起到连接中介的作用。要注意到，驱动的命令是以id+HdfSBuf的形式传递进来的，需要转换成我们之前一直提到的message，才能由message系统来处理。</p>
+<p>HDI client下发的命令通过io-dispatch会传递到DispatchToMessage()函数：</p>
+<p>DispatchToMessage首先创建message，获取之前创建的LocalNodeService结构体中的RemoteService，调用其SendMessage()函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int32_t</span> <span class="title function_">DispatchToMessage</span><span class="params">(<span class="keyword">struct</span> HdfDeviceIoClient *client, <span class="type">int</span> id, <span class="keyword">struct</span> HdfSBuf *reqData, <span class="keyword">struct</span> HdfSBuf *rspData)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//create message</span></span><br><span class="line">    context = CreateMessageContext(RESERVED_SERVICE_ID, serviceId, cmd, reqData);</span><br><span class="line"></span><br><span class="line">    context-&gt;rspData = rspData;</span><br><span class="line">    context-&gt;requestType = MESSAGE_TYPE_SYNC_REQ;</span><br><span class="line">    context-&gt;client = client;</span><br><span class="line">    RemoteService *targetService = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="comment">//get LocalNodeService</span></span><br><span class="line">        targetService = RefRemoteService(serviceId);</span><br><span class="line">        <span class="comment">//SendMessage = SendMessageLocalNode()</span></span><br><span class="line">        errCode = targetService-&gt;SendMessage(targetService, context);</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="literal">false</span>);</span><br><span class="line">    <span class="keyword">if</span> (targetService != <span class="literal">NULL</span> &amp;&amp; targetService-&gt;Disref != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        targetService-&gt;Disref(targetService);</span><br><span class="line">    &#125;</span><br><span class="line">    OsalMemFree(context);</span><br><span class="line">    <span class="keyword">return</span> errCode;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在创建LocalNodeService时我们已经指定了SendMessage()函数的实现：</p>
+<p>SendMessage()根据message类型作不同的处理：</p>
+<ul>
+<li>sync：同步类消息需要马上传递处理</li>
+<li>async：异步类消息由RunDispatcher线程稍后处理</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">ErrorCode <span class="title function_">SendMessageLocalNode</span><span class="params">(<span class="type">const</span> RemoteService *service, MessageContext *context)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//sync req need respone</span></span><br><span class="line">    <span class="keyword">if</span> (!context-&gt;crossNode &amp;&amp; context-&gt;requestType == MESSAGE_TYPE_SYNC_REQ) &#123;</span><br><span class="line">        HandleRequestMessage(service, context);</span><br><span class="line">        SetToResponse(context);</span><br><span class="line">        <span class="keyword">return</span> context-&gt;responseStatus;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (context-&gt;requestType == MESSAGE_TYPE_SYNC_RSP) &#123;</span><br><span class="line">        (<span class="type">void</span>)OsalSemPost(&amp;context-&gt;rspSemaphore);</span><br><span class="line">        <span class="keyword">return</span> ME_SUCCESS;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">//async,append to message</span></span><br><span class="line">        <span class="keyword">return</span> localService-&gt;dispatcher-&gt;AppendMessage(localService-&gt;dispatcher, pri, context);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>message类型还进一步可分为request和response，所有request类型message最终都会调用HandleRequestMessage()来响应请求：</p>
+<p>对于所有的请求message，最终都会调用 LocalNodeService的ServiceDef中的MessageDef来处理。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">HandleRequestMessage</span><span class="params">(<span class="type">const</span> RemoteService *service, MessageContext *context)</span></span><br><span class="line">&#123;</span><br><span class="line">    LocalNodeService *localNodeService = (LocalNodeService *)service;</span><br><span class="line">	<span class="comment">//根据commandID获取请求对应的messageDef</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">MessageDef</span> <span class="title">messageDef</span> =</span> &#123; <span class="literal">NULL</span>, <span class="number">0</span> &#125;;</span><br><span class="line">    <span class="keyword">if</span> (localNodeService-&gt;mapper != <span class="literal">NULL</span> &amp;&amp; context-&gt;commandId &lt; localNodeService-&gt;mapper-&gt;messagesLength) &#123;</span><br><span class="line">        messageDef = localNodeService-&gt;mapper-&gt;messages[context-&gt;commandId];</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">//调用messageDef的函数处理请求</span></span><br><span class="line">    context-&gt;responseStatus = messageDef.handler((RequestContext *)context, context-&gt;reqData, context-&gt;rspData);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>response类型message最终调用HandleResponseMessage()</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">HandleResponseMessage</span><span class="params">(<span class="type">const</span> RemoteService *service, MessageContext *context)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//sync</span></span><br><span class="line">    <span class="keyword">if</span> (context-&gt;requestType == MESSAGE_TYPE_SYNC_RSP) &#123;</span><br><span class="line">        HDF_STATUS status = OsalSemPost(&amp;context-&gt;rspSemaphore);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (context-&gt;requestType == MESSAGE_TYPE_ASYNC_RSP) &#123;</span><br><span class="line">        <span class="comment">//async</span></span><br><span class="line">        <span class="keyword">if</span> (context-&gt;callback != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            context-&gt;callback((<span class="type">const</span> RequestContext *)context, context-&gt;reqData, context-&gt;rspData,</span><br><span class="line">                context-&gt;responseStatus);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; </span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="五、小结"><a href="#五、小结" class="headerlink" title="五、小结"></a>五、小结</h3><p>WLAN Message定义了如何处理来自WIFI HDI层的命令，这些命令适用于控制WIFI 硬件的行为。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/05/31/killer-blog/OpenHarmony/WLAN_Message/" data-id="cmbcy7rhn002it8mtci0gfikd" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/05/31/killer-blog/OpenHarmony/purple_pi_build/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/05/31/killer-blog/OpenHarmony/WLAN_FlowContrl/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

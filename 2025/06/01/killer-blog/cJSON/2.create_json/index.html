@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="@[toc]  cJSON系列：  零基础学习cJSON 源码详解与应用（一）如何学习cJSON 零基础学习cJSON 源码详解与应用（二）创建json数据 零基础学习cJSON 源码详解与应用 （三）cJSON_Print()；打印json  零基础学习cJSON 源码详解与应用 （四）cJSON_Parse()；解析json字符串零基础学习cJSON 源码详解与应用 （五）修改，复制，比较cj">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/cJSON/2.create_json/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="@[toc]  cJSON系列：  零基础学习cJSON 源码详解与应用（一）如何学习cJSON 零基础学习cJSON 源码详解与应用（二）创建json数据 零基础学习cJSON 源码详解与应用 （三）cJSON_Print()；打印json  零基础学习cJSON 源码详解与应用 （四）cJSON_Parse()；解析json字符串零基础学习cJSON 源码详解与应用 （五）修改，复制，比较cj">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/cJSON/2.create_json/5.png">
+<meta property="og:image" content="http://example.com/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="article:published_time" content="2025-06-01T00:24:26.651Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:26.800Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/cJSON/2.create_json/5.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/cJSON/2.create_json" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/cJSON/2.create_json/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.651Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>@[toc]</p>
+<blockquote>
+<p>cJSON系列：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/110395913">零基础学习cJSON 源码详解与应用（一）如何学习cJSON</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/110406265">零基础学习cJSON 源码详解与应用（二）创建json数据</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/110475966">零基础学习cJSON 源码详解与应用 （三）cJSON_Print()；打印json
+</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/110481533">零基础学习cJSON 源码详解与应用 （四）cJSON_Parse()；解析json字符串</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/110499109">零基础学习cJSON 源码详解与应用 （五）修改，复制，比较cjson</a></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>上一篇我们已经介绍了cjson结构体 <a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/110395913">（一）如何学习cJSON</a>，这节就介绍简单的创建json数据并分析源码。</p>
+</blockquote>
+<h2 id="一，创建一个简单的json"><a href="#一，创建一个简单的json" class="headerlink" title="一，创建一个简单的json"></a>一，创建一个简单的json</h2><p>例如创建一个如下的json：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;years&quot;</span>: <span class="number">22</span>,</span><br><span class="line">    <span class="string">&quot;name&quot;</span>: <span class="string">&quot;fool&quot;</span>,</span><br><span class="line">    <span class="string">&quot;man&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="string">&quot;adult&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="string">&quot;money&quot;</span>: null,</span><br><span class="line">    <span class="string">&quot;season&quot;</span>: [<span class="string">&quot;spring&quot;</span>, <span class="string">&quot;summer&quot;</span>, <span class="string">&quot;fall&quot;</span>,<span class="string">&quot;winter&quot;</span>],</span><br><span class="line">    <span class="string">&quot;child&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;girlfriend&quot;</span>: <span class="string">&quot;june&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>首先分析这个json，确定它的所有item类型，其中比较需要注意的是child这个item是一个嵌套子json，所以它的类型应该是object</strong>，从item的类型入手，先创建所有的item，再把item添加到root节点上。代码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> *str_arry[<span class="number">3</span>] = </span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;spring&quot;</span>,</span><br><span class="line">    <span class="string">&quot;summer&quot;</span>,</span><br><span class="line">    <span class="string">&quot;fall&quot;</span>,</span><br><span class="line">    <span class="string">&quot;winter&quot;</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//创建不同类型的item</span></span><br><span class="line">cJSON *root = cJSON_CreateObject();</span><br><span class="line">cJSON *years = cJSON_CreateNumber(<span class="number">22</span>);</span><br><span class="line">cJSON *name = cJSON_CreateString(<span class="string">&quot;fool&quot;</span>);</span><br><span class="line">cJSON *man = cJSON_CreateTrue();</span><br><span class="line">cJSON *adult = cJSON_CreateFalse();</span><br><span class="line">cJSON *money = cJSON_CreateNull();</span><br><span class="line">cJSON *season = cJSON_CreateStringArray(str_arry, <span class="number">3</span>);</span><br><span class="line">cJSON *child = cJSON_CreateObject();</span><br><span class="line">cJSON *girlfriend = cJSON_CreateString(<span class="string">&quot;june&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//将item添加到父节点下</span></span><br><span class="line">cJSON_AddItemToObject(root, <span class="string">&quot;years&quot;</span>, years);</span><br><span class="line">cJSON_AddItemToObject(root, <span class="string">&quot;name&quot;</span>, name);</span><br><span class="line">cJSON_AddItemToObject(root, <span class="string">&quot;man&quot;</span>, man);</span><br><span class="line">cJSON_AddItemToObject(root, <span class="string">&quot;adult&quot;</span>, adult);</span><br><span class="line">cJSON_AddItemToObject(root, <span class="string">&quot;money&quot;</span>, money);</span><br><span class="line">cJSON_AddItemToObject(root, <span class="string">&quot;season&quot;</span>, season);</span><br><span class="line">cJSON_AddItemToObject(child, <span class="string">&quot;girlfriend&quot;</span>, girlfriend);</span><br><span class="line">cJSON_AddItemToObject(root, <span class="string">&quot;child&quot;</span>, child);</span><br><span class="line"></span><br><span class="line"><span class="comment">//将所有json结构体输出成字符串</span></span><br><span class="line"><span class="type">char</span> *json=cJSON_Print(root);</span><br><span class="line"></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>,json);</span><br><span class="line"></span><br><span class="line"><span class="comment">//! 一定要记得用完擦屁股</span></span><br><span class="line">cJSON_Delete(root);</span><br></pre></td></tr></table></figure>
+<p>这里需要注意的是由于cjson是使用动态内存分配的，当cjson用完后，<code>切记！切记！切记！一定用要用cJSON_Delete释放内存</code>。</p>
+<p>打印结果如下：</p>
+<p><img src="/2025/05/30/hello-world/cJSON/2.create_json/5.png" alt="在这里插入图片描述"></p>
+<h2 id="二，源码详解"><a href="#二，源码详解" class="headerlink" title="二，源码详解"></a>二，源码详解</h2><blockquote>
+<p>1, CJSON_PUBLIC(cJSON *) cJSON_CreateObject(void);</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建一个空的json，赋予obj类型</span></span><br><span class="line">CJSON_PUBLIC(cJSON *) cJSON_CreateObject(<span class="type">void</span>)</span><br><span class="line">&#123;</span><br><span class="line">    cJSON *item = cJSON_New_Item(&amp;global_hooks);</span><br><span class="line">    <span class="keyword">if</span> (item)</span><br><span class="line">    &#123;</span><br><span class="line">        item-&gt;type = cJSON_Object;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> item;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该函数调用的是cJSON_New_Item()，传入参数&amp;global_hooks是全局变量，该变量是有三个函数指针分别指向<code>free(),malloc(),realloc()</code>，用来操作内存的。<br>cJSON_New_Item()以动态内存分配的形式，申请了一块内存并将内存初始化。返回指向该内存的指针。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//动态内存分配一个cjson并设为0</span></span><br><span class="line"><span class="type">static</span> cJSON *<span class="title function_">cJSON_New_Item</span><span class="params">(<span class="type">const</span> internal_hooks * <span class="type">const</span> hooks)</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    cJSON* node = (cJSON*)hooks-&gt;allocate(<span class="keyword">sizeof</span>(cJSON));</span><br><span class="line">    <span class="keyword">if</span> (node)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">memset</span>(node, <span class="string">&#x27;\0&#x27;</span>, <span class="keyword">sizeof</span>(cJSON));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> node;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>2, CJSON_PUBLIC(cJSON *) cJSON_CreateString(const char *string);</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建字符串值为string的json，string值可被cjson_delete删除</span></span><br><span class="line">CJSON_PUBLIC(cJSON *) cJSON_CreateString(<span class="type">const</span> <span class="type">char</span> *<span class="built_in">string</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//创建空cjson</span></span><br><span class="line">    cJSON *item = cJSON_New_Item(&amp;global_hooks);</span><br><span class="line">    <span class="keyword">if</span>(item)</span><br><span class="line">    &#123;</span><br><span class="line">        item-&gt;type = cJSON_String;</span><br><span class="line">        <span class="comment">//将string内容复制给valuestring</span></span><br><span class="line">        item-&gt;valuestring = (<span class="type">char</span>*)cJSON_strdup((<span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span>*)<span class="built_in">string</span>, &amp;global_hooks);</span><br><span class="line">        <span class="keyword">if</span>(!item-&gt;valuestring)</span><br><span class="line">        &#123;</span><br><span class="line">            cJSON_Delete(item);</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> item;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>cJSON_strdup()也是后续会经常使用的函数，作用是复制字符串。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//开辟一块新内存，并将string复制到内存中，并返回指向内存的指针</span></span><br><span class="line"><span class="type">static</span> <span class="type">unsigned</span> <span class="type">char</span>* <span class="title function_">cJSON_strdup</span><span class="params">(<span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span>* <span class="built_in">string</span>, <span class="type">const</span> internal_hooks * <span class="type">const</span> hooks)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">size_t</span> length = <span class="number">0</span>;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> *copy = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">string</span> == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//计算所需内存的长度</span></span><br><span class="line">    length = <span class="built_in">strlen</span>((<span class="type">const</span> <span class="type">char</span>*)<span class="built_in">string</span>) + <span class="keyword">sizeof</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line">    <span class="comment">//申请内存</span></span><br><span class="line">    copy = (<span class="type">unsigned</span> <span class="type">char</span>*)hooks-&gt;allocate(length);</span><br><span class="line">    <span class="keyword">if</span> (copy == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">memcpy</span>(copy, <span class="built_in">string</span>, length);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> copy;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>3，CJSON_PUBLIC(cJSON *) cJSON_CreateStringArray(const char **strings, int count);</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 创建字符串型数组的json</span></span><br><span class="line"><span class="comment"> * strings：字符串数组</span></span><br><span class="line"><span class="comment"> * count：数组长度</span></span><br><span class="line"><span class="comment"> * 返回：数组</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">CJSON_PUBLIC(cJSON *) cJSON_CreateStringArray(<span class="type">const</span> <span class="type">char</span> **strings, <span class="type">int</span> count)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">size_t</span> i = <span class="number">0</span>;</span><br><span class="line">    cJSON *n = <span class="literal">NULL</span>;    <span class="comment">//next</span></span><br><span class="line">    cJSON *p = <span class="literal">NULL</span>;    <span class="comment">//prev</span></span><br><span class="line">    cJSON *a = <span class="literal">NULL</span>;    <span class="comment">//arry</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ((count &lt; <span class="number">0</span>) || (strings == <span class="literal">NULL</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建数组</span></span><br><span class="line">    a = cJSON_CreateArray();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; a &amp;&amp; (i &lt; (<span class="type">size_t</span>)count); i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//创建string类型cjson</span></span><br><span class="line">        n = cJSON_CreateString(strings[i]);</span><br><span class="line">        <span class="keyword">if</span>(!n)</span><br><span class="line">        &#123;</span><br><span class="line">            cJSON_Delete(a);</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(!i)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//如果是数组第一个，则将n复制给数组cjson的子节点</span></span><br><span class="line">            a-&gt;child = n;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//将n插入p之后（链表操作）</span></span><br><span class="line">            suffix_object(p,n);</span><br><span class="line">        &#125;</span><br><span class="line">        p = n;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> a;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>4，CJSON_PUBLIC(void) cJSON_AddItemToObject(cJSON *object, const char *string, cJSON *item);</p>
+<p>cJSON_AddItemToObject()是调用了<code>add_item_to_object()</code></p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 将item以键string添加到obj下</span></span><br><span class="line"><span class="comment"> * note：item可以是任何类型的cjson</span></span><br><span class="line"><span class="comment"> * constant_key:指示string是否是外部定义的常量数据</span></span><br><span class="line"><span class="comment"> * 成功：返回 true</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">static</span> cJSON_bool <span class="title function_">add_item_to_object</span><span class="params">(cJSON * <span class="type">const</span> object, <span class="type">const</span> <span class="type">char</span> * <span class="type">const</span> <span class="built_in">string</span>, cJSON * <span class="type">const</span> item, <span class="type">const</span> internal_hooks * <span class="type">const</span> hooks, <span class="type">const</span> cJSON_bool constant_key)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> *new_key = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="type">int</span> new_type = cJSON_Invalid;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ((object == <span class="literal">NULL</span>) || (<span class="built_in">string</span> == <span class="literal">NULL</span>) || (item == <span class="literal">NULL</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//判断key是否是常量数据，若是则不需要重新复制字符串</span></span><br><span class="line">    <span class="keyword">if</span> (constant_key)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//直接取指针，cjson_delete不会删除key</span></span><br><span class="line">        new_key = (<span class="type">char</span>*)cast_away_const(<span class="built_in">string</span>);</span><br><span class="line">        <span class="comment">//cjson类型设置为常量字符串</span></span><br><span class="line">        new_type = item-&gt;type | cJSON_StringIsConst;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//复制string</span></span><br><span class="line">        new_key = (<span class="type">char</span>*)cJSON_strdup((<span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span>*)<span class="built_in">string</span>, hooks);</span><br><span class="line">        <span class="keyword">if</span> (new_key == <span class="literal">NULL</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//修改cjson类型</span></span><br><span class="line">        new_type = item-&gt;type &amp; ~cJSON_StringIsConst;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!(item-&gt;type &amp; cJSON_StringIsConst) &amp;&amp; (item-&gt;<span class="built_in">string</span> != <span class="literal">NULL</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//如果string是常量且不为空则释放内存</span></span><br><span class="line">        hooks-&gt;deallocate(item-&gt;<span class="built_in">string</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//将key赋值给cjson的键</span></span><br><span class="line">    item-&gt;<span class="built_in">string</span> = new_key;</span><br><span class="line">    item-&gt;type = new_type;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//最后把item添加到obj</span></span><br><span class="line">    <span class="keyword">return</span> add_item_to_array(object, item);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在最后调用了add_item_to_array();</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 添加item到数组最后</span></span><br><span class="line"><span class="comment"> * 成功返回 true</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">static</span> cJSON_bool <span class="title function_">add_item_to_array</span><span class="params">(cJSON *<span class="built_in">array</span>, cJSON *item)</span></span><br><span class="line">&#123;</span><br><span class="line">    cJSON *child = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ((item == <span class="literal">NULL</span>) || (<span class="built_in">array</span> == <span class="literal">NULL</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//child是数组的第一个成员</span></span><br><span class="line">    child = <span class="built_in">array</span>-&gt;child;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//如果数组为空，则item赋予第一个成员child</span></span><br><span class="line">    <span class="keyword">if</span> (child == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* list is empty, start new one */</span></span><br><span class="line">        <span class="built_in">array</span>-&gt;child = item;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* append to the end */</span></span><br><span class="line">        <span class="comment">//遍历数组，并在数组最后插入item</span></span><br><span class="line">        <span class="keyword">while</span> (child-&gt;next)</span><br><span class="line">        &#123;</span><br><span class="line">            child = child-&gt;next;</span><br><span class="line">        &#125;</span><br><span class="line">        suffix_object(child, item);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<blockquote>
+<p>5，CJSON_PUBLIC(void) cJSON_Delete(cJSON *c);</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 将item所在链表的及其子节点的所有cjson释放</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">CJSON_PUBLIC(<span class="type">void</span>) cJSON_Delete(cJSON *item)</span><br><span class="line">&#123;</span><br><span class="line">    cJSON *next = <span class="literal">NULL</span>; <span class="comment">//指向当前cjson的下一个</span></span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> (item != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//由json结构体的定义可知，json结构体自身，string和valuestring是由动态内存分配获得，需要释放这三部分内存</span></span><br><span class="line">        next = item-&gt;next;</span><br><span class="line">        <span class="comment">//如果cjson不是参考外部数据且不为空，则递归调用delete，删除cjson的子节点</span></span><br><span class="line">        <span class="keyword">if</span> (!(item-&gt;type &amp; cJSON_IsReference) &amp;&amp; (item-&gt;child != <span class="literal">NULL</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//释放嵌套的json结构体</span></span><br><span class="line">            cJSON_Delete(item-&gt;child);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//如果cjson不是参考外部数据，则valuestring以及string是由cJSON动态内存分配的，需要释放内存</span></span><br><span class="line">        <span class="keyword">if</span> (!(item-&gt;type &amp; cJSON_IsReference) &amp;&amp; (item-&gt;valuestring != <span class="literal">NULL</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            global_hooks.deallocate(item-&gt;valuestring);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (!(item-&gt;type &amp; cJSON_StringIsConst) &amp;&amp; (item-&gt;<span class="built_in">string</span> != <span class="literal">NULL</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            global_hooks.deallocate(item-&gt;<span class="built_in">string</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//释放当前的cjson</span></span><br><span class="line">        global_hooks.deallocate(item);</span><br><span class="line">        <span class="comment">//准备释放链表中的下一个cjson</span></span><br><span class="line">        item = next;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>deallocate();可类比free();<br><strong>这里需要注意的是释放内存时，要判断cjson结构体的string,valuesstring是否是常量。</strong></p>
+<p><strong>当string,valuesstring是动态内存分配时，才能使用deallocate()释放，否则可能出现内存错误。具体原因见下一节</strong></p>
+<h2 id="三-注意-const，reference"><a href="#三-注意-const，reference" class="headerlink" title="三 注意 const，reference"></a>三 注意 const，reference</h2><p>上面的代码中你会发现有些函数中会出现<code>const</code>,<code>reference</code>，<strong>这是cjson允许使用外部定义的变量来作为cjson结构体的成员。这种情况下的字符串需要用const修饰，结构体用reference修饰。</strong></p>
+<p>以<code>cJSON_CreateString()</code>为例，在为<code>valuestring</code>赋值时，使用的是动态内存分配的形式申请一块内存，传入参数string复制到内存，在这之后，参数string如何变化对该item的valuestring是没有影响的。</p>
+<p>作为对比，以<code>cJSON_CreateStringReference()</code>为例：<br>在这个函数中，系统不为<code>valuestring</code>分配内存，而只是把它指向<code>string</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 创建一个string类型的item，其valuestring指向传入参数string，外部定义的string发生变化会影响item的valuestring</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">CJSON_PUBLIC(cJSON *) cJSON_CreateStringReference(<span class="type">const</span> <span class="type">char</span> *<span class="built_in">string</span>)</span><br><span class="line">&#123;</span><br><span class="line">    cJSON *item = cJSON_New_Item(&amp;global_hooks);</span><br><span class="line">    <span class="keyword">if</span> (item != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        item-&gt;type = cJSON_String | cJSON_IsReference;</span><br><span class="line">        item-&gt;valuestring = (<span class="type">char</span>*)cast_away_const(<span class="built_in">string</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> item;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>这么做的目的一个方面是可以节约内存，但在使用时需注意参考变量的值不要轻易修改，其他reference类的函数一样，只是参考的变量不同。</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">CJSON_PUBLIC(cJSON *) cJSON_CreateObjectReference(<span class="type">const</span> cJSON *child);</span><br><span class="line"></span><br><span class="line">CJSON_PUBLIC(cJSON *) cJSON_CreateArrayReference(<span class="type">const</span> cJSON *child);</span><br><span class="line"></span><br><span class="line">CJSON_PUBLIC(<span class="type">void</span>) cJSON_AddItemToObjectCS(cJSON *object, <span class="type">const</span> <span class="type">char</span> *<span class="built_in">string</span>, cJSON *item);</span><br><span class="line">CJSON_PUBLIC(<span class="type">void</span>) cJSON_AddItemReferenceToArray(cJSON *<span class="built_in">array</span>, cJSON *item);</span><br><span class="line">CJSON_PUBLIC(<span class="type">void</span>) cJSON_AddItemReferenceToObject(cJSON *object, <span class="type">const</span> <span class="type">char</span> *<span class="built_in">string</span>, cJSON *item);</span><br></pre></td></tr></table></figure>
+<p><strong>由此造成：当删除一个item时，需要判断其指针是否是外部定义的变量，以此来决定是否使用内存释放函数。</strong></p>
+<h2 id="四-更简单的创建cjson"><a href="#四-更简单的创建cjson" class="headerlink" title="四 更简单的创建cjson"></a>四 更简单的创建cjson</h2><p>当你熟悉了cjson对json的创建思路后，可用以下更加快的方式创建cjson：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">cJSON_AddNullToObject(root, <span class="string">&quot;money&quot;</span>);</span><br><span class="line">cJSON_AddTrueToObject(root, <span class="string">&quot;man&quot;</span>);</span><br><span class="line">cJSON_AddFalseToObject(root, <span class="string">&quot;adult&quot;</span>);</span><br><span class="line">cJSON_AddNumberToObject(root, <span class="string">&quot;years&quot;</span>, <span class="number">22</span>);</span><br><span class="line">cJSON_AddStringToObject(root, <span class="string">&quot;name&quot;</span>, <span class="string">&quot;fool&quot;</span>);</span><br><span class="line"></span><br><span class="line">cJSON *season = cJSON_CreateStringArray(str_arry, <span class="number">3</span>);</span><br><span class="line">cJSON_AddItemToObject(root, <span class="string">&quot;season&quot;</span>, season);</span><br><span class="line"></span><br><span class="line">cJSON *child = cJSON_AddObjectToObject(root, <span class="string">&quot;child&quot;</span>);</span><br><span class="line">cJSON_AddStringToObject(child, <span class="string">&quot;girlfriend&quot;</span>, <span class="string">&quot;june&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>CJSON_PUBLIC(cJSON*) cJSON_AddStringToObject(cJSON * const object, const char * const name, const char * const string);</p>
+</blockquote>
+<p>可见这个函数本质上是调用了前面提到的<code>cJSON_CreateString();</code>与<code>add_item_to_object();</code>就是两步并作一步走。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 添加string类型cjson到obj</span></span><br><span class="line"><span class="comment"> * name ：键</span></span><br><span class="line"><span class="comment"> * string：值</span></span><br><span class="line"><span class="comment"> * 成功返回：string类cjson</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">CJSON_PUBLIC(cJSON*) cJSON_AddStringToObject(cJSON * <span class="type">const</span> object, <span class="type">const</span> <span class="type">char</span> * <span class="type">const</span> name, <span class="type">const</span> <span class="type">char</span> * <span class="type">const</span> <span class="built_in">string</span>)</span><br><span class="line">&#123;</span><br><span class="line">    cJSON *string_item = cJSON_CreateString(<span class="built_in">string</span>);</span><br><span class="line">    <span class="keyword">if</span> (add_item_to_object(object, name, string_item, &amp;global_hooks, <span class="literal">false</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> string_item;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cJSON_Delete(string_item);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>熟悉完json的创建，对json与cjson结构体的对应关系有了更深的掌握，下一章将解析cJSON_Print();输出json。<br><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/cJSON/2.create_json/" data-id="cmbcy7rhr002vt8mte3ptajhk" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/Web/setup_tomcat_web/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/cJSON/1.how_to_study_cjson/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

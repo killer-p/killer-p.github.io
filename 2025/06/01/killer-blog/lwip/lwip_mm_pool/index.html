@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="@[toc] 一，lwip内存池简介c语言的动态内存分配，会造成内存碎片，lwip使用内存池这样的结构来解决该问题。因为网络数据传输需要经常动态分配内存。 lwip的内存池按照用户给出的结构体，把一段连续的内存切分成一个个大小相同的内存区域（大小为结构体大小）。当使用动态内存分配时，会为用户分配一个内存块，释放时也会将整个内存块的回收。 这种动态内存分配方法的优点是速度快，缺点是pool中的内存可">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/lwip/lwip_mm_pool/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="@[toc] 一，lwip内存池简介c语言的动态内存分配，会造成内存碎片，lwip使用内存池这样的结构来解决该问题。因为网络数据传输需要经常动态分配内存。 lwip的内存池按照用户给出的结构体，把一段连续的内存切分成一个个大小相同的内存区域（大小为结构体大小）。当使用动态内存分配时，会为用户分配一个内存块，释放时也会将整个内存块的回收。 这种动态内存分配方法的优点是速度快，缺点是pool中的内存可">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/lwip/lwip_mm_pool/20210225195925835.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/lwip/lwip_mm_pool/6686.jpeg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/lwip/lwip_mm_pool/20210226004849547.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.656Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:26.741Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/lwip/lwip_mm_pool/20210225195925835.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/lwip/lwip_mm_pool" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/lwip/lwip_mm_pool/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.656Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>@[toc]</p>
+<h2 id="一，lwip内存池简介"><a href="#一，lwip内存池简介" class="headerlink" title="一，lwip内存池简介"></a>一，lwip内存池简介</h2><p>c语言的动态内存分配，会造成内存碎片，lwip使用内存池这样的结构来解决该问题。因为网络数据传输需要经常动态分配内存。</p>
+<p>lwip的内存池按照用户给出的结构体，把一段连续的内存切分成一个个大小相同的内存区域（大小为结构体大小）。当使用动态内存分配时，会为用户分配一个内存块，释放时也会将整个内存块的回收。</p>
+<p>这种动态内存分配方法的优点是速度快，缺点是pool中的内存可能没被利用，会造成一定的浪费。故适合用来为固定大小的数据结构分配内存，提供空间利用。<br><img src="/2025/05/30/hello-world/lwip/lwip_mm_pool/20210225195925835.png" alt="在这里插入图片描述"></p>
+<h2 id="二，内存池的数据结构"><a href="#二，内存池的数据结构" class="headerlink" title="二，内存池的数据结构"></a>二，内存池的数据结构</h2><p><strong>lwip的内存池结构体非常简单，是个单向的链表，每种类型的pool维持一条单向链表。</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">memp</span> &#123;</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">memp</span> *<span class="title">next</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>lwip内存池所使用的内存其实就是一个全局数组，其定义如下：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//内存池的真正内存区域</span></span><br><span class="line"><span class="type">static</span> <span class="type">u8_t</span> memp_memory[MEM_ALIGNMENT - <span class="number">1</span> </span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LWIP_MEMPOOL(name,num,size,desc) + ( (num) * (MEMP_SIZE + MEMP_ALIGN_SIZE(size) ) )</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;lwip/memp_std.h&quot;</span></span></span><br><span class="line">];</span><br></pre></td></tr></table></figure>
+<p>需要关注的是这个数组的大小是在编译的时候才会被确定。<strong>这个数组大小的计算公式如下</strong></p>
+<blockquote>
+<p>pool_a的大小 × pool_a的数量 + pool_b的大小 × pool_b的数量 + pool_b的大小 × pool_b的数量 +…….+MEM_ALIGNMENT -1</p>
+</blockquote>
+<p>在<code>lwip/memp_std.h</code>中有各种类型的pool的定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">if</span> LWIP_RAW</span></span><br><span class="line">LWIP_MEMPOOL(RAW_PCB,        MEMP_NUM_RAW_PCB,         <span class="keyword">sizeof</span>(<span class="keyword">struct</span> raw_pcb),        <span class="string">&quot;RAW_PCB&quot;</span>)</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span> </span></span><br></pre></td></tr></table></figure>
+<p>当编译器执行时，这些宏被展开成类似如下：</p>
+<blockquote>
+<p>+MEMP_NUM_RAW_PCB * MEMP_ALIGN_SIZE(sizeof(struct raw_pcb))<br>这就对应了“pool_a的大小 × pool_a的数量”，所有宏展开后就成为上面的公式，也就是所需的内存池的总大小。</p>
+</blockquote>
+<p>另外还有一些变量以类似的形式被编译器编译：</p>
+<p><strong>memp_sizes[MEMP_MAX]数组存放了各种类型pool的大小。MEMP_MAX&#x3D;pool种类。</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">u16_t</span> memp_sizes[MEMP_MAX] = &#123;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LWIP_MEMPOOL(name,num,size,desc)  LWIP_MEM_ALIGN_SIZE(size),</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;lwip/memp_std.h&quot;</span></span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><strong>memp_num[MEMP_MAX]数组存放了各种类型pool的数量。MEMP_MAX&#x3D;pool种类。</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="type">u16_t</span> memp_num[MEMP_MAX] = &#123;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LWIP_MEMPOOL(name,num,size,desc)  (num),</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;lwip/memp_std.h&quot;</span></span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">memp</span> *<span class="title">memp_tab</span>[<span class="title">MEMP_MAX</span>];</span>	<span class="comment">//用数组保存了各种类型pool链的第一个空闲块</span></span><br></pre></td></tr></table></figure>
+<h2 id="三，内存管理函数"><a href="#三，内存管理函数" class="headerlink" title="三，内存管理函数"></a>三，内存管理函数</h2><h3 id="1，初始化函数"><a href="#1，初始化函数" class="headerlink" title="1，初始化函数"></a>1，初始化函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">memp_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">memp</span> *<span class="title">memp</span>;</span></span><br><span class="line">  <span class="type">u16_t</span> i, j;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//将所有内存池初始化为0</span></span><br><span class="line">  <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; MEMP_MAX; ++i) &#123;</span><br><span class="line">    MEMP_STATS_AVAIL(used, i, <span class="number">0</span>);</span><br><span class="line">    MEMP_STATS_AVAIL(max, i, <span class="number">0</span>);</span><br><span class="line">    MEMP_STATS_AVAIL(err, i, <span class="number">0</span>);</span><br><span class="line">    MEMP_STATS_AVAIL(avail, i, memp_num[i]);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  memp = (<span class="keyword">struct</span> memp *)LWIP_MEM_ALIGN(memp_memory);  <span class="comment">//获取内存池首地址</span></span><br><span class="line">  <span class="comment">//将内存池分配成不同类型的pool</span></span><br><span class="line">  <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; MEMP_MAX; ++i) &#123;</span><br><span class="line">    memp_tab[i] = <span class="literal">NULL</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; memp_num[i]; ++j) &#123;</span><br><span class="line">      memp-&gt;next = memp_tab[i];</span><br><span class="line">      memp_tab[i] = memp;</span><br><span class="line">      memp = (<span class="keyword">struct</span> memp *)(<span class="type">void</span> *)((<span class="type">u8_t</span> *)memp + MEMP_SIZE + memp_sizes[i]);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>初始完成后的内存池如图，<strong>不同类型的pool其实是在一片连续的内存memp_memory 上</strong>。<br><img src="/2025/05/30/hello-world/lwip/lwip_mm_pool/6686.jpeg" alt="在这里插入图片描述"></p>
+<h3 id="2，内存分配函数"><a href="#2，内存分配函数" class="headerlink" title="2，内存分配函数"></a>2，内存分配函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">memp_malloc</span><span class="params">(<span class="type">memp_t</span> type)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">memp</span> *<span class="title">memp</span>;</span></span><br><span class="line">  </span><br><span class="line">  SYS_ARCH_DECL_PROTECT(old_level);<span class="comment">//临界保护</span></span><br><span class="line">  SYS_ARCH_PROTECT(old_level);</span><br><span class="line"></span><br><span class="line">  memp = memp_tab[type];  <span class="comment">//获取指定类型的pool链、</span></span><br><span class="line">  </span><br><span class="line">  <span class="keyword">if</span> (memp != <span class="literal">NULL</span>) &#123;</span><br><span class="line">    memp_tab[type] = memp-&gt;next;  <span class="comment">//更新空闲内存块</span></span><br><span class="line"></span><br><span class="line">    MEMP_STATS_INC_USED(used, type);  <span class="comment">//pool使用记录</span></span><br><span class="line">    memp = (<span class="keyword">struct</span> memp*)(<span class="type">void</span> *)((<span class="type">u8_t</span>*)memp + MEMP_SIZE); <span class="comment">//调节memp地址，这里的MEMP_SIZE为0，所以不变</span></span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    MEMP_STATS_INC(err, type);</span><br><span class="line">  &#125;</span><br><span class="line">  SYS_ARCH_UNPROTECT(old_level);<span class="comment">//退出保护</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> memp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用这个函数申请pool时，从指定类型pool链中取出一个空闲的内存块，并返回地址。</p>
+<h3 id="3，释放内存"><a href="#3，释放内存" class="headerlink" title="3，释放内存"></a>3，释放内存</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">memp_free</span><span class="params">(<span class="type">memp_t</span> type, <span class="type">void</span> *mem)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">memp</span> *<span class="title">memp</span>;</span></span><br><span class="line">  SYS_ARCH_DECL_PROTECT(old_level);	</span><br><span class="line">	<span class="comment">//判断释放的内存是否空指针</span></span><br><span class="line">  <span class="keyword">if</span> (mem == <span class="literal">NULL</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  memp = (<span class="keyword">struct</span> memp *)(<span class="type">void</span> *)((<span class="type">u8_t</span>*)mem - MEMP_SIZE);	<span class="comment">//MEMP_SIZE为0</span></span><br><span class="line"></span><br><span class="line">  SYS_ARCH_PROTECT(old_level);<span class="comment">//临界保护</span></span><br><span class="line"></span><br><span class="line">  MEMP_STATS_DEC(used, type); <span class="comment">//used置位0</span></span><br><span class="line">  </span><br><span class="line">  memp-&gt;next = memp_tab[type];<span class="comment">//将内存块插入链表 </span></span><br><span class="line">  memp_tab[type] = memp;</span><br><span class="line"></span><br><span class="line">  SYS_ARCH_UNPROTECT(old_level);<span class="comment">//退出临界保护</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>释放内存时只需要将pool重归链表。<br><strong>内存池的分配方式总体上就比较简单，在lwip中使用内存池的常常是固定大小的结构体，如udp控制块，tcp控制块等。</strong><br><img src="/2025/05/30/hello-world/lwip/lwip_mm_pool/20210226004849547.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/lwip/lwip_mm_pool/" data-id="cmbcy7rhx003gt8mt0qug9mvp" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/lwip/lwip_mm_heap/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/lwip/lwip_netif/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

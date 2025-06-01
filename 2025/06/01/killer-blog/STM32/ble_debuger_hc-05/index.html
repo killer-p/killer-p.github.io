@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="@[toc] 前言测试项目地址：https:&#x2F;&#x2F;gitee.com&#x2F;killerp&#x2F;stm32_ble_debug 串口是我们经常用来输出数据的接口，使用一些蓝牙串口模块，如HC-05能方便的通过蓝牙将串口数据发送到上位机，省去了串口连线到电脑的步骤。 今天分享一个功能强大的APP,蓝牙调试器，它具备以下功能  发送&#x2F;接收蓝牙串口的数据  自定义蓝牙串口 发送&#x2F;接收数据包格式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/STM32/ble_debuger_hc-05/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="@[toc] 前言测试项目地址：https:&#x2F;&#x2F;gitee.com&#x2F;killerp&#x2F;stm32_ble_debug 串口是我们经常用来输出数据的接口，使用一些蓝牙串口模块，如HC-05能方便的通过蓝牙将串口数据发送到上位机，省去了串口连线到电脑的步骤。 今天分享一个功能强大的APP,蓝牙调试器，它具备以下功能  发送&#x2F;接收蓝牙串口的数据  自定义蓝牙串口 发送&#x2F;接收数据包格式">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/ble_debuger_hc-05/20210517205508381.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/ble_debuger_hc-05/2021051720591697.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/ble_debuger_hc-05/2021051721251260.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/ble_debuger_hc-05/20210517213030362.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/ble_debuger_hc-05/20210517213724203.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/ble_debuger_hc-05/20210517231732731.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/ble_debuger_hc-05/20210519101144674.jpg">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/STM32/ble_debuger_hc-05/20210519102124328.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.647Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:27.062Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/STM32/ble_debuger_hc-05/20210517205508381.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/STM32/ble_debuger_hc-05" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/STM32/ble_debuger_hc-05/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.647Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>@[toc]</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>测试项目地址：<a target="_blank" rel="noopener" href="https://gitee.com/killerp/stm32_ble_debug">https://gitee.com/killerp/stm32_ble_debug</a></p>
+<p>串口是我们经常用来输出数据的接口，使用一些蓝牙串口模块，如HC-05能方便的通过蓝牙将串口数据发送到上位机，省去了串口连线到电脑的步骤。</p>
+<p><strong>今天分享一个功能强大的APP,蓝牙调试器，它具备以下功能</strong></p>
+<ul>
+<li><p><strong>发送&#x2F;接收蓝牙串口的数据</strong></p>
+</li>
+<li><p><strong>自定义蓝牙串口 发送&#x2F;接收数据包格式</strong></p>
+</li>
+<li><p><strong>支持多种控件：如按键，文本，滑动窗口，坐标轴显示等。</strong></p>
+</li>
+</ul>
+<p><strong>尤其是自定义数据包格式 和 多种可选的控件 是数据处理强大工具！</strong></p>
+<p>本次实验基于stm32及HC-05蓝牙串口模块，上位机为安卓手机，蓝牙调试器下载：</p>
+<p>应用商店搜索 <code>蓝牙调试器</code>，APP图标见下图：</p>
+<p><img src="/2025/05/30/hello-world/STM32/ble_debuger_hc-05/20210517205508381.png" alt="在这里插入图片描述"></p>
+<h2 id="一，设置数据包格式"><a href="#一，设置数据包格式" class="headerlink" title="一，设置数据包格式"></a>一，设置数据包格式</h2><p>APP界面如图所示，设备连接 与 对话模式 都是基操 ，我们直奔主题：<strong>专业调试</strong></p>
+<p><img src="/2025/05/30/hello-world/STM32/ble_debuger_hc-05/2021051720591697.jpg" alt="在这里插入图片描述"></p>
+<p><strong>首先新建一个工程，暂时取名为demo，我们需要关注 编辑控件 和 通信设置 功能；先进入通信设置，设置我们的数据包格式：</strong></p>
+<p>根据自己的数据需求，设置数据包内传输的数据。数据包的格式设置规则如下：</p>
+<ul>
+<li>起始字节:<code>0xA5</code></li>
+<li>原始数据</li>
+<li>校验和（原始数据所有字节之和，再取低8bit数据）</li>
+<li>结束字节:<code>0x5A</code></li>
+</ul>
+<p>数据格式支持<code>bool，char，short，int，float</code>四种c语言常用的数据类型，在本次例程中，我将传输char，short，int，float类型的数据。假定我们要发送和接收的数据包格式如下：</p>
+<p><img src="/2025/05/30/hello-world/STM32/ble_debuger_hc-05/2021051721251260.png" alt="在这里插入图片描述"></p>
+<p><strong>根据上面的数据包格式，到APP中的发送和接收数据包界面，分别添加一个char,short,int,float的变量;如图：到此我们就完成了数据包格式的设置了。</strong></p>
+<p><img src="/2025/05/30/hello-world/STM32/ble_debuger_hc-05/20210517213030362.jpg" alt="在这里插入图片描述"></p>
+<h2 id="二，编辑控件"><a href="#二，编辑控件" class="headerlink" title="二，编辑控件"></a>二，编辑控件</h2><p><strong>这里以Y-T一维波形图为例子</strong>，简单介绍控件的设置流程：</p>
+<p>点击+，选择Y-T一维波形图，随后弹出下面窗口：</p>
+<p><strong>该波形图能同时显示6个通道的数据，Receive表示数据来自接收的数据包，随后是数据类型，最后是链接到上一步中我们创建的变量。</strong></p>
+<p><img src="/2025/05/30/hello-world/STM32/ble_debuger_hc-05/20210517213724203.jpg" alt="在这里插入图片描述"></p>
+<p>补充：右上角的黄色的齿轮可设置数据接收周期，这个取决于逆串口发送的周期，暂时设置为100ms。同时还能支持控件的移动和缩放等。</p>
+<h2 id="三，stm32-串口发送"><a href="#三，stm32-串口发送" class="headerlink" title="三，stm32 串口发送"></a>三，stm32 串口发送</h2><p>蓝牙调试器的设置基本完成了，接下来就是单片机的串口程序设计了，这里以stm32为例子：</p>
+<p>简单介绍一下串口的配置：</p>
+<ul>
+<li><strong>串口波特率：9600</strong></li>
+<li><strong>使能DMA发送</strong></li>
+<li><strong>使能接收中断</strong></li>
+</ul>
+<p>这一段代码显示如何组装我们的数据:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> USART_TX_LEN 14	<span class="comment">//数据包大小</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">uint8_t</span> USART_TX_BUF[USART_TX_LEN];	<span class="comment">//数据包缓存区</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> x = <span class="number">0x01</span>;	</span><br><span class="line"><span class="type">short</span> y = <span class="number">0x02</span>;</span><br><span class="line"><span class="type">int</span> z = <span class="number">0x03</span>;</span><br><span class="line"><span class="type">float</span> f = <span class="number">4.5</span>;	</span><br><span class="line"></span><br><span class="line">USART_TX_BUF[<span class="number">0</span>] = <span class="number">0xA5</span>;	</span><br><span class="line">	</span><br><span class="line">USART_TX_BUF[<span class="number">1</span>] = (<span class="type">uint8_t</span>)x;</span><br><span class="line">	</span><br><span class="line">Short_to_Byte(y,&amp;USART_TX_BUF[<span class="number">2</span>]);</span><br><span class="line">	</span><br><span class="line">Int_to_Byte(z,&amp;USART_TX_BUF[<span class="number">4</span>]);</span><br><span class="line">	</span><br><span class="line">Float_to_Byte(f,&amp;USART_TX_BUF[<span class="number">8</span>]);</span><br><span class="line"></span><br><span class="line"><span class="comment">//计算校验和</span></span><br><span class="line">USART_TX_BUF[<span class="number">12</span>] =(<span class="type">uint8_t</span>) ((USART_TX_BUF[<span class="number">1</span>]+USART_TX_BUF[<span class="number">2</span>]+USART_TX_BUF[<span class="number">3</span>]+USART_TX_BUF[<span class="number">4</span>]+USART_TX_BUF[<span class="number">5</span>]+USART_TX_BUF[<span class="number">6</span>]+USART_TX_BUF[<span class="number">7</span>]+USART_TX_BUF[<span class="number">8</span>]+USART_TX_BUF[<span class="number">9</span>]+USART_TX_BUF[<span class="number">10</span>]+USART_TX_BUF[<span class="number">11</span>])&amp;<span class="number">0xff</span>);</span><br><span class="line">	</span><br><span class="line">USART_TX_BUF[<span class="number">13</span>] = <span class="number">0x5A</span>;</span><br><span class="line">	</span><br><span class="line"><span class="comment">//通过串口1发送</span></span><br><span class="line">ble_send(USART_TX_BUF,<span class="number">14</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//延时100ms</span></span><br><span class="line">delay_ms(<span class="number">100</span>);</span><br></pre></td></tr></table></figure>
+
+<p>串口发送函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//send data to hc-05</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">ble_send</span><span class="params">(<span class="type">uint8_t</span> *data,<span class="type">int</span> len)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">while</span>(__HAL_UART_GET_FLAG(&amp;huart1,UART_FLAG_TC)!=SET);	<span class="comment">//wait until tx complete</span></span><br><span class="line">	<span class="keyword">if</span>(!data)<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">	HAL_UART_Transmit_DMA(&amp;huart1,data,len);	<span class="comment">//Ê¹ÓÃDMAÄ£Ê½·¢ËÍ</span></span><br><span class="line">	<span class="keyword">while</span>(__HAL_UART_GET_FLAG(&amp;huart1,UART_FLAG_TC)!=SET);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>要将short,int,float类型变量转换为字节类型变量，才能通过串口传输，下面函数实现转换功能：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">Int_to_Byte</span><span class="params">(<span class="type">int</span> i,<span class="type">uint8_t</span> *byte)</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> longdata = <span class="number">0</span>;</span><br><span class="line">	longdata = *(<span class="type">unsigned</span> <span class="type">long</span>*)&amp;i;          </span><br><span class="line">	byte[<span class="number">3</span>] = (longdata &amp; <span class="number">0xFF000000</span>) &gt;&gt; <span class="number">24</span>;</span><br><span class="line">	byte[<span class="number">2</span>] = (longdata &amp; <span class="number">0x00FF0000</span>) &gt;&gt; <span class="number">16</span>;</span><br><span class="line">	byte[<span class="number">1</span>] = (longdata &amp; <span class="number">0x0000FF00</span>) &gt;&gt; <span class="number">8</span>;</span><br><span class="line">	byte[<span class="number">0</span>] = (longdata &amp; <span class="number">0x000000FF</span>);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="type">void</span> <span class="title function_">Float_to_Byte</span><span class="params">(<span class="type">float</span> f,<span class="type">uint8_t</span> *byte)</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> longdata = <span class="number">0</span>;</span><br><span class="line">	longdata = *(<span class="type">unsigned</span> <span class="type">long</span>*)&amp;f;          </span><br><span class="line">	byte[<span class="number">3</span>] = (longdata &amp; <span class="number">0xFF000000</span>) &gt;&gt; <span class="number">24</span>;</span><br><span class="line">	byte[<span class="number">2</span>] = (longdata &amp; <span class="number">0x00FF0000</span>) &gt;&gt; <span class="number">16</span>;</span><br><span class="line">	byte[<span class="number">1</span>] = (longdata &amp; <span class="number">0x0000FF00</span>) &gt;&gt; <span class="number">8</span>;</span><br><span class="line">	byte[<span class="number">0</span>] = (longdata &amp; <span class="number">0x000000FF</span>);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">Short_to_Byte</span><span class="params">(<span class="type">short</span> s,<span class="type">uint8_t</span> *byte)</span></span><br><span class="line">&#123;</span><br><span class="line">      </span><br><span class="line">	byte[<span class="number">1</span>] = (s &amp; <span class="number">0xFF00</span>) &gt;&gt; <span class="number">8</span>;</span><br><span class="line">	byte[<span class="number">0</span>] = (s &amp; <span class="number">0xFF</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>蓝牙调试器接收界面显示：</p>
+<p><img src="/2025/05/30/hello-world/STM32/ble_debuger_hc-05/20210517231732731.jpg" alt="在这里插入图片描述"></p>
+<h2 id="四，stm32-串口接收"><a href="#四，stm32-串口接收" class="headerlink" title="四，stm32 串口接收"></a>四，stm32 串口接收</h2><p>首先，我们在 蓝牙调试器 中添加 <strong>可编辑文本</strong> 控件 来<strong>输入我们要发送的数据</strong>；</p>
+<p><strong>本实验中，我们发送一帧数据包给stm32，stm32解析出数据后，对数据进行加法运算并返回到蓝牙调试器。</strong></p>
+<p>实现效果如图：</p>
+<p>黑色框中显示接收到的数据，绿色框中显示发送的数据；</p>
+<blockquote>
+<p>对于char 类型+1，short+2,int+3,float+1.1;</p>
+<p><img src="/2025/05/30/hello-world/STM32/ble_debuger_hc-05/20210519101144674.jpg" alt="在这里插入图片描述"><br>stm32使能串口接收中断，并在中断中处理数据：</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> USART_RX_LEN 14</span></span><br><span class="line"><span class="type">uint8_t</span> USART_RX_BUF[USART_RX_LEN];</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">	<span class="type">uint8_t</span> option;	<span class="comment">//bit0 indecate weather the msg is recved</span></span><br><span class="line">	<span class="type">char</span> x;</span><br><span class="line">	<span class="type">short</span> y;</span><br><span class="line">	<span class="type">int</span> z;</span><br><span class="line">	<span class="type">float</span> f;</span><br><span class="line">&#125;Ble_Data;</span><br><span class="line"></span><br><span class="line">Ble_Data rec_data;	<span class="comment">//蓝牙接收结构体</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">USART1_IRQ_Cb</span><span class="params">(<span class="type">void</span>)</span>                	</span><br><span class="line">&#123; </span><br><span class="line">	<span class="type">uint8_t</span> err = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">if</span>((__HAL_UART_GET_FLAG(&amp;huart1,UART_FLAG_RXNE)!=RESET))  <span class="comment">//接收中断(接收到的数据必须是0x5a结尾0xa5开头)</span></span><br><span class="line">	&#123;</span><br><span class="line">    HAL_UART_Receive(&amp;huart1,USART_RX_BUF,USART_RX_LEN,<span class="number">100</span>); <span class="comment">//读取串口接收的一字节数据到Res</span></span><br><span class="line">		</span><br><span class="line">		<span class="comment">//检查包头，包尾</span></span><br><span class="line">		<span class="keyword">if</span>(USART_RX_BUF[<span class="number">0</span>]==<span class="number">0xa5</span> &amp;&amp; USART_RX_BUF[USART_RX_LEN<span class="number">-1</span>]==<span class="number">0x5a</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="comment">//检查校验和</span></span><br><span class="line">			err = (<span class="type">uint8_t</span>) ((USART_RX_BUF[<span class="number">1</span>]+USART_RX_BUF[<span class="number">2</span>]+USART_RX_BUF[<span class="number">3</span>]+USART_RX_BUF[<span class="number">4</span>]+USART_RX_BUF[<span class="number">5</span>]+USART_RX_BUF[<span class="number">6</span>]+USART_RX_BUF[<span class="number">7</span>]+USART_RX_BUF[<span class="number">8</span>]+USART_RX_BUF[<span class="number">9</span>]+USART_RX_BUF[<span class="number">10</span>]+USART_RX_BUF[<span class="number">11</span>])&amp;<span class="number">0xff</span>);</span><br><span class="line">			<span class="keyword">if</span>(err!=USART_RX_BUF[<span class="number">12</span>])</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="comment">//返回错误 数据无效</span></span><br><span class="line">				rec_data.option |=<span class="number">0x00</span>;</span><br><span class="line">				<span class="keyword">return</span> ;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="comment">//数据有效</span></span><br><span class="line">			rec_data.option |=<span class="number">0x01</span>;</span><br><span class="line">			</span><br><span class="line">			<span class="comment">//将buff中的字节数据转换成指定类型</span></span><br><span class="line">			rec_data.x = (<span class="type">char</span>)USART_RX_BUF[<span class="number">1</span>];</span><br><span class="line">			rec_data.y = *((<span class="type">short</span> *) (&amp;USART_RX_BUF[<span class="number">2</span>]));</span><br><span class="line">			rec_data.z = *((<span class="type">int</span> *) (&amp;USART_RX_BUF[<span class="number">4</span>]));</span><br><span class="line">			rec_data.f = *((<span class="type">float</span> *) (&amp;USART_RX_BUF[<span class="number">8</span>]));</span><br><span class="line"></span><br><span class="line">		&#125; 		 </span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2025/05/30/hello-world/STM32/ble_debuger_hc-05/20210519102124328.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/STM32/ble_debuger_hc-05/" data-id="cmbcy7rha001ot8mt2rvhcim0" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/STM32/Stabilizer/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/STM32/Manony_filter_Posture_Settlement/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

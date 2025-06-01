@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Flow ContrlWIFI驱动可以选择是否使用Flow Control来缓存网络数据的收发。 以下是Flow Control的定义，可以看到有两个线程分别负责处理收发数据的逻辑，有对应的两个信号量来完成线程的同步，以及由进程状态的变量，还有由netbuf组成的两个收发队列，这些是FlowControl模块使用到的数据。 12345678910struct FlowControlModule &amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/05/31/killer-blog/OpenHarmony/WLAN_FlowContrl/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Flow ContrlWIFI驱动可以选择是否使用Flow Control来缓存网络数据的收发。 以下是Flow Control的定义，可以看到有两个线程分别负责处理收发数据的逻辑，有对应的两个信号量来完成线程的同步，以及由进程状态的变量，还有由netbuf组成的两个收发队列，这些是FlowControl模块使用到的数据。 12345678910struct FlowControlModule &amp;">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-31T02:36:45.816Z">
+<meta property="article:modified_time" content="2025-06-01T00:19:46.497Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/OpenHarmony/WLAN_FlowContrl" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/05/31/killer-blog/OpenHarmony/WLAN_FlowContrl/" class="article-date">
+  <time class="dt-published" datetime="2025-05-31T02:36:45.816Z" itemprop="datePublished">2025-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="Flow-Contrl"><a href="#Flow-Contrl" class="headerlink" title="Flow Contrl"></a>Flow Contrl</h2><p>WIFI驱动可以选择是否使用Flow Control来缓存网络数据的收发。</p>
+<p>以下是Flow Control的定义，可以看到有两个线程分别负责处理收发数据的逻辑，有对应的两个信号量来完成线程的同步，以及由进程状态的变量，还有由netbuf组成的两个收发队列，这些是FlowControl模块使用到的数据。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">FlowControlModule</span> &#123;</span></span><br><span class="line">    OSAL_DECLARE_THREAD(txTransferThread);              <span class="comment">//发送数据</span></span><br><span class="line">    OSAL_DECLARE_THREAD(rxTransferThread);              <span class="comment">//接收数据</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">OsalSem</span> <span class="title">sem</span>[<span class="title">FLOW_DIR_COUNT</span>];</span>                 <span class="comment">//线程信号量</span></span><br><span class="line">    FcThreadStatus threadStatus[FLOW_DIR_COUNT];        <span class="comment">//线程状态</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">FlowControlQueues</span> <span class="title">fcmQueue</span>[<span class="title">FLOW_DIR_COUNT</span>];</span>  <span class="comment">//netuf缓存队列</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">FlowControlOp</span> *<span class="title">op</span>;</span>                           <span class="comment">//驱动实现</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">FlowControlInterface</span> *<span class="title">interface</span>;</span>             <span class="comment">//提供给开发者的接口</span></span><br><span class="line">    <span class="type">void</span> *fcmPriv;                                      <span class="comment">/**&lt; Private data of the flow control module */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>然后还提供给开发者接口来操作FlowControl模块，例如FlowControlInterface，其定义在下面。根据g_fcInterface给我们提供的接口，可以知道开发者使用FlowControl模块主要就是向指定队列发送netbuf就完事了。当然还有最重要的，使用RegisterFlowControlOp注册一个FlowControlOp结构体。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">FlowControlInterface</span> <span class="title">g_fcInterface</span> =</span> &#123;</span><br><span class="line">    .setQueueThreshold = SetQueueThreshold,	<span class="comment">//设置队列最大值</span></span><br><span class="line">    .getQueueIdByEtherBuff = GetQueueIdByEtherBuff,	<span class="comment">//获取队列buff</span></span><br><span class="line">    .sendBuffToFCM = SendBuffToFCM,	<span class="comment">//发送netbuf到队列</span></span><br><span class="line">    .schedFCM = SchedTransfer,		<span class="comment">//调度线程</span></span><br><span class="line">    .registerFlowControlOp = RegisterFlowControlOp,	<span class="comment">//注册FlowControlOp结构体</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>FlowControlOp由驱动开发者根据具体的wifi芯片实现，负责操作wifi 芯片的逻辑。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">FlowControlOp</span> &#123;</span></span><br><span class="line">	<span class="comment">//检查wifi芯片是否处于station或p2p模式</span></span><br><span class="line">    <span class="type">bool</span> (*isDeviceStaOrP2PClient)(<span class="type">void</span>);</span><br><span class="line">    <span class="comment">//发送队列中的数据到网口</span></span><br><span class="line">    <span class="type">int32_t</span> (*txDataPacket)(NetBufQueue *q, <span class="type">void</span> *fcmPrivate, <span class="type">int32_t</span> fwPriorityId);</span><br><span class="line">	<span class="comment">//发送队列中的数据到协议栈</span></span><br><span class="line">    <span class="type">int32_t</span> (*rxDataPacket)(NetBufQueue *q, <span class="type">void</span> *fcmPrivate, <span class="type">int32_t</span> fwPriorityId);</span><br><span class="line">	<span class="comment">//获取发送队列id</span></span><br><span class="line">    FlowControlQueueID (*getTxQueueId)(<span class="type">const</span> <span class="type">void</span> *para);</span><br><span class="line">	<span class="comment">//获取接收队列id</span></span><br><span class="line">    FlowControlQueueID (*getRxQueueId)(<span class="type">const</span> <span class="type">void</span> *para);</span><br><span class="line">	<span class="comment">//获取发送队列优先级</span></span><br><span class="line">    <span class="type">int32_t</span> (*getTxPriorityId)(FlowControlQueueID id);</span><br><span class="line">	<span class="comment">//获取接收队列优先级</span></span><br><span class="line">    <span class="type">int32_t</span> (*getRxPriorityId)(FlowControlQueueID id);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="一、创建FlowControlModule"><a href="#一、创建FlowControlModule" class="headerlink" title="一、创建FlowControlModule"></a>一、创建FlowControlModule</h3><p>创建FlowContriol模块很简单，就是初始化所有成员变量。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> FlowControlModule *<span class="title function_">InitFlowControl</span><span class="params">(<span class="type">void</span> *fcmPriv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//创建内存</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">FlowControlModule</span> *<span class="title">fcm</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">    fcm = (<span class="keyword">struct</span> FlowControlModule *)OsalMemCalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> FlowControlModule));</span><br><span class="line">    (<span class="type">void</span>)memset_s(fcm, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> FlowControlModule), <span class="number">0</span>, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> FlowControlModule));</span><br><span class="line"></span><br><span class="line">    <span class="comment">//初始化两个队列</span></span><br><span class="line">    FlowControlQueueInit(fcm);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//初始化信号量</span></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; FLOW_DIR_COUNT; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (OsalSemInit(&amp;fcm-&gt;sem[i], <span class="number">0</span>) != HDF_SUCCESS) &#123;</span><br><span class="line">            OsalMemFree(fcm);</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//初始化线程</span></span><br><span class="line">    <span class="keyword">if</span> (CreateFlowControlTask(fcm) != HDF_SUCCESS) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//注册接口</span></span><br><span class="line">    fcm-&gt;interface = &amp;g_fcInterface;</span><br><span class="line">    fcm-&gt;fcmPriv = fcmPriv;</span><br><span class="line">    g_fcm = fcm;</span><br><span class="line">    <span class="keyword">return</span> fcm;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="1-1、收发线程"><a href="#1-1、收发线程" class="headerlink" title="1.1、收发线程"></a>1.1、收发线程</h4><p>在创建flowcontrol 线程中可以看到两个线程的优先级是最高的，因为网络数据需要及时处理，否则会导致队列溢出。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int32_t</span> <span class="title function_">CreateFlowControlTask</span><span class="params">(<span class="keyword">struct</span> FlowControlModule *fcm)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">OsalThreadParam</span> <span class="title">config</span> =</span> &#123;</span><br><span class="line">        .priority = OSAL_THREAD_PRI_HIGHEST,	<span class="comment">//最高的优先级</span></span><br><span class="line">        .stackSize = <span class="number">0</span>,	<span class="comment">//为什么栈大小为0？</span></span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="type">int32_t</span> ret = CreateTask(&amp;fcm-&gt;txTransferThread, RX_THREAD_NAME, RunWiFiTxFlowControl, &amp;config, fcm);</span><br><span class="line">    ret = CreateTask(&amp;fcm-&gt;rxTransferThread, TX_THREAD_NAME, RunWiFiRxFlowControl, &amp;config, fcm);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>两个线程使用同一套代码，根据参数dir来判断是接收还是发送。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int32_t</span> <span class="title function_">RunWiFiFlowControl</span><span class="params">(<span class="type">void</span> *para, FlowDir dir)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">FlowControlModule</span> *<span class="title">fcm</span> =</span> (<span class="keyword">struct</span> FlowControlModule *)para;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">        fcm-&gt;threadStatus[dir] = THREAD_WAITING;</span><br><span class="line">        <span class="comment">//等待信号量同步</span></span><br><span class="line">        <span class="keyword">if</span> (OsalSemWait(&amp;fcm-&gt;sem[dir], HDF_WAIT_FOREVER) != HDF_SUCCESS) &#123;</span><br><span class="line">            HDF_LOGE(<span class="string">&quot;%s exit: OsalSemWait return false!&quot;</span>, __func__);</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        fcm-&gt;threadStatus[dir] = THREAD_RUNNING;</span><br><span class="line">        <span class="comment">//分别处理收发逻辑</span></span><br><span class="line">        <span class="keyword">if</span> (dir == FLOW_TX) &#123;</span><br><span class="line">            FlowControlTxTreadProcess(fcm);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (dir == FLOW_RX) &#123;</span><br><span class="line">            FlowControlRxTreadProcess(fcm);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-2、队列"><a href="#1-2、队列" class="headerlink" title="1.2、队列"></a>1.2、队列</h4><p>我们知道无论什么类型的网络数据，最终都要进入队列，因为该模块的队列比较多，我们先看看有队列是什么以及有哪些队列：</p>
+<p>FlowControlQueue定义如下，其本质是在NetBufQueue的基础上，增加一些变量来给FlowControl管理。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">FlowControlQueue</span> &#123;</span></span><br><span class="line">    FlowControlQueueID queueID;  <span class="comment">//见下文</span></span><br><span class="line">    NetBufQueue dataQueue;       <span class="comment">//由netbuf组成的队列</span></span><br><span class="line">    <span class="type">uint32_t</span> queueThreshold;     <span class="comment">//网络数据最大值</span></span><br><span class="line">    OsalSpinlock lock;           <span class="comment">/**&lt; Queue lock */</span></span><br><span class="line">    <span class="type">uint32_t</span> pktCount;           <span class="comment">/**&lt; Number of packets received by the network data queue */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>FlowControlQueueID是用于表示一个队列组所拥有的所有类型的队列，一个队列组包含了9个不同等级（类型）的队列，这些队列是有优先级的。例如其定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">enum</span> &#123;</span></span><br><span class="line">    CTRL_QUEUE_ID = <span class="number">0</span>,  <span class="comment">/**&lt; Control queue ID */</span></span><br><span class="line">    VIP_QUEUE_ID,       <span class="comment">/**&lt; VIP queue ID */</span></span><br><span class="line">    NORMAL_QUEUE_ID,    <span class="comment">/**&lt; Normal queue ID */</span></span><br><span class="line">    TCP_DATA_QUEUE_ID,  <span class="comment">/**&lt; TCP data queue ID */</span></span><br><span class="line">    TCP_ACK_QUEUE_ID,   <span class="comment">/**&lt; TCP ACK queue ID */</span></span><br><span class="line">    BK_QUEUE_ID,        <span class="comment">/**&lt; Background flow queue ID */</span></span><br><span class="line">    BE_QUEUE_ID,        <span class="comment">/**&lt; Best-effort flow queue ID */</span></span><br><span class="line">    VI_QUEUE_ID,        <span class="comment">/**&lt; Video flow queue ID */</span></span><br><span class="line">    VO_QUEUE_ID,        <span class="comment">/**&lt; Voice flow queue ID */</span></span><br><span class="line">    QUEUE_ID_COUNT      <span class="comment">/**&lt; Total number of queue IDs */</span></span><br><span class="line">&#125; FlowControlQueueID;</span><br></pre></td></tr></table></figure>
+
+<p>在全局变量中，就有如下四个队列组，其意义见代码注释</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//sta模式发送线程所拥有的队列类型</span></span><br><span class="line"><span class="type">static</span> FlowControlQueueID g_staPriorityMapTx[QUEUE_ID_COUNT] = &#123;</span><br><span class="line">    CTRL_QUEUE_ID, VIP_QUEUE_ID, NORMAL_QUEUE_ID, TCP_ACK_QUEUE_ID, TCP_DATA_QUEUE_ID, VO_QUEUE_ID, VI_QUEUE_ID,</span><br><span class="line">    BE_QUEUE_ID, BK_QUEUE_ID</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//sta模式接收线程所拥有的队列类型</span></span><br><span class="line"><span class="type">static</span> FlowControlQueueID g_staPriorityMapRx[QUEUE_ID_COUNT] = &#123;</span><br><span class="line">    CTRL_QUEUE_ID, VIP_QUEUE_ID, NORMAL_QUEUE_ID, TCP_DATA_QUEUE_ID, TCP_ACK_QUEUE_ID, VO_QUEUE_ID, VI_QUEUE_ID,</span><br><span class="line">    BE_QUEUE_ID, BK_QUEUE_ID</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//应该是ap模式下的</span></span><br><span class="line"><span class="type">static</span> FlowControlQueueID g_priorityMapTx[QUEUE_ID_COUNT] = &#123;</span><br><span class="line">    CTRL_QUEUE_ID, VIP_QUEUE_ID, NORMAL_QUEUE_ID, TCP_DATA_QUEUE_ID, TCP_ACK_QUEUE_ID, VO_QUEUE_ID, VI_QUEUE_ID,</span><br><span class="line">    BE_QUEUE_ID, BK_QUEUE_ID</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> FlowControlQueueID g_priorityMapRx[QUEUE_ID_COUNT] = &#123;</span><br><span class="line">    CTRL_QUEUE_ID, VIP_QUEUE_ID, NORMAL_QUEUE_ID, TCP_ACK_QUEUE_ID, TCP_DATA_QUEUE_ID, VO_QUEUE_ID, VI_QUEUE_ID,</span><br><span class="line">    BE_QUEUE_ID, BK_QUEUE_ID</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>所以，收发线程的作用就是负责把队列中的netbuf送到他们该去的地方。发送的netbuf就应该传递给网口驱动，而接收到的netbuf就该传递给协议栈。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//发送线程处理队列中的数据</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">FlowControlTxTreadProcess</span><span class="params">(<span class="keyword">struct</span> FlowControlModule *fcm)</span></span><br><span class="line">&#123;</span><br><span class="line">  	<span class="comment">//sta发送队列组</span></span><br><span class="line">    <span class="keyword">if</span> (isSta) &#123;</span><br><span class="line">        <span class="comment">//遍历队列组的所有队列</span></span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; FLOW_CONTROL_MAP_SIZE; i++) &#123;</span><br><span class="line">            SendFlowControlQueue(fcm, g_staPriorityMapTx[i], FLOW_TX);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">//同上</span></span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; FLOW_CONTROL_MAP_SIZE; i++) &#123;</span><br><span class="line">            SendFlowControlQueue(fcm,  g_priorityMapTx[i], FLOW_TX);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>FlowControlTxTreadProcess和FlowControlRxTreadProcess最后会调用SendFlowControlQueue来入队，最终调用txDataPacket或rxDataPacket来发送接受数据。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int32_t</span> <span class="title function_">SendFlowControlQueue</span><span class="params">(<span class="keyword">struct</span> FlowControlModule *fcm, <span class="type">uint32_t</span> id, <span class="type">uint32_t</span> dir)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//获取指定队列</span></span><br><span class="line">    q = &amp;fcm-&gt;fcmQueue[dir].queues[id].dataQueue;</span><br><span class="line">    <span class="keyword">if</span> (dir == FLOW_TX) &#123;</span><br><span class="line">        <span class="keyword">if</span> (fcm-&gt;op != <span class="literal">NULL</span> &amp;&amp; fcm-&gt;op-&gt;getTxPriorityId != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="comment">//获取队列优先级</span></span><br><span class="line">            fwPriorityId = fcm-&gt;op-&gt;getTxPriorityId(id);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (fcm-&gt;op != <span class="literal">NULL</span> &amp;&amp; fcm-&gt;op-&gt;txDataPacket != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="comment">//调用FlowControlOp的发送函数，把队列中的netbuf通过网口发送</span></span><br><span class="line">            fcm-&gt;op-&gt;txDataPacket(q, fcm-&gt;fcmPriv, fwPriorityId);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            HDF_LOGE(<span class="string">&quot;%s fail : fcm-&gt;op-&gt;txDataPacket = null!&quot;</span>, __func__);</span><br><span class="line">            <span class="keyword">return</span> HDF_ERR_INVALID_PARAM;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (dir == FLOW_RX) &#123;</span><br><span class="line">        <span class="keyword">if</span> (fcm-&gt;op != <span class="literal">NULL</span> &amp;&amp; fcm-&gt;op-&gt;getRxPriorityId != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            rxPriorityId = fcm-&gt;op-&gt;getRxPriorityId(id);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (fcm-&gt;op != <span class="literal">NULL</span> &amp;&amp; fcm-&gt;op-&gt;rxDataPacket != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="comment">//调用FlowControlOp的接收函数，把队列中的netbuf传递给协议栈</span></span><br><span class="line">            fcm-&gt;op-&gt;rxDataPacket(q, fcm-&gt;fcmPriv, rxPriorityId);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            HDF_LOGE(<span class="string">&quot;%s fail : fcm-&gt;op-&gt;txDataPacket = null!&quot;</span>, __func__);</span><br><span class="line">            <span class="keyword">return</span> HDF_ERR_INVALID_PARAM;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> HDF_SUCCESS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="二、FlowControlInterface"><a href="#二、FlowControlInterface" class="headerlink" title="二、FlowControlInterface"></a>二、FlowControlInterface</h3><p>既然我们了解了FlowControl模块的线程的主要作用，即将数据入队。那么是由谁来发起（同步）线程的运行呢？这就需要使用到FlowControlInterface，开发者调用FlowControlInterface的接口来实现对队列的操作。我们重点关注sendBuffToFCM()和schedFCM()</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">FlowControlInterface</span> &#123;</span></span><br><span class="line">    <span class="comment">//根据netbuf获取到队列的id</span></span><br><span class="line">    FlowControlQueueID (*getQueueIdByEtherBuff)(<span class="type">const</span> NetBuf *buff);</span><br><span class="line">	<span class="comment">//设置队列最大容量</span></span><br><span class="line">    <span class="type">int32_t</span> (*setQueueThreshold)(<span class="keyword">struct</span> FlowControlModule *fcm, <span class="type">uint32_t</span> queueThreshold, <span class="type">uint32_t</span> id, <span class="type">uint32_t</span> dir);</span><br><span class="line">	<span class="comment">//发送netbuf到队列</span></span><br><span class="line">    <span class="type">int32_t</span> (*sendBuffToFCM)(<span class="keyword">struct</span> FlowControlModule *fcm, NetBuf *buff, <span class="type">uint32_t</span> id, <span class="type">uint32_t</span> dir);</span><br><span class="line">	<span class="comment">//发送信号量，同步线程</span></span><br><span class="line">    <span class="type">int32_t</span> (*schedFCM)(<span class="keyword">struct</span> FlowControlModule *fcm, FlowDir dir);</span><br><span class="line">	<span class="comment">//注册FlowControlOp</span></span><br><span class="line">    <span class="type">int32_t</span> (*registerFlowControlOp)(<span class="keyword">struct</span> FlowControlModule *fcm, <span class="keyword">struct</span> FlowControlOp *op);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-1、schedFCM"><a href="#2-1、schedFCM" class="headerlink" title="2.1、schedFCM"></a>2.1、schedFCM</h4><p>将netbuf推进到指定队列：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int32_t</span> <span class="title function_">SendBuffToFCM</span><span class="params">(<span class="keyword">struct</span> FlowControlModule *fcm, NetBuf *buff, <span class="type">uint32_t</span> id, <span class="type">uint32_t</span> dir)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">FlowControlQueue</span> *<span class="title">fcmQueue</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">    NetBufQueue *dataQ = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="comment">//检查参数</span></span><br><span class="line">    <span class="keyword">if</span> (!IsValidSentToFCMPra(fcm, id, dir)) &#123;</span><br><span class="line">        HDF_LOGE(<span class="string">&quot;%s fail : IsValidSentToFCMPra FALSE!&quot;</span>, __func__);</span><br><span class="line">        <span class="keyword">return</span> HDF_ERR_INVALID_PARAM;</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">//获取队列</span></span><br><span class="line">    fcmQueue = &amp;fcm-&gt;fcmQueue[dir].queues[id];</span><br><span class="line">    <span class="comment">//获取netbuf队列</span></span><br><span class="line">    dataQ = &amp;fcmQueue-&gt;dataQueue;</span><br><span class="line">    <span class="comment">//检查fcmQueue的容量</span></span><br><span class="line">    FcmQueuePreProcess(fcmQueue);</span><br><span class="line">    <span class="keyword">if</span> (NetBufQueueIsEmpty(dataQ)) &#123;</span><br><span class="line">        fcm-&gt;fcmQueue[dir].queues[id].pktCount = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//netbuf入队</span></span><br><span class="line">    NetBufQueueEnqueue(dataQ, buff);</span><br><span class="line">    <span class="comment">//数据包+1</span></span><br><span class="line">    fcm-&gt;fcmQueue[dir].queues[id].pktCount++;</span><br><span class="line">    <span class="keyword">return</span> HDF_SUCCESS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一般驱动程序在调用SendBuffToFCM()后，还要调用SchedTransfer()来同步线程，使线程即使的处理队列中的netbuf</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int32_t</span> <span class="title function_">SchedTransfer</span><span class="params">(<span class="keyword">struct</span> FlowControlModule *fcm, FlowDir dir)</span></span><br><span class="line">&#123;</span><br><span class="line">    OsalSemPost(&amp;fcm-&gt;sem[dir]);</span><br><span class="line">    <span class="keyword">return</span> HDF_SUCCESS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/05/31/killer-blog/OpenHarmony/WLAN_FlowContrl/" data-id="cmbcy7rhn002jt8mt70e4hfzu" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/05/31/killer-blog/OpenHarmony/WLAN_Message/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/05/31/killer-blog/Linux/vm/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="@[toc] 系列文章  Sifive Learn Inventor 基础之gpio 按键中断 Sifive learn inventor基础之串口&amp;操作寄存器 Sifive learn inventor基础之硬件pwm&amp;寄存器 risc-v Sifive learn inventor基础之硬件i2c与LSM303AGR通信   这一次用iic简单的读取lsm303的加速度数据，对">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="@[toc] 系列文章  Sifive Learn Inventor 基础之gpio 按键中断 Sifive learn inventor基础之串口&amp;操作寄存器 Sifive learn inventor基础之硬件pwm&amp;寄存器 risc-v Sifive learn inventor基础之硬件i2c与LSM303AGR通信   这一次用iic简单的读取lsm303的加速度数据，对">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616215621940.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616222000256.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616222150630.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616222357338.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616222554357.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616223626295.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616223845964.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200724223659828.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.659Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:26.785Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616215621940.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/sifive/i2c_LSM303AGR" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.659Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>@[toc]</p>
+<p><strong>系列文章</strong></p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106589242">Sifive Learn Inventor 基础之gpio 按键中断</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106603894">Sifive learn inventor基础之串口&amp;操作寄存器</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106631404">Sifive learn inventor基础之硬件pwm&amp;寄存器</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106796337">risc-v Sifive learn inventor基础之硬件i2c与LSM303AGR通信</a></li>
+</ol>
+<blockquote>
+<p>这一次用iic简单的读取lsm303的加速度数据，对于中断等不做操作；<br>2020 .7.29 优化了数据处理部分的代码。得到的数据更直观。精度是0.1mm</p>
+</blockquote>
+<h2 id="一，硬件连接"><a href="#一，硬件连接" class="headerlink" title="一，硬件连接"></a>一，硬件连接</h2><p><strong>如图的连接，I2C的两根信号都通过R6,R7上拉，通过这点可知与LSM303的通信波特率是400khz。</strong><br><img src="/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616215621940.png" alt="在这里插入图片描述"></p>
+<h2 id="二，获取数据"><a href="#二，获取数据" class="headerlink" title="二，获取数据"></a>二，获取数据</h2><p><strong>1，使用最新的freedom-e-sdk，<a target="_blank" rel="noopener" href="https://github.com/sifive/freedom-e-sdk">freedom-e-sdk GitHub仓库</a>，最新的sdk支持iic和pwm库函数开发，而且提供freertos的模板例程。在此基础上开发iic十分方便。</strong><br><strong>2，首先初始化开发板的iic接口，并通过iic接口配置lsm303的寄存器，设置加速度计的工作模式和输出速率（reg1_a寄存器），这里我设置的是普通模式，输出速率为400hz：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//reg1中是reg1_a寄存器的地址及写入的值 </span></span><br><span class="line"><span class="type">char</span> reg1[<span class="number">2</span>]=&#123;<span class="number">0x20</span>,<span class="number">0x77</span>&#125;;</span><br><span class="line"><span class="comment">//初始化iic为master 波特率400khz</span></span><br><span class="line">metal_i2c_init(i2c, I2C_BAUDRATE, METAL_I2C_MASTER);</span><br><span class="line"><span class="comment">//写控制寄存器reg1_A 普通模式，400hz输出，使能x，y，z轴加速度计</span></span><br><span class="line">metal_i2c_write(i2c, ACCELEROMETER_I2C_ADDR, <span class="number">2</span>,reg1 , METAL_I2C_STOP_ENABLE);</span><br></pre></td></tr></table></figure>
+<p><strong>然后创建一个定时时间为dt的任务，在这个任务里，我们读取lsm303加速度的输出寄存器的高位数据，比较对精度要求不高的话可以忽略低位数据。然后将数据进行积分处理得到速度和路程。这个项目里我不需要y轴数据所以没有读取。</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 由于普通模式有效数据10位，且数据为左对齐，只读取高位寄存器</span></span><br><span class="line"><span class="comment"> * 将数据进行积分处理</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">prvAccelerTask</span><span class="params">(<span class="type">void</span> *pvParameters)</span></span><br><span class="line">&#123;</span><br><span class="line">	TickType_t xNextWakeTime;</span><br><span class="line">	 <span class="type">char</span> *  pcMessage = <span class="string">&quot;start accelertask\r\n&quot;</span>;</span><br><span class="line">	(<span class="type">void</span>)pvParameters;</span><br><span class="line">	<span class="comment">//out_add中的值是加速度计OUT_X_H_A,OUT_Z_H_A寄存器的地址，</span></span><br><span class="line">	<span class="type">static</span> <span class="type">char</span> out_addr[<span class="number">2</span>]=&#123;<span class="number">0x29</span>,<span class="number">0x2d</span>&#125;,buff[<span class="number">2</span>]=&#123;<span class="number">0</span>&#125;;</span><br><span class="line">	<span class="comment">//延时时间，同时也是时间的微分dt 单位是ms</span></span><br><span class="line">	Motor.dt=<span class="number">20</span>;</span><br><span class="line">	xNextWakeTime = xTaskGetTickCount();</span><br><span class="line">	write(STDOUT_FILENO,pcMessage,<span class="built_in">strlen</span>(pcMessage));</span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">	&#123;</span><br><span class="line"></span><br><span class="line">		<span class="comment">//进入临界段，防止通信被打断</span></span><br><span class="line">		taskENTER_CRITICAL();</span><br><span class="line">		<span class="comment">//分别读取OUT_X_H_A,OUT_Z_H_A高位寄存器</span></span><br><span class="line">		metal_i2c_write(i2c, ACCELEROMETER_I2C_ADDR, <span class="number">1</span>,out_addr , METAL_I2C_STOP_DISABLE);</span><br><span class="line">		metal_i2c_read(i2c, ACCELEROMETER_I2C_ADDR, <span class="number">1</span>,buff , METAL_I2C_STOP_ENABLE);</span><br><span class="line">		metal_i2c_write(i2c, ACCELEROMETER_I2C_ADDR, <span class="number">1</span>,&amp;out_addr[<span class="number">1</span>] , METAL_I2C_STOP_DISABLE);</span><br><span class="line">		metal_i2c_read(i2c, ACCELEROMETER_I2C_ADDR, <span class="number">1</span>,&amp;buff[<span class="number">1</span>] , METAL_I2C_STOP_ENABLE);</span><br><span class="line">		<span class="comment">//赋值给lsm303对象</span></span><br><span class="line">		lsm303.acc_x_raw=buff[<span class="number">0</span>];</span><br><span class="line">		lsm303.acc_z_raw=buff[<span class="number">1</span>];</span><br><span class="line">		<span class="comment">//对原生数据处理，转化成加速度，速度，位移</span></span><br><span class="line">		sensor_data_process();</span><br><span class="line">		taskEXIT_CRITICAL();</span><br><span class="line">		write(<span class="number">1</span>,pcMessage,<span class="built_in">strlen</span>(pcMessage));</span><br><span class="line">		vTaskDelayUntil( &amp;xNextWakeTime, pdMS_TO_TICKS( Motor.dt ) );</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这就是配置的寄存器；<br><img src="/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616222000256.png" alt="在这里插入图片描述"><br><strong>我设置的是400hz，所以代码里写入的值是0x77，其实也不必太高，过高会影响精度。</strong><br><img src="/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616222150630.png" alt="在这里插入图片描述"><br><strong>以下是不同模式下，输出数据的有效位数，普通模式下，输出10位数据，再看看输出寄存器的描述，大概的意思就是输出的数据是左对齐的二进制补码。那就在处理数据时要解析出原码。至于不了解左对齐是什么的<a target="_blank" rel="noopener" href="https://wenku.baidu.com/view/de047e3eb94ae45c3b3567ec102de2bd9605de34.html">可以点我。</a></strong><br><img src="/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616222357338.png" alt="在这里插入图片描述"><br><img src="/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616222554357.png" alt="在这里插入图片描述"></p>
+<h2 id="三，处理数据"><a href="#三，处理数据" class="headerlink" title="三，处理数据"></a>三，处理数据</h2><p><strong>上面得到的数据是原始的，原生态无污染的，要加工成加速度数据，也就是单位为m&#x2F;s^2的数据。要计算实际的加速度，需要乘以一个比例系数，在开发文档称为灵敏度，灵敏度与加速度计工作模式与full scal（缩放）有关，缩放的配置在reg4_a寄存器，默认是0，也就是±2g。所以可知我配置的灵敏度为3.9mg。详细如下图：</strong><br><img src="/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616223626295.png" alt="在这里插入图片描述"><br><img src="/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616223845964.png" alt="在这里插入图片描述"><br><strong>因为板子是倾斜约45°放的，所以要得到水平的加速度需要经过直角坐标转换。<br><code>lsm303.acc_x_real=(int)lsm303.acc_x_raw*4*39;</code>乘4是因为普通模式输出10位数据，而我只读了高八位，舍弃了低二位，所以要左移2位，也就是乘4，39就是灵敏度。经过单位换算，得到的加速度单位是100ug</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 处理lsm303读取的数据，获取速度，距离</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">sensor_data_process</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//如果raw是负数的话需要取绝对值，乘以灵敏度，再将符号返回</span></span><br><span class="line">	<span class="keyword">if</span>(lsm303.acc_x_raw&amp;<span class="number">0x80</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		lsm303.acc_x_raw =-lsm303.acc_x_raw;</span><br><span class="line">		lsm303.acc_x_real=(<span class="type">int</span>)lsm303.acc_x_raw*<span class="number">4</span>*<span class="number">39</span>;</span><br><span class="line">		lsm303.acc_x_real=-lsm303.acc_x_real;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> lsm303.acc_x_real=(<span class="type">int</span>)lsm303.acc_x_raw*<span class="number">4</span>*<span class="number">39</span>;</span><br><span class="line">	<span class="keyword">if</span>(lsm303.acc_z_raw&amp;<span class="number">0x80</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		lsm303.acc_z_raw =-lsm303.acc_z_raw;</span><br><span class="line">		lsm303.acc_z_real=(<span class="type">int</span>)lsm303.acc_z_raw*<span class="number">4</span>*<span class="number">39</span>;</span><br><span class="line">		lsm303.acc_z_real=-lsm303.acc_z_real;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> lsm303.acc_z_real=(<span class="type">int</span>)lsm303.acc_z_raw*<span class="number">4</span>*<span class="number">39</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//x=8112 z=-6552 滤除重力</span></span><br><span class="line">	lsm303.acc_x_filter=lsm303.acc_x_real<span class="number">-8112</span>;</span><br><span class="line">	lsm303.acc_z_filter=<span class="number">6552</span>+lsm303.acc_z_real;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//lsm303.acc_x_filter=lsm303.acc_x_filter &amp; ~0x000000ff;</span></span><br><span class="line">	<span class="comment">//lsm303.acc_z_filter=lsm303.acc_z_filter &amp; ~0x000000ff;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//加速度分解到水平方向  sinθ=2/3 cosθ=3/4</span></span><br><span class="line">	Motor.acc=(lsm303.acc_x_filter*<span class="number">2</span>/<span class="number">3</span>+lsm303.acc_z_filter*<span class="number">3</span>/<span class="number">4</span>)/<span class="number">100</span>;<span class="comment">//cm/s^2</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//加速度，速度积分</span></span><br><span class="line">	Motor.speed=Motor.speed+Motor.acc*Motor.dt/<span class="number">100</span>;<span class="comment">//mm</span></span><br><span class="line">	Motor.distance=Motor.distance+Motor.speed*Motor.dt/<span class="number">100</span>;<span class="comment">//0.1mm</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="三，小结"><a href="#三，小结" class="headerlink" title="三，小结"></a>三，小结</h2><p><strong>这种简单粗暴的用加速度双重积分出距离其实非常不准确，积分误差会随时间而增加，需要其他方式进行校准。</strong><br><img src="/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200724223659828.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/" data-id="cmbcy7ri0003rt8mt654l77h4" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/other/tools/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/sifive/GPIO_isr/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

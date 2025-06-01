@@ -71,87 +71,58 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-linux/dma-buf" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+    <article id="post-killer-blog/sifive/pwm" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/2025/05/30/linux/dma-buf/" class="article-date">
-  <time class="dt-published" datetime="2025-05-30T14:38:29.096Z" itemprop="datePublished">2025-05-30</time>
+    <a href="/2025/06/01/killer-blog/sifive/pwm/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.660Z" itemprop="datePublished">2025-06-01</time>
 </a>
     
   </div>
   <div class="article-inner">
     
     
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2025/05/30/linux/dma-buf/">DMA BUF</a>
-    </h1>
-  
-
-      </header>
-    
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h1 id="一、DMABUF-框架"><a href="#一、DMABUF-框架" class="headerlink" title="一、DMABUF 框架"></a>一、DMABUF 框架</h1><p>dmabuf 是一个驱动间共享buf 的机制，他的简单使用场景如下：</p>
-<p><img src="/./pictures/dmabuf_1.png" alt="dmabuf_1.png"></p>
-<p>用户从DRM（显示驱动）申请一个dmabuf，把dmabuf 设置给GPU驱动，并启动GPU将数据输出到dmabuf，GPU输出完成后，再将dmabuf设置到DRM 驱动，完成画面的显示。</p>
-<p>在这个过程中通过共享dmabuf的方式，避免了GPU输出数据拷贝到drm frame buff的动作。</p>
-<p>如下所示，dmabuf 框架分为用户层和驱动层，用户层可以通过 &#x2F;dev&#x2F;dmabuf_heap&#x2F;xxx节点，从名称为xxx的dma heap 中申请dmabuf。申请到的dmabuf 在用户层的视角就是一个文件，并由fd 标识一个dmabuf。将fd 通过DRM、GPU接口传给驱动，驱动就能共享这个dmabuf。</p>
-<p>以下是一个简单的dmabuf 的示例代码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> fd, dmabuf_fd;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">dma_heap_allocation_data</span> <span class="title">data</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> <span class="title">fds</span>;</span></span><br><span class="line"></span><br><span class="line">data.len = <span class="number">1024</span> * <span class="number">1024</span> * <span class="number">4</span>;</span><br><span class="line"><span class="comment">//打开dma heap</span></span><br><span class="line">fd = open(<span class="string">&quot;/dev/dma-heap/xxx&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//从dma heap 申请dmabuf</span></span><br><span class="line">ioctl(fd, DMA_HEAP_IOCTL_ALLOC, &amp;data);</span><br><span class="line"></span><br><span class="line"><span class="comment">//将dmabuf的fd 设置到gpu进行处理</span></span><br><span class="line">set_dmabuf_to_gpu(data.fd);</span><br><span class="line"></span><br><span class="line"><span class="comment">//等待gpu 输出完毕</span></span><br><span class="line">fds.fd = data.fd;</span><br><span class="line">fds.events = POLLIN | POLLOUT;</span><br><span class="line">poll(fds, <span class="number">1</span>, TIMEOUT);</span><br><span class="line"></span><br><span class="line"><span class="comment">//将dmabuf 设置到drm显示</span></span><br><span class="line">set_dmabuf_to_drm(data.fd);</span><br><span class="line"></span><br><span class="line"><span class="comment">//等待显示完成</span></span><br><span class="line">poll(fds, <span class="number">1</span>, TIMEOUT);</span><br><span class="line"></span><br><span class="line"><span class="comment">//释放dmabuf</span></span><br><span class="line">close(data.fd);</span><br></pre></td></tr></table></figure>
-
-<h1 id="二、DMA-Heap"><a href="#二、DMA-Heap" class="headerlink" title="二、DMA Heap"></a>二、DMA Heap</h1><p>dma heap 就是一个dmabuf 内存池，让用户可以从内存池中申请dmabuf。其代码主要在dma-heap.c，设备驱动可以创建自己的dma heap，从而提供给用户申请dmabuf。例如DRM驱动可以创建一个DRM dma heap。DRM驱动最重要的就算实现struct dma_heap_ops 对象，这个对象需要实现allocate() 函数，即当用户从dma heap 申请dmabuf 时，DRM驱动要如何分配真实的物理内存。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">dma_heap_ops</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> (*allocate)(<span class="keyword">struct</span> dma_heap *heap,</span><br><span class="line">            <span class="type">unsigned</span> <span class="type">long</span> len,</span><br><span class="line">            <span class="type">unsigned</span> <span class="type">long</span> fd_flags,</span><br><span class="line">            <span class="type">unsigned</span> <span class="type">long</span> heap_flags);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">dma_heap</span> &#123;</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *name;</span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">dma_heap_ops</span> *<span class="title">ops</span>;</span> <span class="comment">//主要实现申请dmabuf的回调函数</span></span><br><span class="line">    <span class="type">void</span> *priv;</span><br><span class="line">    <span class="type">dev_t</span> heap_devt;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">list</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">cdev</span> <span class="title">heap_cdev</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>dma-heap.c 中其他的代码主要是实现一个简单设备驱动，提供接口给用户。</p>
-<h1 id="三、dmabuf"><a href="#三、dmabuf" class="headerlink" title="三、dmabuf"></a>三、dmabuf</h1><h2 id="3-1、dmabuf使用场景"><a href="#3-1、dmabuf使用场景" class="headerlink" title="3.1、dmabuf使用场景"></a>3.1、dmabuf使用场景</h2><p>在dmabuf 的使用场景中，有两种驱动：exporter 和 importer。</p>
-<ul>
-<li>exporter 是dmabuf 的提供者，是实现dma heap的驱动程序，负责dmabuf 对应的物理内存的申请、释放、映射等实现。</li>
-<li>importer 是dmabuf的使用者，是使用dmabuf 进行输入输出数据的驱动程序，他不关心dmabuf的申请释放，只需要往dmabuf 里读写数据即可。</li>
-</ul>
-<p>像上述例子中，DRM驱动首先是exporter，允许用户从dma heap申请内存，又是importer，从dmabuf 中读取数据显示到屏幕。而GPU是纯纯的importer，向dmabuf 中写入数据。</p>
-<p>这两种角色的关系如下图所示：</p>
-<p><img src="D:\killerp-blog\Linux\picture\dmabuf_2.png" alt="image-20240615175450839"></p>
-<p>从上述图可见dma_buf_ops 的实现至关重要。所以接下来我们关注dmabuf是如何被创建的。</p>
-<h2 id="3-2、dmabuf的创建"><a href="#3-2、dmabuf的创建" class="headerlink" title="3.2、dmabuf的创建"></a>3.2、dmabuf的创建</h2><p>dmabuf 是如何从dma heap 中被申请出来的？这部分主要是在allocate回调函数实现的，在大部分驱动中，allocate回调函数中会从物理内存中申请内存，并 调用dma_buf_export() 创建一个dmabuf 对象。</p>
-<p>所以我们的重点将分析 dma_buf_export() 函数是如何创建一个dmabuf 对象的。</p>
-<p>首先还是看dmabuf 的结构体定义：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">dma_buf</span> &#123;</span></span><br><span class="line">    <span class="type">size_t</span> size;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file</span> *<span class="title">file</span>;</span>                 <span class="comment">//匿名文件，代表该dmabuf，暴露给用户从而支持跨驱动传输</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">attachments</span>;</span>      <span class="comment">//attachment 链表</span></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">dma_buf_ops</span> *<span class="title">ops</span>;</span>     <span class="comment">//重要的回调函数</span></span><br><span class="line">    <span class="type">void</span> *vmap_ptr;                    <span class="comment">//dmabuf kernel 地址</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dma_resv</span> *<span class="title">resv</span>;</span>             <span class="comment">//保留区，用于存放dma fence对象</span></span><br><span class="line">    <span class="comment">/* poll support */</span></span><br><span class="line">    <span class="type">wait_queue_head_t</span> poll;            <span class="comment">//等待队列，用于poll</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dma_buf_poll_cb_t</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">dma_fence_cb</span> <span class="title">cb</span>;</span></span><br><span class="line">        <span class="type">wait_queue_head_t</span> *poll;</span><br><span class="line"></span><br><span class="line">        <span class="type">__poll_t</span> active;</span><br><span class="line">    &#125; cb_excl, cb_shared;              <span class="comment">//用于poll、dma fence</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>以下是dma_buf_export() 的简略版，很简单就是根据exp_info 初始化dmabuf对象，并创建一个文件，将dmabuf 与文件绑定起来。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">struct</span> dma_buf *<span class="title function_">dma_buf_export</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> dma_buf_export_info *exp_info)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//初始dmabuf 对象</span></span><br><span class="line">    dmabuf = kzalloc(alloc_size, GFP_KERNEL);</span><br><span class="line">    dmabuf-&gt;priv = exp_info-&gt;priv;</span><br><span class="line">    dmabuf-&gt;ops = exp_info-&gt;ops;</span><br><span class="line">    dmabuf-&gt;size = exp_info-&gt;size;</span><br><span class="line">    dmabuf-&gt;exp_name = exp_info-&gt;exp_name;</span><br><span class="line">    dmabuf-&gt;owner = exp_info-&gt;owner;</span><br><span class="line">    spin_lock_init(&amp;dmabuf-&gt;name_lock);</span><br><span class="line">    init_waitqueue_head(&amp;dmabuf-&gt;poll);</span><br><span class="line">    dmabuf-&gt;cb_excl.poll = dmabuf-&gt;cb_shared.poll = &amp;dmabuf-&gt;poll;</span><br><span class="line">    dmabuf-&gt;cb_excl.active = dmabuf-&gt;cb_shared.active = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!resv) &#123;</span><br><span class="line">        resv = (<span class="keyword">struct</span> dma_resv *)&amp;dmabuf[<span class="number">1</span>];</span><br><span class="line">        dma_resv_init(resv);</span><br><span class="line">    &#125;</span><br><span class="line">    dmabuf-&gt;resv = resv;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//初始化file</span></span><br><span class="line">    file = dma_buf_getfile(dmabuf, exp_info-&gt;flags);</span><br><span class="line">    file-&gt;f_mode |= FMODE_LSEEK;</span><br><span class="line">    dmabuf-&gt;file = file;</span><br><span class="line"></span><br><span class="line">    mutex_init(&amp;dmabuf-&gt;lock);</span><br><span class="line">    INIT_LIST_HEAD(&amp;dmabuf-&gt;attachments);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//添加到全局链表</span></span><br><span class="line">    mutex_lock(&amp;db_list.lock);</span><br><span class="line">    list_add(&amp;dmabuf-&gt;list_node, &amp;db_list.head);</span><br><span class="line">    mutex_unlock(&amp;db_list.lock);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> dmabuf;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-3、dma-buf-ops"><a href="#3-3、dma-buf-ops" class="headerlink" title="3.3、dma_buf_ops"></a>3.3、dma_buf_ops</h2><p>exporter驱动只关注struct dma_buf_export_info 对象即可，最重要的是struct dma_buf_ops对象的实现，这点需要根据具体的驱动实现。所以下面分析这些回调函数的含义是什么：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">dma_buf_ops</span> &#123;</span></span><br><span class="line">    <span class="comment">//判断当前设备是否能够访问dmabuf的物理内存，一些物理内存只能由指定的设备访问如vram。若设备可以访问改物理内存，则返回一个attachment代表此次访问</span></span><br><span class="line">    <span class="type">int</span> (*attach)(<span class="keyword">struct</span> dma_buf *, <span class="keyword">struct</span> dma_buf_attachment *);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//释放之前获取的attachment</span></span><br><span class="line">    <span class="type">void</span> (*detach)(<span class="keyword">struct</span> dma_buf *, <span class="keyword">struct</span> dma_buf_attachment *);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//importer 调用这个函数，锁定dmabuf的物理内存，使其不能被迁移</span></span><br><span class="line">    <span class="type">int</span> (*pin)(<span class="keyword">struct</span> dma_buf_attachment *attach);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//解锁物理内存</span></span><br><span class="line">    <span class="type">void</span> (*unpin)(<span class="keyword">struct</span> dma_buf_attachment *attach);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//将dmabuf的物理内存映射到importer的地址空间，表示importer要开始访问物理内存</span></span><br><span class="line">    <span class="comment">//因为exporter要让所以attach的设备都能访问，所以可能要将物理内存移动到合适的地址，所以函数可能休眠</span></span><br><span class="line">    <span class="comment">//返回一个sg_table，表示物理地址散列表</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sg_table</span> * (*<span class="title">map_dma_buf</span>)(<span class="keyword">struct</span> <span class="title">dma_buf_attachment</span> *,</span></span><br><span class="line"><span class="class">                     <span class="title">enum</span> <span class="title">dma_data_direction</span>);</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//解除映射并释放sg_table</span></span><br><span class="line">    <span class="type">void</span> (*unmap_dma_buf)(<span class="keyword">struct</span> dma_buf_attachment *,</span><br><span class="line">                  <span class="keyword">struct</span> sg_table *,</span><br><span class="line">                  <span class="keyword">enum</span> dma_data_direction);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//释放dmabuf，exporter在这个函数释放私有数据</span></span><br><span class="line">    <span class="type">void</span> (*release)(<span class="keyword">struct</span> dma_buf *);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//importer在使用cpu读取dmabuf前，调用该接口让exporter 确保数据在内存上且cpu能读取到正确的数据</span></span><br><span class="line">    <span class="type">int</span> (*begin_cpu_access)(<span class="keyword">struct</span> dma_buf *, <span class="keyword">enum</span> dma_data_direction);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//结束cpu 访问</span></span><br><span class="line">    <span class="type">int</span> (*end_cpu_access)(<span class="keyword">struct</span> dma_buf *, <span class="keyword">enum</span> dma_data_direction);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//将dmabuf 物理内存map 到用户地址空间</span></span><br><span class="line">    <span class="type">int</span> (*mmap)(<span class="keyword">struct</span> dma_buf *, <span class="keyword">struct</span> vm_area_struct *vma);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//将dmabuf 物理内存map到内核地址空间</span></span><br><span class="line">    <span class="type">void</span> *(*vmap)(<span class="keyword">struct</span> dma_buf *);</span><br><span class="line">    <span class="type">void</span> (*vunmap)(<span class="keyword">struct</span> dma_buf *, <span class="type">void</span> *vaddr);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>dmabuf框架将一个驱动访问物理内存的动作拆分成这么多个步骤，目的就是为了多个设备能共享一个物理内存，而每个设备的访问能力，访问地址空间都可能不一样，这就需要将访问过程细细拆分，协调好每个设备的访问顺序和关系。</p>
-<h1 id="四、dma-fence"><a href="#四、dma-fence" class="headerlink" title="四、dma-fence"></a>四、dma-fence</h1><p>dma fence 是用于做同步的。考虑以下场景：</p>
-<p>一个dmabuf，先由GPU完成渲染，然后再交给DRM进行显示输出。那么GPU渲染完成后，如何通知DRM进行显示输出呢？也就是GPU和DRM之前如何进行同步？这就需要引入fence用于设备间的同步，fence用于表示一个操作的完成状态，故fence有两个状态，not done和done。</p>
-<p>首先GPU在开始渲染操作前，创建一个fence，注册回调函数，将fence添加到dmabuf 中，随后DRM 等待该fence done。当GPU渲染完成中断上来后，会通知fence done。随后DRM线程被唤醒，进行显示操作。</p>
-<p>另外，dma fence还需要考虑多设备访问的情况，即可能有多个设备在等待fence完成，那么fence就必须支持多个设备的等待。</p>
-<p>那么就先看dma fence的定义：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">dma_fence</span> &#123;</span></span><br><span class="line">    <span class="type">spinlock_t</span> *lock;</span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">dma_fence_ops</span> *<span class="title">ops</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">cb_list</span>;</span>  <span class="comment">//回调函数链表，每个等待fence的驱动，都需要注册一个回调节点到该链表，当fence done时，会遍历该链表执行所有驱动的回调函数。</span></span><br><span class="line">        <span class="comment">/* @cb_list replaced by @timestamp on dma_fence_signal() */</span></span><br><span class="line">        <span class="type">ktime_t</span> timestamp;</span><br><span class="line">        <span class="comment">/* @timestamp replaced by @rcu on dma_fence_release() */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">rcu_head</span> <span class="title">rcu</span>;</span></span><br><span class="line">    &#125;;</span><br><span class="line">    u64 context;</span><br><span class="line">    u64 seqno;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">kref</span> <span class="title">refcount</span>;</span></span><br><span class="line">    <span class="type">int</span> error;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>如图所示：GPU线程会在操作dmabuf 前，创建fence，并等待fence完成，同时DRM也会等待该fence完成。当GPU渲染完成中断产生后，会调用fence done，依次唤醒GPU、DRM线程，GPU线程此时就可以继续下一帧图像的渲染，而DRM就可以将已经完成渲染的图像显示到屏幕。</p>
-<p><img src="D:\killerp-blog\Linux\picture\dmabuf_3.png" alt="image-20240615224223396"></p>
-<p>这个过程中调用的接口有：</p>
-<ol>
-<li>dma_fence_init()：初始化一个dma fence对象</li>
-<li>dma_resv_reserve_shared() ：从dma resv 中保留一个share fence 指针</li>
-<li>dma_resv_add_shared_fence()：将dma fence添加到resv 对象</li>
-<li>dma_fence_default_wait()：向dma fence注册回调函数dma_fence_default_wait_cb，并睡眠等待dma fence完成</li>
-<li>dma_fence_signal()：标志dma fence 完成，并回调dma fence 中的所有回调函数</li>
+        <h2 id="risc-v-Sifive-learn-inventor基础之硬件pwm"><a href="#risc-v-Sifive-learn-inventor基础之硬件pwm" class="headerlink" title="risc-v Sifive learn inventor基础之硬件pwm"></a>risc-v Sifive learn inventor基础之硬件pwm</h2><p>@[toc]</p>
+<h2 id="系列文章"><a href="#系列文章" class="headerlink" title="系列文章"></a>系列文章</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106589242">Sifive Learn Inventor 基础之gpio 按键中断</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106603894">Sifive learn inventor基础之串口&amp;操作寄存器</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106631404">Sifive learn inventor基础之硬件pwm&amp;寄存器</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106796337">risc-v Sifive learn inventor基础之硬件i2c与LSM303AGR通信</a></li>
 </ol>
-<p>其中有一个叫dma_resv的对象，简单来说dma_resv 是一个存放dma fence的地方，一个dmabuf 可能同时有若干个dma fence，且dma fence还有共享和独占两种。dma_resv可以理解为一块内存区域，专门存放dma fence的，故要将dma fence添加到dmabuf时，要先调用dma_resv_reserve_shared() 预留出dma fence的位置，然后再调用dma_resv_add_shared_fence() 添加到dma resv。</p>
-<h1 id="五、poll"><a href="#五、poll" class="headerlink" title="五、poll"></a>五、poll</h1><p>前面所述都是在内核态，但对于用户来说，也希望获取到设备的同步信息。例如在本文一开始的例子中，用户会使用poll 系统调用等待gpu渲染完成。这一切都是由dma_buf_fops来实现的。</p>
-<p>在3.2中提到dmabuf的创建中，有一个步骤会创建匿名文件，这个匿名文件就是用于暴露给用户的接口。这个文件代表了一个dmabuf，用户通过该文件的fd可以操作该dmabuf的一些功能，dma_buf_fops是所有dmabuf 共享的file_operations，其中就包括poll的实现。</p>
-<p>当用户调用poll 系统调用等待dmabuf时，会遍历dmabuf 上的所有fence，并将回调函数dma_buf_poll_cb注册到每一个fence上，并进入休眠。当有任意一个fence done时，就会唤醒用户线程，从而退出poll。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106603894">risc-v Sifive learn inventor基础之串口</a><br>继串口之后，继续来通过寄存器操作硬件pwm，熟悉操作寄存器的流程。<br>因为sifive官方没有提供pwm的库函数，所以必须根据芯片手册配置寄存器来开发pwm。这是练习操作寄存器的好机会！</p>
+</blockquote>
+<h2 id="错误修改"><a href="#错误修改" class="headerlink" title="错误修改"></a>错误修改</h2><p>2020.7.24<br>修改了示例应用中，pwm占空比为1&#x2F;5；多谢指正；<br>之前关于pwmcount，scale与pwms的关系搞错了，正确的关系是pwms&#x3D;pwmcount&#x2F;scale。耽误各位了</p>
+<h2 id="一，硬件连接"><a href="#一，硬件连接" class="headerlink" title="一，硬件连接"></a>一，硬件连接</h2><p>在入门手册中可以知道，在金手指上，gpio2接到小车上的右边电机且控制电机正转。在芯片手册的gpio章节，可以找到gpio2的复用功能1中对应的是pwm0_cmp2，所以要操作的就是pwmcmp2输出pwm波。<br><img src="/2025/05/30/hello-world/sifive/pwm/2020060823454538.png" alt="金手指"><br><img src="/2025/05/30/hello-world/sifive/pwm/2020060823460562.png" alt="gpio2"></p>
+<h2 id="二，pwm"><a href="#二，pwm" class="headerlink" title="二，pwm"></a>二，pwm</h2><p>e310有三个pwm控制器，我们需要操作的是pwm0。<br>一个pwm控制器的寄存器如下：</p>
+<blockquote>
+<p>pwmcfg：配置pwm<br>pwmcount：pwm计数寄存器<br>pwms：保存pwmcount经过放大后的值，这个寄存器用来与pwmcmpX寄存器比较，从而产生pwm波。</p>
+</blockquote>
+<p><img src="/2025/05/30/hello-world/sifive/pwm/2020060823500383.png" alt="pwm寄存器"><br><strong>1，pwmcfg</strong></p>
+<ul>
+<li><strong>pwmscale：pwmcount的扩大倍数 ；pwmscale∈（0-15）；扩大倍数：2^0—&gt;2^15;</strong></li>
+<li><strong>pwmsticky和pwmdeglitch：是与pwm中断相关的，是用来防止当改变cmpX的值时，中断再次触发。</strong></li>
+<li><strong>pwmzero ：为1时，当pwms&#x3D;&#x3D;cmp0时，pwmcount会重置。但是在开发过程中，我发现这个位无法被置一，当向bit 9写1时，bit 10置1，而bit 9保持0 最后发现这个不会影响pwmzero的功能。</strong></li>
+<li><strong>pwmcmpXcenter： 用来设置pwm的中央对齐模式</strong></li>
+<li><strong>pwmXgang： 设置pwm轮流产生信号。</strong> </li>
+<li><strong>pwmcmpXip:中断标志位</strong><br><img src="/2025/05/30/hello-world/sifive/pwm/20200608235301136.png" alt="在这里插入图片描述"></li>
+</ul>
+<p><strong>2，pwms与pwmcmpx</strong><br><em><strong>pwms的值就是pwmcount的值缩小2^n倍，n&#x3D;scale，n∈【0，15】。缩放后的值与pwmcmpX寄存器里的值比较，产生pwm波。当pwms&gt;pwmcmpX 时，gpioX输出高电平。</strong></em></p>
+<p><img src="/2025/05/30/hello-world/sifive/pwm/20200609002818951.png" alt="在这里插入图片描述"><br><strong>pwmcpmX的最大值与cmpwdith有关，如图不同pwm控制器有不一样的cmpwdith，如pwm0的cmpwdith&#x3D;8，pwmcmpX寄存器就只能设置8位，也就是0-&gt;255，pwm1的cmpwdith&#x3D;16,pwmcmpX范围0-&gt;2^16-1。这一点在编程时需要注意传递的参数不能超出范围。</strong><br><img src="/2025/05/30/hello-world/sifive/pwm/20200609091806437.png" alt="在这里插入图片描述"></p>
+<h2 id="二，代码编写"><a href="#二，代码编写" class="headerlink" title="二，代码编写"></a>二，代码编写</h2><p><strong>了解了寄存器的功能后，就可以通过代码来操作寄存器实现所需的功能了。可见，通过scale可以设置pwms的时钟频率（pwm时钟频率是16MHZ），设置pwmcmp0可以设置pwm的周期，再通过设置pwmcmpX调节pwm的占空比。</strong><br><strong>首先设置gpio2，输出使能，复用功能1，配置pwmcfg寄存器，保险起见，先清零，再设置scale<br><em>注意，pwmenalways必须在pwmzerocmp之前置位，若pwmzerocmp先置位，则pwmenalways设置为1时，pwmzerocmp会被清零!</em><br>最后清零所有cmp寄存器，然后设置cmp0的值，这样初始化了周期，cmp1-cmp3的输出全是高电平。</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#include &quot;pwm.h&quot;</span></span><br><span class="line">/*</span><br><span class="line"> * 设置pwm0占空比 </span><br><span class="line"> * cmp_num :0-&gt;3</span><br><span class="line"> * 通过设置pwmcmp0可以设置周期,cmpx&gt;pwms 低电平</span><br><span class="line"> * cmp 【0，155】这是由于pwmdwith=8</span><br><span class="line"> */</span><br><span class="line">int pwm0_setcmp(int cmp_num,char cmp)&#123;</span><br><span class="line">	<span class="keyword">if</span>(cmp_num==0)&#123;</span><br><span class="line">		PWM0_CMP0 &amp;=0;</span><br><span class="line">		PWM0_CMP0|=cmp;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span>(cmp_num==1)&#123;</span><br><span class="line">		PWM0_CMP1 &amp;=0;</span><br><span class="line">		PWM0_CMP1|=cmp;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span>(cmp_num==2)&#123;</span><br><span class="line">		PWM0_CMP2 &amp;=0;</span><br><span class="line">		PWM0_CMP2|=cmp;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span>(cmp_num==3)&#123;</span><br><span class="line">		PWM0_CMP3 &amp;=0;</span><br><span class="line">		PWM0_CMP3|=cmp;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">/*</span><br><span class="line"> * pwm初始化</span><br><span class="line"> *  假设时钟周期设为64M</span><br><span class="line"> * 周期 = (250*2^scale)/64 us=2^scale*3.90625</span><br><span class="line"> *int scale (0-15)时钟分频系数 scale=7时，T=500us</span><br><span class="line"> */</span><br><span class="line">void pwm_init(int scale)&#123;</span><br><span class="line"></span><br><span class="line">	//GPIO2-&gt;PWM0CMP2</span><br><span class="line">	GPIO0_IOF_EN |=(1&lt;&lt;<span class="string">2);//enable gpio2 iof</span></span><br><span class="line"><span class="string">	GPIO0_IOF_SEL |=(1&lt;&lt;2</span>); //select iof 1</span><br><span class="line"></span><br><span class="line">	//配置cfg寄存器</span><br><span class="line">	PWM0_CFG &amp;=0;//clear cfg</span><br><span class="line">	PWM0_CFG |=scale;//set scale=0</span><br><span class="line">	PWM0_CFG |=(1&lt;&lt;<span class="string">12);//set pwmenalways 1 ;note:this must be done before pwmzeorcmp</span></span><br><span class="line"><span class="string">	PWM0_CFG |=(1&lt;&lt;9);//set pwmzero 1</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">	//init the cmpx value</span></span><br><span class="line"><span class="string">	pwm0_setcmp(0,250); </span></span><br><span class="line"><span class="string">	pwm0_setcmp(1,250); </span></span><br><span class="line"><span class="string">	pwm0_setcmp(2,250); </span></span><br><span class="line"><span class="string">	pwm0_setcmp(3,250); </span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>寄存器相关宏定义</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> PWM0_CFG (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_PWM0_0_BASE_ADDRESS + METAL_SIFIVE_PWM0_PWMCFG)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PWM0_CMP0 (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_PWM0_0_BASE_ADDRESS + METAL_SIFIVE_PWM0_PWMCMP0)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PWM0_CMP1 (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_PWM0_0_BASE_ADDRESS + METAL_SIFIVE_PWM0_PWMCMP1)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PWM0_CMP2 (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_PWM0_0_BASE_ADDRESS + METAL_SIFIVE_PWM0_PWMCMP2)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PWM0_CMP3 (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_PWM0_0_BASE_ADDRESS + METAL_SIFIVE_PWM0_PWMCMP3)))</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><em><strong>示例应用</strong></em><br>设置pwm周期500us 占空比1&#x2F;5</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">__metal_driver_sifive_fe310_g000_pll_init(&amp;__metal_dt_clock_4);<span class="comment">//clock 64mhz</span></span><br><span class="line">metal_clock_set_rate_hz(&amp;__metal_dt_clock_4.clock,<span class="number">64000000</span>);</span><br><span class="line"><span class="comment">//当scale=7 PWM周期500us</span></span><br><span class="line">pwm_init(<span class="number">7</span>);</span><br><span class="line">pwm0_setcmp(<span class="number">2</span>,<span class="number">200</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="三，小结"><a href="#三，小结" class="headerlink" title="三，小结"></a>三，小结</h2><p>以pwm0为例，其他的pwm也大致可以依样画葫芦。这次用逻辑分析仪，能明显清晰的看到pwm的周期和占空比，通过不断调试pwmcfg，最后找到规律。同时实践了操作寄存器的方法。编写了reg.h，方便操作寄存器。<br>作者学识短浅，如有错误的地方，望不吝赐教，如果我的博客对你有帮助，记得点赞收藏哦！<br><img src="/2025/05/30/hello-world/sifive/pwm/20200614084559688.png" alt="在这里插入图片描述"></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2025/05/30/linux/dma-buf/" data-id="cmbawrir90001g8mt6yb3fgo4" data-title="DMA BUF" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2025/06/01/killer-blog/sifive/pwm/" data-id="cmbcy7ri1003tt8mt9ch25t3e" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -163,46 +134,908 @@
 
 
   
-    <article id="post-hello-world" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+    <article id="post-killer-blog/sifive/uart" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/2025/05/30/hello-world/" class="article-date">
-  <time class="dt-published" datetime="2025-05-30T14:11:58.276Z" itemprop="datePublished">2025-05-30</time>
+    <a href="/2025/06/01/killer-blog/sifive/uart/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.660Z" itemprop="datePublished">2025-06-01</time>
 </a>
     
   </div>
   <div class="article-inner">
     
     
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2025/05/30/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+        <h2 id="risc-v-Sifive-learn-inventor基础之串口"><a href="#risc-v-Sifive-learn-inventor基础之串口" class="headerlink" title="risc-v Sifive learn inventor基础之串口"></a>risc-v Sifive learn inventor基础之串口</h2><p>@[toc]</p>
+<h2 id="系列文章"><a href="#系列文章" class="headerlink" title="系列文章"></a>系列文章</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106589242">Sifive Learn Inventor 基础之gpio 按键中断</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106603894">Sifive learn inventor基础之串口&amp;操作寄存器</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106631404">Sifive learn inventor基础之硬件pwm&amp;寄存器</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106796337">risc-v Sifive learn inventor基础之硬件i2c与LSM303AGR通信</a></li>
+</ol>
+<blockquote>
+<p>上一章了解了中断后，继续实践另一个重要的外设串口以及Sifive提供的操作寄存器的函数__METAL_ACCESS_ONCE<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106589242">Sifive learn inventor基础之串口gpio中断配置</a></p>
+<p>开发板只有两个串口，分别是uart0和uart1，uart0外接到jlink模块，可以用于与上位机的通信，uart1与esp32连接。<br>本章以uart0为例子来初始化uart0，并且实现pc端串口发送数据，开发板自动返回接收的数据。</p>
+</blockquote>
+<h2 id="一，硬件连接"><a href="#一，硬件连接" class="headerlink" title="一，硬件连接"></a>一，硬件连接</h2><p>由芯片手册可以知道，uart0_rx对应gpio16，uart0_tx对应gpio17；所以我们需要复用这两gpio口；</p>
+<h2 id="二，代码编写"><a href="#二，代码编写" class="headerlink" title="二，代码编写"></a>二，代码编写</h2><p>1，初始化uart0</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 串口0 波特率115200 用于打印数据</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">uart0_init</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//enable rx and tx</span></span><br><span class="line">	UART0_TXCTRL  |= (<span class="number">1</span> &lt;&lt;<span class="number">0</span>);</span><br><span class="line">	UART0_RXCTRL  |= (<span class="number">1</span> &lt;&lt;<span class="number">0</span>);</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//RXWM 1 watermark=0 </span></span><br><span class="line">	<span class="comment">//__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_UART0_0_BASE_ADDRESS + METAL_SIFIVE_UART0_RXCTRL))  |= (1 &lt;&lt;16);</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//enable rx inturupt</span></span><br><span class="line">	UART0_IE |= (<span class="number">1</span> &lt;&lt;<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">//先将div寄存器清零，再进行赋值操作</span></span><br><span class="line">	UART0_DIV  &amp;= <span class="number">0</span>;</span><br><span class="line">	<span class="comment">//设置波特率为 115200 时钟频率64M，div=(64M/115200)-1=554</span></span><br><span class="line">	UART0_DIV |=<span class="number">554</span>;</span><br><span class="line">	<span class="comment">//复用gpio16，17</span></span><br><span class="line">	GPIO0_IOF_EN  |= (<span class="number">1</span> &lt;&lt;<span class="number">16</span>);</span><br><span class="line">	GPIO0_IOF_EN  |= (<span class="number">1</span> &lt;&lt;<span class="number">17</span>);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>因为库函数用不惯（好多bug），所以自己通过操作寄存器初始化uart，首先要去看芯片手册的uart章节，了解各个寄存器的功能。学过stm32的人一看就清楚这是在配置寄存器，需要搭配芯片手册看才能了解每一步的意义。</strong><br><strong>以下是在uart.h中对用到的uart寄存器的定义，有了这些宏定义，对寄存器的操作看起来就比较简洁。</strong><br><em><strong>这里介绍一个非常重要的库函数__METAL_ACCESS_ONCE，可以看到这是一个宏定义函数，大概的意思就是操作地址为（x）的寄存器；<br>具体寄存器地址在手册里可以找到，另外bsp&#x2F;install&#x2F;include&#x2F;metal&#x2F;machine目录下的platform.h文件里，定义了大部分寄存器的地址，使用起来就是复制粘贴，非常方便</strong></em><br><img src="/2025/05/30/hello-world/sifive/uart/20200607173318652.png" alt="在这里插入图片描述"><br><em><strong>uart.h</strong></em></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> UART1_RXDATA (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_UART0_1_BASE_ADDRESS + METAL_SIFIVE_UART0_RXDATA)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> UART0_RXDATA __METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_UART0_0_BASE_ADDRESS + METAL_SIFIVE_UART0_RXDATA))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> UART1_TXDATA (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_UART0_1_BASE_ADDRESS + METAL_SIFIVE_UART0_TXDATA)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> UART0_TXDATA __METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_UART0_0_BASE_ADDRESS + METAL_SIFIVE_UART0_TXDATA))</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> UART0_TXCTRL (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_UART0_0_BASE_ADDRESS + METAL_SIFIVE_UART0_TXCTRL)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> UART0_RXCTRL (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_UART0_0_BASE_ADDRESS + METAL_SIFIVE_UART0_RXCTRL)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> UART0_IE (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_UART0_0_BASE_ADDRESS + METAL_SIFIVE_UART0_IE)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> UART0_DIV (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_UART0_0_BASE_ADDRESS + METAL_SIFIVE_UART0_DIV)))</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> UART1_TXCTRL (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_UART0_1_BASE_ADDRESS + METAL_SIFIVE_UART0_TXCTRL)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> UART1_RXCTRL (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_UART0_1_BASE_ADDRESS + METAL_SIFIVE_UART0_RXCTRL)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> UART1_IE (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_UART0_1_BASE_ADDRESS + METAL_SIFIVE_UART0_IE)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> UART1_DIV (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_UART0_1_BASE_ADDRESS + METAL_SIFIVE_UART0_DIV)))</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> GPIO0_IOF_EN (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_GPIO0_0_BASE_ADDRESS + METAL_SIFIVE_GPIO0_IOF_EN)))</span></span><br></pre></td></tr></table></figure>
+<p>初始化函数中的被注释部分__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_SIFIVE_UART0_0_BASE_ADDRESS + METAL_SIFIVE_UART0_RXCTRL))  |&#x3D; (1 &lt;&lt;16);可能比较难以理解，结合芯片手册，得知操作的是watermark功能 。因为接收FIFO是8个字节长，当设置watermark&#x3D;2时，只有当FIFO里的数据超过2个字节时，uart才会产生中断。当FIFO里的数据少于2时，中断标志位就会自动清除。所以watermark可以认为是一个门槛，超过门槛就会触发中断。我一般设置为默认，就是0；<br><img src="/2025/05/30/hello-world/sifive/uart/20200607174438266.png" alt="在这里插入图片描述"><br>watermark官网手册说明<br><img src="/2025/05/30/hello-world/sifive/uart/20200607175108142.png" alt="在这里插入图片描述"><br>2,配置plic<br>就像上一章一样，配置plic中断，这一次就非常能理解了。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">*串口0接收中断初始化</span></span><br><span class="line"><span class="comment">*uart0 uart0对象</span></span><br><span class="line"><span class="comment">*flag 退出中断后的标志</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">Uart0_rx_interrupt_init</span><span class="params">(<span class="keyword">struct</span> metal_uart *uart0,<span class="type">int</span> *flag)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//uart0 id=33 查询手册</span></span><br><span class="line">	<span class="type">int</span>  uart0_id=<span class="number">33</span>;</span><br><span class="line">	uart0_intr=uart0-&gt;vtable-&gt;controller_interrupt(uart0);</span><br><span class="line"></span><br><span class="line">	metal_interrupt_init(uart0_intr);</span><br><span class="line">    </span><br><span class="line">	<span class="comment">//注册回调函数 传递flag</span></span><br><span class="line">	metal_interrupt_register_handler(uart0_intr,uart0_id,uart0_isr,flag);</span><br><span class="line">	<span class="comment">//设置优先级</span></span><br><span class="line">	metal_interrupt_set_priority(uart0_intr,uart0_id,<span class="number">4</span>);</span><br><span class="line">	metal_interrupt_enable(uart0_intr,uart0_id);</span><br><span class="line">	</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">*串口0接收中断回调函数</span></span><br><span class="line"><span class="comment">*每接收一个字节进入一次此函数 每次进入会读取一个字节数据到buff</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">uart0_isr</span> <span class="params">(<span class="type">int</span> id, <span class="type">void</span> *data)</span> &#123;</span><br><span class="line">	<span class="type">int</span> *flag=(<span class="type">int</span> *)data;</span><br><span class="line">	<span class="comment">//读取uart0接收寄存器</span></span><br><span class="line">	uart0_buff.rxbyte=UART0_RXDATA;</span><br><span class="line">	<span class="comment">//将读到的一个字节的数据放到buff</span></span><br><span class="line">	uart0_buff.rxdata[uart0_buff.rn]=uart0_buff.rxbyte&amp;<span class="number">0x0ff</span>;</span><br><span class="line">	uart0_buff.rn++;</span><br><span class="line">	<span class="comment">//UART0_RXDATA寄存器的31位为1时表示FIFO里已经没有数据，说明接收完成</span></span><br><span class="line">	<span class="keyword">if</span>((UART0_RXDATA&gt;&gt;<span class="number">31</span>)&amp;<span class="number">1</span>)&#123;</span><br><span class="line">		uart0_buff.rxdata[uart0_buff.rn]=<span class="number">0</span>;</span><br><span class="line">		*flag=<span class="number">3</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3，当uart0接收全部数据后，flag&#x3D;3，再把数据发送回去</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 串口0发送 用于打印</span></span><br><span class="line"><span class="comment"> * char *p 字符串的首地址</span></span><br><span class="line"><span class="comment"> * len 字符串长度（字节）</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">uart0send</span><span class="params">(<span class="type">char</span> *p,<span class="type">int</span> len)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//UART0_TXDATA的第31位为1时表示发送FIFO为空，即发送完成</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;len;i++)&#123;</span><br><span class="line">		<span class="keyword">while</span>(UART0_TXDATA&amp;(<span class="number">1</span>&lt;&lt;<span class="number">31</span>));</span><br><span class="line">		<span class="comment">//发送一个字节的数据</span></span><br><span class="line">		UART0_TXDATA  |=p[i];</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(flag==<span class="number">3</span>)&#123;</span><br><span class="line">	<span class="type">char</span> *c=<span class="string">&quot;uart0 recieve data:\r\n&quot;</span>;</span><br><span class="line">	<span class="type">int</span> len=<span class="built_in">strlen</span>(c);</span><br><span class="line">	uartsend(c,len);</span><br><span class="line">	uart0send(uart0_buff.rxdata,uart0_buff.rn);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="三，小结"><a href="#三，小结" class="headerlink" title="三，小结"></a>三，小结</h2><p><strong>这个操作寄存器的函数非常有用，结合芯片手册，我们可以避开库函数，更好的去了解芯片的底层逻辑。对一些库函数没有涉及的外设，例如pwm也需要操作寄存器来进行开发。</strong><br><img src="/2025/05/30/hello-world/sifive/uart/20200614084756634.png" alt="在这里插入图片描述"></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2025/05/30/hello-world/" data-id="cmbavxgrp0000g8mt3u627ieq" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2025/06/01/killer-blog/sifive/uart/" data-id="cmbcy7ri1003ut8mt10rh6ulw" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-killer-blog/worklife/2025求职准备" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.660Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="一、准备问题"><a href="#一、准备问题" class="headerlink" title="一、准备问题"></a>一、准备问题</h2><h3 id="1-1、自我介绍"><a href="#1-1、自我介绍" class="headerlink" title="1.1、自我介绍"></a>1.1、自我介绍</h3><p>x哥好，我是潘润鑫，目前就职于星宸科技，我的工作内容是在Linux内核驱动中，开发和维护多媒体系统。我熟悉在Linux内核进行软件开发，解决内核常见的问题，并对Linux 内核中多媒体pipeline的搭建有一定的理解。</p>
+<p>在工作中，我参加了3个芯片项目，主导的开发任务有：<br>1、Sideband data设计与实现：设计开发了一套接口，用于在不同模块之间传递参数信息，该接口实现高内聚低耦合，提供给其他驱动程序使用，并且复用了原有代码的逻辑，减少了工作量。<br>2、Linux系统读取RTOS系统Log：设计Linux驱动，通过寄存器与dma与CM4交互，读取CM4上RTOS系统的log<br>3、CMDQ Burst Write：针对软件写寄存器速度慢的问题，与硬件rd设计了一套软硬件方案，将写寄存器的耗时减少了70%。<br>4、DMABUF：将SDK对接到DMABUF框架中</p>
+<p>在工作中，我解决了大量的Linux内核驱动BUG：<br>详见2.7、缺陷解决</p>
+<p>在职期间，我取得企业明星个人奖、优秀新人奖，以及两次绩效A。</p>
+<h3 id="1-2、为什么离职？"><a href="#1-2、为什么离职？" class="headerlink" title="1.2、为什么离职？"></a>1.2、为什么离职？</h3><p>1、目前的工作中测试和debug的占比较大，我希望能承担更多的软件新功能开发项目</p>
+<p>2、公司业务转向FAE</p>
+<h3 id="1-3、对自己的职业规划"><a href="#1-3、对自己的职业规划" class="headerlink" title="1.3、对自己的职业规划"></a>1.3、对自己的职业规划</h3><p>技术上在未来的2-3年内，进一步积累操作系统领域工作经验，能够负责较大软件项目的开发，能够提高工作效率，与同事沟通协作的效率。</p>
+<h3 id="1-4、遇到最大的困难是什么"><a href="#1-4、遇到最大的困难是什么" class="headerlink" title="1.4、遇到最大的困难是什么"></a>1.4、遇到最大的困难是什么</h3><p>困难描述：在P3P FPGA验证阶段，cmdq一个单元测试出错（从未遇见过的错误），同时有CMDQ PTS新功能要验证，距离硬件frozen剩余的时间不多，必须尽快解决问题。</p>
+<p>BUG描述：CMDQ Delay功能测试中，发现delay 2ms 的case实际上delay了160ms。</p>
+<p>如何解决困难：</p>
+<ol>
+<li>认真分析错误现象，找出其中的规律、特点：2s delay 没有问题，2ms delay有问题，说明可能是硬件精度问题，检查clock，发现正常。</li>
+<li>cmdq chn0 没有问题，但后续chn1、2、3有问题；询问hw rd，说chn都是使用同一套硬件，是对硬件的分时复用，实现上没有区别。</li>
+<li>分析代码，发现有关中断cmd，怀疑是中断关闭太久引起，尝试注释中断的cmd。发现case 都可以pass，怀疑是中断问题，于是询问硬件RD中断的处理机制。得到的回答仍然无法解释现象。</li>
+<li>将中断cmd替换成其他cmd、如 poll、null 发现也可以pass，怀疑是和cmd类型相关，于是与hw rd分享实验现象。</li>
+<li>hw rd开会讨论后认为可能是riu总线延迟，导致write cmd在poll cmd之后执行，导致timeout时间设置不及时生效导致的</li>
+<li>自我提升：遇到困难，保持乐观的心态。抓住问题的特点，针对性的做实验，尽量多的抓取数据，沟通时不要太发散思维。并及时与相关人员进行充分的沟通，拉通双方的信息。</li>
+</ol>
+<h3 id="1-5、我的核心竞争力"><a href="#1-5、我的核心竞争力" class="headerlink" title="1.5、我的核心竞争力"></a>1.5、我的核心竞争力</h3><p>丰富的debug经验，对多线程并发的理解（）<br>优秀的架构设计能力</p>
+<h2 id="二、工作内容"><a href="#二、工作内容" class="headerlink" title="二、工作内容"></a>二、工作内容</h2><ul>
+<li>MI SDK ：MI 即媒体接口，主要提供多媒体处理的API接口给客户，客户通过MI接口可以调用soc 上的多媒体ip，进行音视频流app的搭建。</li>
+<li>mma heap：一块用于存放多媒体数据的专用内存。</li>
+<li>iommu：将mma heap所在的物理地址映射到范围更大的虚拟地址，提供虚拟地址给多媒体ip访问</li>
+</ul>
+<h3 id="2-1、SYS内存管理"><a href="#2-1、SYS内存管理" class="headerlink" title="2.1、SYS内存管理"></a>2.1、SYS内存管理</h3><h4 id="2-1-1、mma-heap"><a href="#2-1-1、mma-heap" class="headerlink" title="2.1.1、mma heap"></a>2.1.1、mma heap</h4><p>一块用于存放多媒体数据的专用内存，由于音视频流处理过程需要使用到连续物理内存，为了满足连续物理内存的需求，sigmastar设计了一个mma heap的内存池。<br>为什么不适应dma_alloc_coherent()？是因为iommu存在，我们需要实现一个驱动去管理iommu，将物理地址映射到连续虚拟地址，提供给ip dma使用</p>
+<h4 id="2-1-2、iommu"><a href="#2-1-2、iommu" class="headerlink" title="2.1.2、iommu"></a>2.1.2、iommu</h4><p>MIU 总线：与DDR进行连接。</p>
+<p>既然有大块连续物理内存的需求，那么就避免不了内存碎片。为了减少内存碎片，提升内存系统利用率，引入了iommu。</p>
+<blockquote>
+<p>内存碎片：即有一块较大的连续地址空闲，经过若干次申请释放后，由于小块内存散布在地址空间各个角落，导致虽然总的空闲空间足够，但无法凑出一块较大的连续空间，从而导致内存申请失败。</p>
+</blockquote>
+<p>mma heap的原理：sigmastar 芯片中有一个iommu，用于帮助建立mma heap，他的硬件示意图如下所示：</p>
+<p><img src="/image-20240612215136387.png?lastModify=1742087513" alt="image-20240612215136387"></p>
+<p>sigmastar io mmu 可以将一段物理内存地址映射为另一段虚拟物理内存地址。与arm mmu最大的不同是，io mmu 是集成在内存控制器上的，其使用者包括soc 上的所有ip，如isp、venc、disp。<br>DDR上的真实物理地址PA，经过IO MMU映射后，成为虚拟物理地址VPA，VPA地址与DDR上的地址是不重叠的。VPA就是所谓的mma heap，专门给音视频流ip使用。ip发出访问VPA地址请求，会在iommu转换成对应的物理地址的访问。</p>
+<p>io mmu 映射的最小单位是entry，每个entry大小可配置为32k-&gt;128k，共有4096个entry，只有一级页表，因为可以映射128M-&gt;512M的物理内存，已经足够使用了。在内存系统初始化时，会通过memblock系统保留一块物理内存，然后创建一个mma allocator，allocator 管理一段虚拟地址空间，一般来说会比真实物理地址大，这取决于entry szie。<br>当音视频流启动后，每次向mma heap内存申请时，SYS会从allocator中申请一段连续的地址，然后对这段地址使用iommu进行映射，将VPA映射到PA使地址有效。<br>释放buf 时，会解除映射。</p>
+<blockquote>
+<p>使用IO MMU的好处是什么？</p>
+<ul>
+<li><p>减少内存碎片，例如，通过将64M的内存空间映射到128M的VPA，更大的内存空间可以更好的降低内存碎片带来的影响。避免上述的总空闲内存足够，但无法凑出连续的内存空间的情况。</p>
+</li>
+<li><p>帮助发现use after free问题，当内存释放后，io mmu会解除映射关系。假如此时有ip 访问到未被映射的VPA，会触发异常；</p>
+</li>
+<li><p>帮助解决内存访问越界、在申请内存时，在内存前后申请多余的字节，但不对这些字节进行映射，如果ip访问越界，则会触发异常，打印信息。</p>
+</li>
+<li><p>帮助定位踩内存，MIU 内存保护，可以为一段地址空间的内存设置白名单，白名单之外的ip访问该段地址空间，会触发异常，打印信息帮助debug踩内存</p>
+</li>
+</ul>
+</blockquote>
+<h4 id="2-1-3、chunk"><a href="#2-1-3、chunk" class="headerlink" title="2.1.3、chunk"></a>2.1.3、chunk</h4><p>chunk用于描述一个较大的内存块。chunk manager是管理在一段内存上，chunk的申请和释放。chunk 的申请和释放的逻辑是：为了避免内存碎片，尽量从最合适的chunk中切割得到所需的chunk。chunk 是与硬件无关的，纯粹软件逻辑实现的。在申请chunk的时候，需要输入所需的chunk 大小、对齐要求，需要对buf 地址、大小进行字节对齐，甚至要浪费一些内存。</p>
+<blockquote>
+<p>为什么需要内存对齐？</p>
+<p>答：硬件在访问内存的时候，一次会读取若干个字节，若数据在内存中保持字节对齐，硬件可以以最少的内存访问次数读取到所需的数据</p>
+</blockquote>
+<h4 id="2-1-4、ring-pool"><a href="#2-1-4、ring-pool" class="headerlink" title="2.1.4、ring pool"></a>2.1.4、ring pool</h4><p>对于ven ip，由于每次编码完成之后的码流数据大小是未知的，无法在编码前提前确定的，故其输出的buf 的大小也是未知的。那么我们就无法在编码前预申请一个指定大小的buf。</p>
+<p>ring pool 就是为解决这个问题产生的设计。其核心是申请一个较大的mma buf，ven 每次编码完成后，都将帧的数据输出到该ring pool 中，并设置该帧的长度，更新写指针，同时用户也会从ring pool 的读指针中读取数据给应用层，更新读指针。当写指针达到buf 尾部时，会重新跳转到buf 首地址继续写数据。只要保证pool 的大小在一个合理的值，对于ven来说，输出buf足够大，且同时用户能及时读数据，就能确保编码能正常进行。</p>
+<h4 id="2-1-5、dmabuf"><a href="#2-1-5、dmabuf" class="headerlink" title="2.1.5、dmabuf"></a>2.1.5、dmabuf</h4><p>将mma heap 对接dmabuf 框架。实现了dmabuf exporter 和 dmabuf importer。</p>
+<ul>
+<li><p>exporter：支持从mma heap 申请一块内存作为dmabuf，并实现attachment 的回调函数。</p>
+</li>
+<li><p>importer：支持从dmabuf中获取物理地址，并封装成SYS支持的buf 数据结构，用于ip的数据输出。</p>
+</li>
+<li><p>dma fence：在ip 输出数据结束后，唤醒poll 的线程。</p>
+</li>
+</ul>
+<h4 id="2-1-6、cma"><a href="#2-1-6、cma" class="headerlink" title="2.1.6、cma"></a>2.1.6、cma</h4><p>连续内存管理</p>
+<h4 id="2-1-7、cache"><a href="#2-1-7、cache" class="headerlink" title="2.1.7、cache"></a>2.1.7、cache</h4><p>cache line、flush cache</p>
+<h4 id="2-1-9、vmap、map"><a href="#2-1-9、vmap、map" class="headerlink" title="2.1.9、vmap、map"></a>2.1.9、vmap、map</h4><h3 id="2-2、线程管理"><a href="#2-2、线程管理" class="headerlink" title="2.2、线程管理"></a>2.2、线程管理</h3><h4 id="2-2-1、线程"><a href="#2-2-1、线程" class="headerlink" title="2.2.1、线程"></a>2.2.1、线程</h4><p>一般来说，都有以下模型，一个线程负责管理一个硬件设备的输入输出。</p>
+<p><img src="/image-20240613223254395.png?lastModify=1742087513" alt="image-20240613223254395"></p>
+<p>我们希望中断产生后，cpu 能尽快处理中断，将输出buf 传递给后级或者用户。利用多线程的特性，为每一个ip创建一个线程，这样就算多个ip 在同时产生中断，也能有多个线程并发处理中断。</p>
+<h4 id="2-2-2、buf-传递"><a href="#2-2-2、buf-传递" class="headerlink" title="2.2.2、buf 传递"></a>2.2.2、buf 传递</h4><p>视频流类似流水线，前级模块的输出作为后级模块的输入，也可以输出给用户app。<br>SYS线程中实现将前级buf传给后级，buf 传递实现是传递引用，即buf 的物理地址和长度。通过引用计数来管理buf，决定buf 何时释放。<br>sys 线程中还实现了buf 传递的时序</p>
+<h3 id="2-3、CMDQ"><a href="#2-3、CMDQ" class="headerlink" title="2.3、CMDQ"></a>2.3、CMDQ</h3><h4 id="2-3-1、cmdq-原理"><a href="#2-3-1、cmdq-原理" class="headerlink" title="2.3.1、cmdq 原理"></a>2.3.1、cmdq 原理</h4><p>CMDQ 是command queue的简称。他是芯片上的一个ip，用于代替cpu 访问寄存器。<br>cmdq可以执行：读写等待寄存器的操作，同时cmdq 会维护一个脚本，不停地从脚本里读取命令去执行。<br>软件只需要往脚本里写入命令即可。</p>
+<h4 id="2-3-2、作用"><a href="#2-3-2、作用" class="headerlink" title="2.3.2、作用"></a>2.3.2、作用</h4><p>在处理一帧视频图像时，cpu需要为ip设置寄存器（内存、中断、配置），图像处理完成后，cpu需要响应中断信号，并设置下一帧的寄存器。但是当linux系统cpu loading较高时，会出现cpu响应中断延迟的问题，此时会导致ip有一段时间的空闲。</p>
+<p>有cmdq 时，软件可以同时将两个buf 的寄存器先填到脚本里，ip先处理一帧后，产生中断给cpu外，还会中断信号给cmdq，cmdq就会继续执行脚本，设置第二帧的寄存器。cmdq 执行速度快，ip几乎可以满载运行。</p>
+<h3 id="2-4、项目经验"><a href="#2-4、项目经验" class="headerlink" title="2.4、项目经验"></a>2.4、项目经验</h3><h4 id="2-4-1、cmdq-pts"><a href="#2-4-1、cmdq-pts" class="headerlink" title="2.4.1、cmdq pts"></a>2.4.1、cmdq pts</h4><p>需求背景：当ip处理完一帧图像后，cmdq 会产生中断到cpu，在中断回调函数中会去计算done pts。若cpu 处于高负载场景时，会出现中断延迟，导致中断合并，那么这两帧图像的done pts 就出现重复，会影响到用户的视频播放。<br>为了解决这个问题，在cmdq ip 中新增计时器以及fifo queue。当ip done 完成后，由cmdq 记录当前的count 值，保存到fifo queue中。<br>当cpu中断服务函数执行时，读取fifo中的count值，与cmdq 当前count值作比较，计算差值diff。然后获取系统pts，将pts减去差值，得到真实的硬件done pts。</p>
+<p>fifo的存在：若cpu 中断响应延迟很久，那么fifo 的存在可以保证有几张buf的pts信息还是能保存到的</p>
+<h4 id="2-4-2、cmdq-burst-write"><a href="#2-4-2、cmdq-burst-write" class="headerlink" title="2.4.2、cmdq burst write"></a>2.4.2、cmdq burst write</h4><p>需求背景：在16路视频播放场景下，出现画面卡顿。</p>
+<p>分析：</p>
+<ol>
+<li>首先查看系统cpu loading，发现已达到92%，怀疑是cpu问题。</li>
+<li>先使用perf抓取火焰图，分析多媒体内核线程的调用，发现ISP线程在Enqueue函数中占用较多cpu 时间。</li>
+<li>使用Ftrace function graph，重点查看ISP 函数的执行时间，发现执行时间700us，猜测是该函数执行时间过长，导致总的一帧buf处理时间大于2ms，从而导致来不及处理下一帧图像，而丢弃一些图像。</li>
+<li>分析函数代码，发现耗时较长主要是因为写reg的时候，会先将reg写到全局变量，再拷贝到cmdq 脚本，最后cmdq 才写入reg。其中cpu 两次拷贝耗时较长。</li>
+<li>为什么需要写入全局变量，再拷贝到cmdq 脚本？因为cmdq api的设计需要将reg作为输入参数，在设置输入参数时，就必定有一次拷贝。再到API内部，输入参数到cmdq 脚本，又有一次拷贝。</li>
+<li>解决方案：从两个方面进行优化：</li>
+<li>软件上：修改cmdq API，直接将cmdq 脚本地址暴露给ISP模块，由ISP模块直接向脚本里写入数据。</li>
+<li>硬件上：增加burst write cmd，支持写连续地址的寄存器，只保留连续地址寄存器的值，删掉其他的字段，将数据量减少到1&#x2F;4</li>
+<li>实测在写2000个连续寄存器，耗时可减少到1&#x2F;3</li>
+</ol>
+<h4 id="2-4-3、dmabuf"><a href="#2-4-3、dmabuf" class="headerlink" title="2.4.3、dmabuf"></a>2.4.3、dmabuf</h4><p>需求背景：<br>为了将SDK输出的图像对接安卓DRM显示框架显示，需要支持前端sensor的图像输出为dma-buf 格式</p>
+<p>解决步骤：</p>
+<ol>
+<li>方案讨论，确定可行性</li>
+<li>开始实作</li>
+<li>实现一个dmabuf exporter，输出dmabuf 其背后的物理内存是IOMMU映射的VPA</li>
+<li>实现dmabuf importer，通过attach、map attachment，获取到dmabf sgtable，然后将sg table中的sg list封装成SDK支持的buf 格式，再传给ip</li>
+<li>sg_table 是 DMA 硬件操作的关键；</li>
+<li>一个dmabuf可能同时被多个设备访问，为了确保物理内存能被所有设备的地址空间覆盖，需要先attach 收集设备的地址空间信息</li>
+<li>map attachment时，分配物理内存，生成sg table，并将物理内存信息填入sg table，同时刷新cache？</li>
+</ol>
+<h4 id="2-4-4、Linux-dump-rtos-log"><a href="#2-4-4、Linux-dump-rtos-log" class="headerlink" title="2.4.4、Linux dump rtos log"></a>2.4.4、Linux dump rtos log</h4><p>需求背景：<br>在多核异构系统中，有arm core运行linux系统，riscv core运行rtos系统。<br>客户希望在调试时，可以在linux 系统中读取rtos系统的日志，并且在rtos系统奔溃时，可以抓取rtos奔溃之后留下的日志。<br>注：riscv运行在sram、arm 运行在dram，arm 无法访问sram。但可以通过dma拷贝sram数据到dram</p>
+<p>解决步骤：</p>
+<ol>
+<li>硬件支持：使用mailbox 寄存器在两个core 之间通信，以及核间中断</li>
+<li>我负责linux 端的驱动开发。主要工作是：两个部分：</li>
+<li>创建&#x2F;proc&#x2F;pm_rtos&#x2F;log节点，暴露给用户抓log的接口，实现proc_ops的open回调。</li>
+<li>关于proc框架的原理，一般来说用户都会使用cat 程序查看proc节点，在cat 程序中会open、read、read的大小是一个page。然后kernel 层也会申请一个page 缓存，用来给驱动输出字符串。随后kernel 会将page 拷贝到用户层。</li>
+<li>在open回调中，首先要确保rtos端有正常运行，先使用bdma拷贝预先定义的结构体。（拷贝的地址和长度在mailbox寄存器）</li>
+<li>假如结构体内容正确，说明rtos有正常运行。否则走异常处理流程</li>
+<li>申请一块连续物理内存(dma_alloc_coherent())，8k，然后设置source和dest物理地址和大小到bdma，trigger bdma</li>
+<li>等待bdma传输完成，bdma传输完成后，会产生中断，在中断中唤醒用户线程。</li>
+<li>将log拼接拷贝到seq-&gt;buf中，返回给用户层</li>
+<li>测试ok<br>需要关注的点：</li>
+<li>cache：使用dma_alloc_coherent()申请的物理内存没有cache</li>
+<li>map时是否有带cache</li>
+<li>超时机制，当bdma没有done时，会退出等待</li>
+<li>proc seq file 机制</li>
+<li>log buf为ringbuf ，需要读写指针</li>
+</ol>
+<h4 id="2-4-5、code-size优化"><a href="#2-4-5、code-size优化" class="headerlink" title="2.4.5、code size优化"></a>2.4.5、code size优化</h4><p>sys模块export 很多api symbol 给其他模块使用，希望减少symbol来减少code size</p>
+<p>设计一个结构体，存放若干函数指针，将之前的api函数赋值给该结构体，并export该结构体的symbol，这样外部驱动只需要引用一个symbol，就可以使用该结构体访问到对应的api。为了保持API稳定，还提供了若干宏用于兼容之前的设计，避免影响到外部驱动</p>
+<p>结果上：mi sys 驱动size 减少了4k byte</p>
+<h4 id="2-4-6、mi-poll-refine-优化"><a href="#2-4-6、mi-poll-refine-优化" class="headerlink" title="2.4.6、mi poll refine 优化"></a>2.4.6、mi poll refine 优化</h4><p>问题1：多进程调用 mi poll 时有概率出现读写不同步的情况，导致数据错误BUGON<br>问题2：多进程调用</p>
+<h4 id="2-4-7、sideband-data设计实现"><a href="#2-4-7、sideband-data设计实现" class="headerlink" title="2.4.7、sideband data设计实现"></a>2.4.7、sideband data设计实现</h4><p>问题：视频流模块需要获取pipeline上其他模块的参数信息<br>负责内容：利用SYS 在模块间传递BUF的机制，在BUF结构体上新增成员，保存参数信息，并提供接口给模块，运行其通过接口访问参数信息。<br>设计体现了高内聚，低耦合的思想，高度抽象了参数信息，使其之具备地址，和大小两个属性。外部模块如何去定义参数信息，都不会影响到sys的代码逻辑。只需要新增参数类型。<br>参数信息的生命周期和BUF绑定，在BUF释放时，参数信息也就被释放。</p>
+<h3 id="2-7、缺陷解决"><a href="#2-7、缺陷解决" class="headerlink" title="2.7、缺陷解决"></a>2.7、缺陷解决</h3><h4 id="2-7-1、VDF卡住"><a href="#2-7-1、VDF卡住" class="headerlink" title="2.7.1、VDF卡住"></a>2.7.1、VDF卡住</h4><p>现象</p>
+<p>vdf 跑3chn，ctrl+c退出时，会卡住</p>
+<p>分析</p>
+<ol>
+<li><p>首先show thread 看当前所有线程的backtrace</p>
+</li>
+<li><p>检查mi内核线程，发现在destroy chn 和 dequeue task里进行睡眠，于是需要分析两个线程睡眠的原因，以及代码的逻辑</p>
+</li>
+<li><p>vdf退出时，概率性先stop chn2，并且等待chn2 task 清空</p>
+</li>
+<li><p>mi thread那边会先deq in、再deq out。deq ch1 in 失败，deq chn2 成功，在deq chn1 out失败后，就跳出deq 流程。导致vdf 线程chn2 task 一直不为空</p>
+</li>
+<li><p>同时由于stop chn2 一直在等待，所以chn1 也一直无法stop</p>
+</li>
+</ol>
+<p>总结</p>
+<p>vdf chn 销毁顺序和sys deq 顺序不匹配导致的</p>
+<h4 id="2-7-2、VDISP死锁"><a href="#2-7-2、VDISP死锁" class="headerlink" title="2.7.2、VDISP死锁"></a>2.7.2、VDISP死锁</h4><p>思路<br>死锁的解决核心是抓取系统上所有线程的backtrace，查找backtrace中在等待锁的线程，再从代码中分析造成死锁的情景。明白死锁是如何产生后即可解决。</p>
+<ol>
+<li>问题：vdisp 退出app时，有概率会卡死，uart可以输入</li>
+<li>分析：</li>
+<li>首先使用show threads 查看系统所有线程backtrace</li>
+<li>关注那些在等lock 的线程,使用gdb 定位到lock的位置</li>
+<li>从lock位置出发，回溯线程的函数调用路线，分析线程间锁的关系</li>
+<li>定位到内核线程使用allocator，会先拿到A锁，进入vdisp API，尝试拿B锁但阻塞</li>
+<li>用户线程退出app时，执行unbind，会先拿B锁，然后调用SYS 接口销毁allocator时，需要拿A锁，但阻塞</li>
+<li>两个线程互相等待卡死</li>
+<li>解决办法：用户退出app时，unbind函数中不需要在B锁的保护下调用SYS接口</li>
+</ol>
+<h4 id="2-7-3、数组越界访问"><a href="#2-7-3、数组越界访问" class="headerlink" title="2.7.3、数组越界访问"></a>2.7.3、数组越界访问</h4><ol>
+<li>问题：app运行过程中，概率性出现segment fault</li>
+<li>分析：</li>
+<li>通过gdb 分析 核心转储文件core，定位到segment fault所在的代码</li>
+<li>分析代码是指针访问错误，怀疑是数组越界</li>
+<li>检查驱动代码，发现是用户没有对API返回值进行检查，将获取到的错误数据传递给API，在代码中访问错误的数据，出现里数组的越界访问</li>
+<li>解决：增加检查API返回值</li>
+</ol>
+<h4 id="2-7-4、unmap导致的踩内存"><a href="#2-7-4、unmap导致的踩内存" class="headerlink" title="2.7.4、unmap导致的踩内存"></a>2.7.4、unmap导致的踩内存</h4><ol>
+<li>问题：概率性iommu上报cpu访问非法地址</li>
+<li>分析：</li>
+<li>通过加log怀疑是use after free，结合app逻辑得到结果</li>
+<li>释放buf时，先unmap iommu，再unmap arm mmu。在unmap arm mmu时，由于cache刷新，会将数据写到dram，但此时对应的dram已经被unmap，故iommu会报错</li>
+<li>解决：将arm mmu unmap提前</li>
+</ol>
+<h4 id="2-7-5、delay寄存器不生效"><a href="#2-7-5、delay寄存器不生效" class="headerlink" title="2.7.5、delay寄存器不生效"></a>2.7.5、delay寄存器不生效</h4><ol>
+<li>问题：单元测试中，测试cmdq delay 1ms，实际延迟100ms，设置delay timeout寄存器不生效</li>
+<li>分析：</li>
+<li>抓取寄存器发现值是正常的</li>
+<li>由于软件流程比较简单，故询问HW RD CMDQ的下寄存器原理</li>
+<li>后来猜测可能是cmdq 下delay timeout寄存器还没生效，就开始trigger wait cmd，导致使用的还是之前的timeout时间</li>
+<li>解决办法 是在write timeout之后，多插入一条poll，等到真正写入reg之后再trigger wait</li>
+</ol>
+<h4 id="2-7-6、rcu中断风暴"><a href="#2-7-6、rcu中断风暴" class="headerlink" title="2.7.6、rcu中断风暴"></a>2.7.6、rcu中断风暴</h4><ol>
+<li>问题：app运行过程中，出现rcu info报错，stall on cpu 0</li>
+<li>分析：</li>
+<li>一般这种警告都是由于中断风暴导致的，即一个中断频繁的触发，导致一个cpu一直处于中断模式。rcu 机制会检查到这个cpu的异常</li>
+<li>接下来就是确定哪个中断异常，如果串口可用，就cat &#x2F;proc&#x2F;interrupts 看中断的信息，发现是cmdq 中断异常</li>
+<li>因为是STR过程产生的，注重分析cmdq str 函数</li>
+<li>与hw 沟通后得知str 过程所有reg 会被复位，irq mask也被复位。所以当str 退出之后，所有irq mask 都为0，但由于有str resume回调，正在使用的cmdq会恢复irq mask。但是此时如果申请新的cmdq，在enable 的时候会立刻触发irq，且未注册中断处理函数，这就导致irq 风暴</li>
+<li>解决：在str resume 时，恢复所有irq mask，并且在enable cmdq 之前，必须先设置irq mask，中断回调函数。</li>
+</ol>
+<h4 id="2-7-7、驱动内存泄露"><a href="#2-7-7、驱动内存泄露" class="headerlink" title="2.7.7、驱动内存泄露"></a>2.7.7、驱动内存泄露</h4><ol>
+<li>问题：app重复运行过程中出现oom</li>
+<li>分析：</li>
+<li>首先加大linux内存，压测，仍然出现oom</li>
+<li>分析oom信息，发现是slub使用较多，于是重点分析slub</li>
+<li>使用kmemleak分析，没有收获</li>
+<li>使用cam os mem trace，发现是venc模块使用的内存一直增加，通过backtrace定位到alloc的申请者，发现内存泄露</li>
+<li>kmemleak没有收获的原因是 cam os mem trace的存在冲突</li>
+</ol>
+<h4 id="2-7-7、dmafence泄露"><a href="#2-7-7、dmafence泄露" class="headerlink" title="2.7.7、dmafence泄露"></a>2.7.7、dmafence泄露</h4><ol>
+<li>问题：客户压测报错：申请dma fence内存失败</li>
+<li>分析：</li>
+<li>开启kmemleak，没有发现错误</li>
+<li>开启cam os mem trace，过滤sys，发现sys申请的内存在一直增加</li>
+<li>cat &#x2F;proc&#x2F;xxx&#x2F;dmafence节点，发现存在大量dmafence，不合理</li>
+<li>分析代码是否有dmafence泄露，找到问题</li>
+</ol>
+<h4 id="2-7-8、系统彻底卡死"><a href="#2-7-8、系统彻底卡死" class="headerlink" title="2.7.8、系统彻底卡死"></a>2.7.8、系统彻底卡死</h4><p>这种情况下，有多种原因：</p>
+<ol>
+<li>运行app过程中，系统突然卡死，没有输入任何错误信息</li>
+<li>开启lockdep检查是否死锁</li>
+<li>借助外部debug设备jtag、trace32，抓取系统信息如寄存器，log buf</li>
+</ol>
+<h4 id="2-7-9、oom"><a href="#2-7-9、oom" class="headerlink" title="2.7.9、oom"></a>2.7.9、oom</h4><ol>
+<li>app运行过程出现oom 信息，内存不足</li>
+<li>分析oom信息，确定是否是内存泄露</li>
+<li>分析应用运行一段时间前后的 &#x2F;proc&#x2F;meminfo信息，看哪个值增长较大</li>
+<li>看匿名页数量偏大，还是slub数量偏大，确定是内核还是应用的内存泄露</li>
+<li>应用泄露：使用asan lib 重新链接应用程序，包括程序所使用的库，运行等待asan报错</li>
+<li>内核泄露：使用kmemleak检查，若怀疑是MI，使用cam os mem trace</li>
+</ol>
+<h4 id="2-7-10、多线程竞争访问（1）"><a href="#2-7-10、多线程竞争访问（1）" class="headerlink" title="2.7.10、多线程竞争访问（1）"></a>2.7.10、多线程竞争访问（1）</h4><p>场景描述：<br>cmdq abnormal case<br>有一个硬件，每处理完成一张图像，status reg更新为idle，id reg更新为图像id。<br>但是实际场景发现BUGON，条件是status为idle，但是id与图像id不匹配。说明硬件此时没有在工作，但是可以确定软件流程中有将图像输入给硬件，而硬件却没有更新id</p>
+<p>以往的情况认为这是一个硬件的BUG，status reg 不准确，故在FPGA上hw rd 新增了flag来标记idle状态。</p>
+<p>分析：<br>在FPGA验证过程中，发现新的flag仍然无法解决问题。review code怀疑是图像 id没有实际的写到寄存器，于是在代码中加入log查看代码运行，查看出错时线程的执行步骤，分析代码逻辑，发现是由于多线程抢占访问共享数据导致的。</p>
+<p>具体来说，有两个线程同时访问一个共享变量导致，线程A会先把task id+1，然后去trigger，但是有概率在A trigger 之前，B抢占了A的执行，然后B去检查task id和硬件status，就发现status为idle 而task id没有更新，进而判断为错误。</p>
+<p>目前的修改办法是：修改线程A的处理顺序，先使用局部变量将task id + 1，trigger硬件，然后再更新全局变量task id，线程B即使抢占了A，但由于未trigger，且全局task id没有+1，故不会报错。</p>
+<h4 id="2-7-11、多进程竞争访问（2）"><a href="#2-7-11、多进程竞争访问（2）" class="headerlink" title="2.7.11、多进程竞争访问（2）"></a>2.7.11、多进程竞争访问（2）</h4><p>poll<br>背景<br>用户调用 getfd api，会有以下步骤</p>
+<ol>
+<li>读共享变量fd是否赋值，若没有继续，有则退出</li>
+<li>设置共享变量fd的值<br>问题：<br>两个进程同时使用API，在第一步会都返回没有，继续走第二步，第二步会检查到重复设置fd，出发BUGON<br>解决：<br>要在进程间做互斥访问，只能在内核里实现。将读写共享变量的接口封装为一个ioctl，在内核态枷锁互斥</li>
+</ol>
+<h4 id="2-7-12、多线程竞争访问（3）"><a href="#2-7-12、多线程竞争访问（3）" class="headerlink" title="2.7.12、多线程竞争访问（3）"></a>2.7.12、多线程竞争访问（3）</h4><p>sram<br>描述：<br>jpeg 和 scl 共享一个sram，线程先调用scl 回调设置sram，再调用jpeg回调设置sram。jpeg和scl 读取到的sram信息必须一致<br>问题出现就是jpeg 发现读取到的sram 信息和 scl 给的信息不一致，故BUGON</p>
+<p>分析：<br>查看sram 信息的读写的代码，发现只有在free的时候会清除sram信息。查看BGON log发现每次出错时，都有disable 函数的打印，且问题只出现在切换绑定模式的情景。<br>于是分析disable 函数与sram free的关系，发现disable 函数中，会先设置flag让scl 释放sram，然后等待scl 图像处理完成。<br>在内核中有AB线程，A线程在disable 之前，正常的设置sram信息，然后调用jpeg的接口。B线程有概率在收到disable 设置的flag后，去free sram，导致A线程调用jpeg里检查不一致而BUGON</p>
+<p>解决：<br>代码逻辑问题，disable时，必须要等手里的图像都处理完成后，再清除设置信息。</p>
+<h4 id="2-7-13、use-after-free"><a href="#2-7-13、use-after-free" class="headerlink" title="2.7.13、use after free"></a>2.7.13、use after free</h4><p>poll<br>描述：<br>用户app调用API时打开一个设备节点时，获取一个匿名文件，并且内核会为其创建一个对象；当app调用deinit API时，会将该对象释放。但是当进程退出&#x2F;或close 文件时，由于文件有release回调，在回调中会将访问该对象，导致use after free</p>
+<p>分析：<br>在修改对象的地方加log，复现场景，查看log发现上述原因。<br>解决：<br>当app调用deinit API时，会将该对象释放，同时会将其关联的数据结构的指针都置为NULL</p>
+<h3 id="2-8、功能开发"><a href="#2-8、功能开发" class="headerlink" title="2.8、功能开发"></a>2.8、功能开发</h3><h4 id="2-8-1、hw-breakpoint-优化"><a href="#2-8-1、hw-breakpoint-优化" class="headerlink" title="2.8.1、hw breakpoint 优化"></a>2.8.1、hw breakpoint 优化</h4><p>hw breakpoint 在产生中断时，会一直触发中断</p>
+<h2 id="三、面试经历"><a href="#三、面试经历" class="headerlink" title="三、面试经历"></a>三、面试经历</h2><h3 id="3-1、华为OD"><a href="#3-1、华为OD" class="headerlink" title="3.1、华为OD"></a>3.1、华为OD</h3><p>笔试需要中等难度题目，力扣中等题，熟能生巧，面试宝典</p>
+<p>题目类型：递归，回溯，图论，搜索树，动态规划，</p>
+<p>结果：机试188分，200分可进面试。失败</p>
+<h3 id="3-2、卓驭"><a href="#3-2、卓驭" class="headerlink" title="3.2、卓驭"></a>3.2、卓驭</h3><h4 id="一面"><a href="#一面" class="headerlink" title="一面"></a>一面</h4><p>嵌入式软件…师（底软）</p>
+<p>【主要职责】: 1、负责车载嵌入式产品的软件架构设计、编码和单元测试； 2、参与软件需求分析，编写详细设计文档和开发代码，负责软件的集成测试和系统调试； 3、优化软件性能，提高系统的稳定性和可靠性；</p>
+<p>4、与硬件工程师协作，确保软件与硬件的兼容性；</p>
+<p>5、参与工厂测试软件的开发，分析解决量产以及售后的问题。</p>
+<p>【任职要求】: 1、计算机科学与技术、电子信息工程、软件工程或相关专业本科及以上学历； 2、3年以上嵌入式软件开发经验，熟悉 C &#x2F; C +＋编程语言； 3、熟悉 Linux 内核，了解内核关于内存管理、调度等模块的基本概念，有在 Linux 下进行嵌入式软件开发的经验； 4、有STM32、 ARM 或其他嵌入式处理器开发经验者优先； 5、熟悉嵌入式软件开发流程，包括需求分析、设计、编码、测试和维护； 6、具备良好的问题解决能力、沟通能力和团队协作精神； 7、熟悉至少一种脚本语言，如 Python 、 Shell 等；</p>
+<p>8、有一定的团队管理经验或者项目管理经验。</p>
+<p>面试经历</p>
+<ol>
+<li><p>自我介绍</p>
+</li>
+<li><p>iommu</p>
+</li>
+<li><p>对cmdq 中断与线程的交互比较感兴趣，cmdq fence、dma done</p>
+</li>
+<li><p>有没有因为cache 导致的问题</p>
+</li>
+<li><p>中断线程化，调度器有哪几种，wakeup的流程</p>
+</li>
+<li><p>访问内存地址0 时，arm 会有什么状态</p>
+</li>
+<li><p>kernel panic时如何处理</p>
+</li>
+<li><p>qunix 微内核</p>
+</li>
+<li><p>相机、通用bsp、网络驱动、mcu</p>
+</li>
+<li><p>有没有和同事发生矛盾，怎么处理</p>
+</li>
+<li><p>和同事合作时，如果对方不合作，要怎么push他</p>
+</li>
+</ol>
+<h4 id="二面"><a href="#二面" class="headerlink" title="二面"></a>二面</h4><ol>
+<li><p>自我介绍</p>
+</li>
+<li><p>先考察技术：在linux系统，如何通过虚拟地址访问内存的</p>
+</li>
+<li><p>缺页异常程序如何工作</p>
+</li>
+<li><p>segmemt fault 是在缺页异常程序里被调用的吗</p>
+</li>
+<li><p>一个程序分为多少个段，mmap 的内存属于哪个段</p>
+</li>
+<li><p>有没有使用过gdb、如何跳转到指定帧</p>
+</li>
+<li><p>kernel panic 中的栈回溯的如何打印出来的</p>
+</li>
+<li><p>业务和技术的关系</p>
+</li>
+<li><p>职业规划</p>
+</li>
+<li><p>对卓驭科技的了解，有什么产品</p>
+</li>
+</ol>
+<h4 id="三面"><a href="#三面" class="headerlink" title="三面"></a>三面</h4><p>了解卓驭科技 和 智能驾驶行业</p>
+<p>卓驭介绍、优势：多年积累的感知、机器学习、定位、决策、规划、控制技术与智能硬件的量产经验，以及高规格的流程体系、产品安全、网络安全等车规全栈认证，提供可落地的智能驾驶解决方案。为所有人提供安全轻松的出行体验。</p>
+<p>成行平台：高速、城区、停车，兼容多芯片，可扩展，双目、激目、雷达、高精地图等</p>
+<p>产品：智能驾驶控制器、传感器，智能驾驶全栈算法，车规级工厂，高质量、高性能，低成本的产品</p>
+<p>技术路线：</p>
+<ol>
+<li><p>以惯导双目为核心的传感器、高性价比、城区领航</p>
+</li>
+<li><p>算法：双目立体视觉</p>
+</li>
+<li><p>计算平台：高度集成化、平台化、性价比、安全</p>
+</li>
+</ol>
+<p>联合高通<strong>SA8775P</strong> 实现舱驾一体，骁龙8650 已经运用</p>
+<p>价值观：</p>
+<ol>
+<li><p>秉持公心：个人与团队的持续成长，都需要不断将自身追求与更高维度的追求相统一。持续突破自身视野的局限，主动担当、为更大的世界创造价值，个人价值也将自然而然地实现。</p>
+</li>
+<li><p>反思：遇到问题积极向内求解</p>
+</li>
+<li><p>求真：心怀对真理与客观规律的尊重，专注做真正有价值、经得起时间考验的事</p>
+</li>
+<li><p>积极正向：面对困难时，一个积极的心态往往能驱使我们找到建设性的思路，促进事情向正面发展，最终克服困难，并使我们从中收获进步与成长。</p>
+</li>
+<li><p>知行合一：真正的“知道”往往伴随行为的改变。认知升级的意义，在于帮助我们在具体的实践中塑造新的习惯、提升自身的能力；</p>
+<p> 而积极的实践亦将反哺于我们的认知升级，实现螺旋上升的正向循环</p>
+</li>
+</ol>
+<h3 id="3-3、安克创新"><a href="#3-3、安克创新" class="headerlink" title="3.3、安克创新"></a>3.3、安克创新</h3><p>一面：有录音，主要是八股文，还有项目经历，问的深度不深。<br>结果：不符合岗位，被拒绝</p>
+<h3 id="3-4、元时空智能"><a href="#3-4、元时空智能" class="headerlink" title="3.4、元时空智能"></a>3.4、元时空智能</h3><p>oppo 手机内存管理、内存性能分析，bug解决<br>一面不愉快的结束了<br>居然有二面</p>
+<ol>
+<li>自我介绍</li>
+<li>内存泄露的例子</li>
+<li>死锁的例子</li>
+<li>dmabuf的项目</li>
+<li>内存回收<br>谈薪资</li>
+</ol>
+<h3 id="3-5、塞防"><a href="#3-5、塞防" class="headerlink" title="3.5、塞防"></a>3.5、塞防</h3><p>一面后无消息</p>
+<h3 id="3-6、晶晨"><a href="#3-6、晶晨" class="headerlink" title="3.6、晶晨"></a>3.6、晶晨</h3><p>解码的驱动层开发、会涉及到具体的厂商业务，主要是和厂商联合开发。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/" data-id="cmbcy7ri2003wt8mt8xb704kw" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-killer-blog/other/tools" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/other/tools/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.659Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="单片机开发工具集"><a href="#单片机开发工具集" class="headerlink" title="单片机开发工具集"></a>单片机开发工具集</h2><p>@[toc]</p>
+<h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p><strong>在嵌入式单片机开发中，经常要处理一些不同进制的数据，查看配置寄存器等，需要用到一些特定功能的小工具，出于方便开发和课余爱好，我就准备做一个工具集合来实现这些小功能，解决在开发过程中遇到的小问题。这就需要慢慢的积累问题和解决，所以这博客尽量持续更新。后续可能会加入新的功能。</strong><br><strong>为了图个方便，我用c直接就在vc++6.0写代码，也没有图形界面，就是命令行，但是功能一定要实现方便，快捷，可靠。</strong><br><strong>项目开源，仓库地址：</strong></p>
+<ul>
+<li>GitHub：<a target="_blank" rel="noopener" href="https://gitee.com/killerp/ctool">https://gitee.com/killerp/ctool</a></li>
+<li>gitee码云（国内）:<a target="_blank" rel="noopener" href="https://github.com/killer-p/ctool">https://github.com/killer-p/ctool</a></li>
+</ul>
+<h4 id="一，目录"><a href="#一，目录" class="headerlink" title="一，目录"></a>一，目录</h4><ol>
+<li>16进制转二进制寄存器；</li>
+<li>未知</li>
+</ol>
+<h4 id="二，模块"><a href="#二，模块" class="headerlink" title="二，模块"></a>二，模块</h4><h5 id="1，16进制转二进制寄存器"><a href="#1，16进制转二进制寄存器" class="headerlink" title="1，16进制转二进制寄存器"></a>1，16进制转二进制寄存器</h5><p><strong>在单片机开发过程中，经常会需要配置寄存器的情况，通过debug可以查看寄存器的值的情况，但是这些寄存器的数值大多是十六进制，即使可以显示成二进制，要与芯片手册的寄存器描述参照起来还是有点麻烦。</strong><br><strong>所以我弄了这么个东西，输入十六进制的寄存器数值，打印出一个表格，将二进制与位数对应起来，哪个位对应寄存器什么功能，看起来就很清楚明白了。效果如下：</strong><br>8位数值<br><img src="/2025/05/30/hello-world/other/tools/20200724222530279.jpg" alt="在这里插入图片描述">16位数值<br><img src="/2025/05/30/hello-world/other/tools/20200724222530287.png" alt="在这里插入图片描述">32位数值<br><img src="/2025/05/30/hello-world/other/tools/202007242225302.png" alt="在这里插入图片描述"><br>欢迎各位来一起开发<br><img src="/2025/05/30/hello-world/other/tools/20200724223256242.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/other/tools/" data-id="cmbcy7rhz003nt8mtgb3g5bmr" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-killer-blog/sifive/i2c_LSM303AGR" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.659Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>@[toc]</p>
+<p><strong>系列文章</strong></p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106589242">Sifive Learn Inventor 基础之gpio 按键中断</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106603894">Sifive learn inventor基础之串口&amp;操作寄存器</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106631404">Sifive learn inventor基础之硬件pwm&amp;寄存器</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106796337">risc-v Sifive learn inventor基础之硬件i2c与LSM303AGR通信</a></li>
+</ol>
+<blockquote>
+<p>这一次用iic简单的读取lsm303的加速度数据，对于中断等不做操作；<br>2020 .7.29 优化了数据处理部分的代码。得到的数据更直观。精度是0.1mm</p>
+</blockquote>
+<h2 id="一，硬件连接"><a href="#一，硬件连接" class="headerlink" title="一，硬件连接"></a>一，硬件连接</h2><p><strong>如图的连接，I2C的两根信号都通过R6,R7上拉，通过这点可知与LSM303的通信波特率是400khz。</strong><br><img src="/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616215621940.png" alt="在这里插入图片描述"></p>
+<h2 id="二，获取数据"><a href="#二，获取数据" class="headerlink" title="二，获取数据"></a>二，获取数据</h2><p><strong>1，使用最新的freedom-e-sdk，<a target="_blank" rel="noopener" href="https://github.com/sifive/freedom-e-sdk">freedom-e-sdk GitHub仓库</a>，最新的sdk支持iic和pwm库函数开发，而且提供freertos的模板例程。在此基础上开发iic十分方便。</strong><br><strong>2，首先初始化开发板的iic接口，并通过iic接口配置lsm303的寄存器，设置加速度计的工作模式和输出速率（reg1_a寄存器），这里我设置的是普通模式，输出速率为400hz：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//reg1中是reg1_a寄存器的地址及写入的值 </span></span><br><span class="line"><span class="type">char</span> reg1[<span class="number">2</span>]=&#123;<span class="number">0x20</span>,<span class="number">0x77</span>&#125;;</span><br><span class="line"><span class="comment">//初始化iic为master 波特率400khz</span></span><br><span class="line">metal_i2c_init(i2c, I2C_BAUDRATE, METAL_I2C_MASTER);</span><br><span class="line"><span class="comment">//写控制寄存器reg1_A 普通模式，400hz输出，使能x，y，z轴加速度计</span></span><br><span class="line">metal_i2c_write(i2c, ACCELEROMETER_I2C_ADDR, <span class="number">2</span>,reg1 , METAL_I2C_STOP_ENABLE);</span><br></pre></td></tr></table></figure>
+<p><strong>然后创建一个定时时间为dt的任务，在这个任务里，我们读取lsm303加速度的输出寄存器的高位数据，比较对精度要求不高的话可以忽略低位数据。然后将数据进行积分处理得到速度和路程。这个项目里我不需要y轴数据所以没有读取。</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 由于普通模式有效数据10位，且数据为左对齐，只读取高位寄存器</span></span><br><span class="line"><span class="comment"> * 将数据进行积分处理</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">prvAccelerTask</span><span class="params">(<span class="type">void</span> *pvParameters)</span></span><br><span class="line">&#123;</span><br><span class="line">	TickType_t xNextWakeTime;</span><br><span class="line">	 <span class="type">char</span> *  pcMessage = <span class="string">&quot;start accelertask\r\n&quot;</span>;</span><br><span class="line">	(<span class="type">void</span>)pvParameters;</span><br><span class="line">	<span class="comment">//out_add中的值是加速度计OUT_X_H_A,OUT_Z_H_A寄存器的地址，</span></span><br><span class="line">	<span class="type">static</span> <span class="type">char</span> out_addr[<span class="number">2</span>]=&#123;<span class="number">0x29</span>,<span class="number">0x2d</span>&#125;,buff[<span class="number">2</span>]=&#123;<span class="number">0</span>&#125;;</span><br><span class="line">	<span class="comment">//延时时间，同时也是时间的微分dt 单位是ms</span></span><br><span class="line">	Motor.dt=<span class="number">20</span>;</span><br><span class="line">	xNextWakeTime = xTaskGetTickCount();</span><br><span class="line">	write(STDOUT_FILENO,pcMessage,<span class="built_in">strlen</span>(pcMessage));</span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">	&#123;</span><br><span class="line"></span><br><span class="line">		<span class="comment">//进入临界段，防止通信被打断</span></span><br><span class="line">		taskENTER_CRITICAL();</span><br><span class="line">		<span class="comment">//分别读取OUT_X_H_A,OUT_Z_H_A高位寄存器</span></span><br><span class="line">		metal_i2c_write(i2c, ACCELEROMETER_I2C_ADDR, <span class="number">1</span>,out_addr , METAL_I2C_STOP_DISABLE);</span><br><span class="line">		metal_i2c_read(i2c, ACCELEROMETER_I2C_ADDR, <span class="number">1</span>,buff , METAL_I2C_STOP_ENABLE);</span><br><span class="line">		metal_i2c_write(i2c, ACCELEROMETER_I2C_ADDR, <span class="number">1</span>,&amp;out_addr[<span class="number">1</span>] , METAL_I2C_STOP_DISABLE);</span><br><span class="line">		metal_i2c_read(i2c, ACCELEROMETER_I2C_ADDR, <span class="number">1</span>,&amp;buff[<span class="number">1</span>] , METAL_I2C_STOP_ENABLE);</span><br><span class="line">		<span class="comment">//赋值给lsm303对象</span></span><br><span class="line">		lsm303.acc_x_raw=buff[<span class="number">0</span>];</span><br><span class="line">		lsm303.acc_z_raw=buff[<span class="number">1</span>];</span><br><span class="line">		<span class="comment">//对原生数据处理，转化成加速度，速度，位移</span></span><br><span class="line">		sensor_data_process();</span><br><span class="line">		taskEXIT_CRITICAL();</span><br><span class="line">		write(<span class="number">1</span>,pcMessage,<span class="built_in">strlen</span>(pcMessage));</span><br><span class="line">		vTaskDelayUntil( &amp;xNextWakeTime, pdMS_TO_TICKS( Motor.dt ) );</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这就是配置的寄存器；<br><img src="/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616222000256.png" alt="在这里插入图片描述"><br><strong>我设置的是400hz，所以代码里写入的值是0x77，其实也不必太高，过高会影响精度。</strong><br><img src="/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616222150630.png" alt="在这里插入图片描述"><br><strong>以下是不同模式下，输出数据的有效位数，普通模式下，输出10位数据，再看看输出寄存器的描述，大概的意思就是输出的数据是左对齐的二进制补码。那就在处理数据时要解析出原码。至于不了解左对齐是什么的<a target="_blank" rel="noopener" href="https://wenku.baidu.com/view/de047e3eb94ae45c3b3567ec102de2bd9605de34.html">可以点我。</a></strong><br><img src="/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616222357338.png" alt="在这里插入图片描述"><br><img src="/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616222554357.png" alt="在这里插入图片描述"></p>
+<h2 id="三，处理数据"><a href="#三，处理数据" class="headerlink" title="三，处理数据"></a>三，处理数据</h2><p><strong>上面得到的数据是原始的，原生态无污染的，要加工成加速度数据，也就是单位为m&#x2F;s^2的数据。要计算实际的加速度，需要乘以一个比例系数，在开发文档称为灵敏度，灵敏度与加速度计工作模式与full scal（缩放）有关，缩放的配置在reg4_a寄存器，默认是0，也就是±2g。所以可知我配置的灵敏度为3.9mg。详细如下图：</strong><br><img src="/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616223626295.png" alt="在这里插入图片描述"><br><img src="/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200616223845964.png" alt="在这里插入图片描述"><br><strong>因为板子是倾斜约45°放的，所以要得到水平的加速度需要经过直角坐标转换。<br><code>lsm303.acc_x_real=(int)lsm303.acc_x_raw*4*39;</code>乘4是因为普通模式输出10位数据，而我只读了高八位，舍弃了低二位，所以要左移2位，也就是乘4，39就是灵敏度。经过单位换算，得到的加速度单位是100ug</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 处理lsm303读取的数据，获取速度，距离</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">sensor_data_process</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//如果raw是负数的话需要取绝对值，乘以灵敏度，再将符号返回</span></span><br><span class="line">	<span class="keyword">if</span>(lsm303.acc_x_raw&amp;<span class="number">0x80</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		lsm303.acc_x_raw =-lsm303.acc_x_raw;</span><br><span class="line">		lsm303.acc_x_real=(<span class="type">int</span>)lsm303.acc_x_raw*<span class="number">4</span>*<span class="number">39</span>;</span><br><span class="line">		lsm303.acc_x_real=-lsm303.acc_x_real;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> lsm303.acc_x_real=(<span class="type">int</span>)lsm303.acc_x_raw*<span class="number">4</span>*<span class="number">39</span>;</span><br><span class="line">	<span class="keyword">if</span>(lsm303.acc_z_raw&amp;<span class="number">0x80</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		lsm303.acc_z_raw =-lsm303.acc_z_raw;</span><br><span class="line">		lsm303.acc_z_real=(<span class="type">int</span>)lsm303.acc_z_raw*<span class="number">4</span>*<span class="number">39</span>;</span><br><span class="line">		lsm303.acc_z_real=-lsm303.acc_z_real;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> lsm303.acc_z_real=(<span class="type">int</span>)lsm303.acc_z_raw*<span class="number">4</span>*<span class="number">39</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//x=8112 z=-6552 滤除重力</span></span><br><span class="line">	lsm303.acc_x_filter=lsm303.acc_x_real<span class="number">-8112</span>;</span><br><span class="line">	lsm303.acc_z_filter=<span class="number">6552</span>+lsm303.acc_z_real;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//lsm303.acc_x_filter=lsm303.acc_x_filter &amp; ~0x000000ff;</span></span><br><span class="line">	<span class="comment">//lsm303.acc_z_filter=lsm303.acc_z_filter &amp; ~0x000000ff;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//加速度分解到水平方向  sinθ=2/3 cosθ=3/4</span></span><br><span class="line">	Motor.acc=(lsm303.acc_x_filter*<span class="number">2</span>/<span class="number">3</span>+lsm303.acc_z_filter*<span class="number">3</span>/<span class="number">4</span>)/<span class="number">100</span>;<span class="comment">//cm/s^2</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//加速度，速度积分</span></span><br><span class="line">	Motor.speed=Motor.speed+Motor.acc*Motor.dt/<span class="number">100</span>;<span class="comment">//mm</span></span><br><span class="line">	Motor.distance=Motor.distance+Motor.speed*Motor.dt/<span class="number">100</span>;<span class="comment">//0.1mm</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="三，小结"><a href="#三，小结" class="headerlink" title="三，小结"></a>三，小结</h2><p><strong>这种简单粗暴的用加速度双重积分出距离其实非常不准确，积分误差会随时间而增加，需要其他方式进行校准。</strong><br><img src="/2025/05/30/hello-world/sifive/i2c_LSM303AGR/20200724223659828.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/" data-id="cmbcy7ri0003rt8mt654l77h4" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-killer-blog/sifive/GPIO_isr" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/sifive/GPIO_isr/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.659Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="Sifive-Learn-Inventor-基础之gpio-按键中断"><a href="#Sifive-Learn-Inventor-基础之gpio-按键中断" class="headerlink" title="Sifive Learn Inventor 基础之gpio 按键中断"></a>Sifive Learn Inventor 基础之gpio 按键中断</h2><p>@[toc]</p>
+<h2 id="系列文章"><a href="#系列文章" class="headerlink" title="系列文章"></a>系列文章</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106589242">Sifive Learn Inventor 基础之gpio 按键中断</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106603894">Sifive learn inventor基础之串口&amp;操作寄存器</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106631404">Sifive learn inventor基础之硬件pwm&amp;寄存器</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/106796337">risc-v Sifive learn inventor基础之硬件i2c与LSM303AGR通信</a></li>
+</ol>
+<blockquote>
+<p>Sifive Learn Inventor是Sifive的一款基于RISC-V内核的开发板，具体见官网的Hifive Rev b 的文档</p>
+</blockquote>
+<h2 id="一，硬件连接"><a href="#一，硬件连接" class="headerlink" title="一，硬件连接"></a>一，硬件连接</h2><p>芯片的gpio11连接到buttonA，如下，可见，按键按下是低电平，所以我们可以设置gpio11为下降沿中断来实现按键中断。<br><img src="/2025/05/30/hello-world/sifive/GPIO_isr/2020060616125185.png" alt="在这里插入图片描述"><br><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h2 id="二，代码编写"><a href="#二，代码编写" class="headerlink" title="二，代码编写"></a>二，代码编写</h2><ol>
+<li>首先是button初始化</li>
+</ol>
+<p>​&#96;&#96;&#96;c<br>&#x2F;**<br>*buttona初始化为下降沿触发中断<br>*&#x2F;<br>void ButtonA_init(int *flag)<br>{<br>	<br>	struct metal_gpio *gpio0;&#x2F;&#x2F;声明一个gpio对象<br>	int buttonA_id&#x3D;12;&#x2F;&#x2F;根据芯片手册查询到gpio11的中断id的为12<br>	gpio0&#x3D;metal_gpio_get_device(0);&#x2F;&#x2F;实例化gpio对象</p>
+<pre><code>//获得gpio控制器，其实就是plic
+buttonA_intr=metal_gpio_interrupt_controller(gpio0);
+
+metal_interrupt_init(buttonA_intr);
+
+//注册回调函数 buttonA_isr是回调函数的函数名，最后传递的flag是一个指针，是传递给回调函数的参数
+metal_interrupt_register_handler(buttonA_intr,buttonA_id,buttonA_isr,flag);
+//设置优先级为3
+metal_interrupt_set_priority(buttonA_intr,buttonA_id,3);
+
+//enable gpio
+metal_gpio_disable_output(gpio0,11);
+metal_gpio_enable_input(gpio0,11);
+
+//禁止gpio功能复用
+metal_gpio_disable_pinmux(gpio0,11);
+
+//先关闭一下中断
+metal_gpio_config_interrupt(gpio0,11,METAL_GPIO_INT_DISABLE);
+
+//清楚gpio中断的所有标志位
+metal_gpio_clear_interrupt(gpio0,11, METAL_GPIO_INT_MAX);
+
+//配置为下降沿中断
+metal_gpio_config_interrupt(gpio0,11,METAL_GPIO_INT_FALLING);
+
+//使能gpio11 
+metal_interrupt_enable(buttonA_intr,buttonA_id);
+</code></pre>
+<p>}<br>​&#96;&#96;&#96;</p>
+<p>2，中断服务函数中，改变全局变量flag的值，随后在主函数中判断flag的值，再进入处理函数；<br>这里的中断函数的名称是可以随意取的，但是传递的参数必须是固定的int id, void <em>data，void</em>data 是由初始化注册回调函数的传递过来的无类型的一个指针。在回调函数中，先拿到gpio对象，然后清楚gpio11的下降沿中断的标志位。然后从data里拿到flag的地址，从而改变flag的值。</p>
+<p>​<code>c /** *buttona回调函数 清除下降沿中断标志位，将flag置2 */ void buttonA_isr (int id, void *data)&#123; 	struct metal_gpio *gpio0=metal_gpio_get_device(0); 	metal_gpio_clear_interrupt(gpio0, 11,METAL_GPIO_INT_FALLING); 	int *flag=(int *)data; 	*flag=2; &#125; ​</code></p>
+<p>3，在main（）函数中检测flag的值</p>
+<p>​<code>c while(1)&#123; 	if(flag==2)&#123; 		fun(); 	&#125; &#125; ​</code></p>
+<h2 id="三，小结"><a href="#三，小结" class="headerlink" title="三，小结"></a>三，小结</h2><p> <strong>这是一个简单的gpio中断的配置，从这个例子出发，来讨论一下sifive的中断是如何完成的。然后就可以依样画葫芦，其他外设的中断也可以相对容易的去理解。</strong><br> 中断产生的过程大概是这样的：<br> <img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><strong>inturrpt就是我们的中断源，当我们的按键按下时，gpio11就产生了一个中断请求，中断信号先来到plic控制器，plic根据请求的优先级来给中断请求排队，根据中断的id来找到中断服务程序的入口，随后进入中断服务函数，当完成中断服务函数后，plic相应的id的中断标志位会被置0</strong><br><strong>根据手册可以知道plic负责管理所有外设的中断请求，从下表可以知道外设对应的中断id。</strong><br><strong>其实上面代码中的buttonA_intr&#x3D;metal_gpio_interrupt_controller(gpio0);这个函数就是把plic控制器的对象负责给buttonA_intr，这样通过操作buttonA_intr，其实也就是对plic的操作。</strong><br><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><strong>综上，要初始化一个外设中断，我们需要配置外设的中断寄存器，同时还要拿到plic对象，中断id，接下来就是配置plic，设置回调函数和中断优先级。这时候再来看初始化代码</strong></p>
+<p>这两个语句就是获取中断id和plic；</p>
+<blockquote>
+<p>int buttonA_id&#x3D;12;<br>buttonA_intr&#x3D;metal_gpio_interrupt_controller(gpio0);</p>
+</blockquote>
+<p>初始化一下plic，主要是把plic对象里的一些参数赋值为0或null</p>
+<blockquote>
+<p>metal_interrupt_init(buttonA_intr);</p>
+</blockquote>
+<p>这个函数就是配置plic的作用，在plic的中断表里id&#x3D;12的地方写入中断回调函数的地址和传递的参数</p>
+<blockquote>
+<p>metal_interrupt_register_handler(buttonA_intr,buttonA_id,buttonA_isr,flag);</p>
+</blockquote>
+<p>设置一下优先级，使能这个中断</p>
+<blockquote>
+<p>metal_interrupt_set_priority(buttonA_intr,buttonA_id,3);<br>metal_interrupt_enable(buttonA_intr,buttonA_id);</p>
+</blockquote>
+<p><strong>至此，一个中断初始化的plic部分就设置完成了，另一部分，外设的中断寄存器配置就要根据手册的说明或者库函数去相应的配置</strong><br>可以根据下面的图片理解plic，其实初始化一个外设中断就像是给下面的表格填写对应的内容，我们需要的就是plic对象，id，回调函数地址，优先级，传递参数。更多的plic内容查看芯片手册。<br><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## Sifive Learn Inventor 基础之gpio 按键中断</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### 文章目录</span><br><span class="line"></span><br><span class="line">- - [Sifive Learn Inventor 基础之gpio 按键中断](https://editor.csdn.net/md/?articleId=106589242#Sifive_Learn_Inventor_gpio__0)</span><br><span class="line">  - [系列文章](https://editor.csdn.net/md/?articleId=106589242#_2)</span><br><span class="line">  - [一，硬件连接](https://editor.csdn.net/md/?articleId=106589242#_9)</span><br><span class="line">  - [二，代码编写](https://editor.csdn.net/md/?articleId=106589242#_13)</span><br><span class="line">  - [三，小结](https://editor.csdn.net/md/?articleId=106589242#_79)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 系列文章</span><br><span class="line"></span><br><span class="line">1. [Sifive Learn Inventor 基础之gpio 按键中断](https://blog.csdn.net/weixin_44821644/article/details/106589242)</span><br><span class="line">2. [Sifive learn inventor基础之串口&amp;操作寄存器](https://blog.csdn.net/weixin_44821644/article/details/106603894)</span><br><span class="line">3. [Sifive learn inventor基础之硬件pwm&amp;寄存器](https://blog.csdn.net/weixin_44821644/article/details/106631404)</span><br><span class="line">4. [risc-v Sifive learn inventor基础之硬件i2c与LSM303AGR通信](https://blog.csdn.net/weixin_44821644/article/details/106796337)</span><br><span class="line"></span><br><span class="line">&gt; Sifive Learn Inventor是Sifive的一款基于RISC-V内核的开发板，具体见官网的Hifive Rev b 的文档</span><br><span class="line"></span><br><span class="line">## 一，硬件连接</span><br><span class="line"></span><br><span class="line">芯片的gpio11连接到buttonA，如下，可见，按键按下是低电平，所以我们可以设置gpio11为下降沿中断来实现按键中断。</span><br><span class="line">![在这里插入图片描述](2020060616125185.png)</span><br><span class="line">![在这里插入图片描述](20200606161214498.png)</span><br><span class="line"></span><br><span class="line">## 二，代码编写</span><br><span class="line"></span><br><span class="line">1. 首先是button初始化</span><br><span class="line"></span><br><span class="line">```c</span><br><span class="line">/**</span><br><span class="line">*buttona初始化为下降沿触发中断</span><br><span class="line">*/</span><br><span class="line">void ButtonA_init(int *flag)</span><br><span class="line">&#123;</span><br><span class="line">	</span><br><span class="line">	struct metal_gpio *gpio0;//声明一个gpio对象</span><br><span class="line">	int buttonA_id=12;//根据芯片手册查询到gpio11的中断id的为12</span><br><span class="line">	gpio0=metal_gpio_get_device(0);//实例化gpio对象</span><br><span class="line"></span><br><span class="line">	//获得gpio控制器，其实就是plic</span><br><span class="line">	buttonA_intr=metal_gpio_interrupt_controller(gpio0);</span><br><span class="line">	</span><br><span class="line">	metal_interrupt_init(buttonA_intr);</span><br><span class="line"></span><br><span class="line">	//注册回调函数 buttonA_isr是回调函数的函数名，最后传递的flag是一个指针，是传递给回调函数的参数</span><br><span class="line">	metal_interrupt_register_handler(buttonA_intr,buttonA_id,buttonA_isr,flag);</span><br><span class="line">	//设置优先级为3</span><br><span class="line">	metal_interrupt_set_priority(buttonA_intr,buttonA_id,3);</span><br><span class="line">	</span><br><span class="line">	//enable gpio</span><br><span class="line">	metal_gpio_disable_output(gpio0,11);</span><br><span class="line">	metal_gpio_enable_input(gpio0,11);</span><br><span class="line">	</span><br><span class="line">	//禁止gpio功能复用</span><br><span class="line">	metal_gpio_disable_pinmux(gpio0,11);</span><br><span class="line">	</span><br><span class="line">	//先关闭一下中断</span><br><span class="line">	metal_gpio_config_interrupt(gpio0,11,METAL_GPIO_INT_DISABLE);</span><br><span class="line">	</span><br><span class="line">	//清楚gpio中断的所有标志位</span><br><span class="line">	metal_gpio_clear_interrupt(gpio0,11, METAL_GPIO_INT_MAX);</span><br><span class="line"></span><br><span class="line">	//配置为下降沿中断</span><br><span class="line">	metal_gpio_config_interrupt(gpio0,11,METAL_GPIO_INT_FALLING);</span><br><span class="line"></span><br><span class="line">	//使能gpio11 </span><br><span class="line">	metal_interrupt_enable(buttonA_intr,buttonA_id);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2，中断服务函数中，改变全局变量flag的值，随后在主函数中判断flag的值，再进入处理函数；<br>这里的中断函数的名称是可以随意取的，但是传递的参数必须是固定的int id, void <em>data，void</em>data 是由初始化注册回调函数的传递过来的无类型的一个指针。在回调函数中，先拿到gpio对象，然后清楚gpio11的下降沿中断的标志位。然后从data里拿到flag的地址，从而改变flag的值。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">*buttona回调函数 清除下降沿中断标志位，将flag置2</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">buttonA_isr</span> <span class="params">(<span class="type">int</span> id, <span class="type">void</span> *data)</span>&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">metal_gpio</span> *<span class="title">gpio0</span>=</span>metal_gpio_get_device(<span class="number">0</span>);</span><br><span class="line">	metal_gpio_clear_interrupt(gpio0, <span class="number">11</span>,METAL_GPIO_INT_FALLING);</span><br><span class="line">	<span class="type">int</span> *flag=(<span class="type">int</span> *)data;</span><br><span class="line">	*flag=<span class="number">2</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>3，在main（）函数中检测flag的值</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span>(<span class="number">1</span>)&#123;</span><br><span class="line">	<span class="keyword">if</span>(flag==<span class="number">2</span>)&#123;</span><br><span class="line">		fun();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三，小结-1"><a href="#三，小结-1" class="headerlink" title="三，小结"></a>三，小结</h2><p><strong>这是一个简单的gpio中断的配置，从这个例子出发，来讨论一下sifive的中断是如何完成的。然后就可以依样画葫芦，其他外设的中断也可以相对容易的去理解。</strong><br>中断产生的过程大概是这样的：<br><img src="/2025/05/30/hello-world/sifive/GPIO_isr/20200606164541184.png" alt="在这里插入图片描述"><br><strong>inturrpt就是我们的中断源，当我们的按键按下时，gpio11就产生了一个中断请求，中断信号先来到plic控制器，plic根据请求的优先级来给中断请求排队，根据中断的id来找到中断服务程序的入口，随后进入中断服务函数，当完成中断服务函数后，plic相应的id的中断标志位会被置0</strong><br><strong>根据手册可以知道plic负责管理所有外设的中断请求，从下表可以知道外设对应的中断id。</strong><br><strong>其实上面代码中的buttonA_intr&#x3D;metal_gpio_interrupt_controller(gpio0);这个函数就是把plic控制器的对象负责给buttonA_intr，这样通过操作buttonA_intr，其实也就是对plic的操作。</strong><br><img src="/2025/05/30/hello-world/sifive/GPIO_isr/20200606165110554.png" alt="在这里插入图片描述"><br><strong>综上，要初始化一个外设中断，我们需要配置外设的中断寄存器，同时还要拿到plic对象，中断id，接下来就是配置plic，设置回调函数和中断优先级。这时候再来看初始化代码</strong></p>
+<p>这两个语句就是获取中断id和plic；</p>
+<blockquote>
+<p>int buttonA_id&#x3D;12;<br>buttonA_intr&#x3D;metal_gpio_interrupt_controller(gpio0);</p>
+</blockquote>
+<p>初始化一下plic，主要是把plic对象里的一些参数赋值为0或null</p>
+<blockquote>
+<p>metal_interrupt_init(buttonA_intr);</p>
+</blockquote>
+<p>这个函数就是配置plic的作用，在plic的中断表里id&#x3D;12的地方写入中断回调函数的地址和传递的参数</p>
+<blockquote>
+<p>metal_interrupt_register_handler(buttonA_intr,buttonA_id,buttonA_isr,flag);</p>
+</blockquote>
+<p>设置一下优先级，使能这个中断</p>
+<blockquote>
+<p>metal_interrupt_set_priority(buttonA_intr,buttonA_id,3);<br>metal_interrupt_enable(buttonA_intr,buttonA_id);</p>
+</blockquote>
+<p><strong>至此，一个中断初始化的plic部分就设置完成了，另一部分，外设的中断寄存器配置就要根据手册的说明或者库函数去相应的配置</strong><br>可以根据下面的图片理解plic，其实初始化一个外设中断就像是给下面的表格填写对应的内容，我们需要的就是plic对象，id，回调函数地址，优先级，传递参数。更多的plic内容查看芯片手册。<br><img src="/2025/05/30/hello-world/sifive/GPIO_isr/20200606172139626.png" alt="在这里插入图片描述"><br><img src="/2025/05/30/hello-world/sifive/GPIO_isr/20200614084841413.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/sifive/GPIO_isr/" data-id="cmbcy7ri0003st8mt4kxkag1u" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-killer-blog/other/ringbuff_c_impl" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/other/ringbuff_c_impl/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.658Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>@[toc]</p>
+<h2 id="一-什么是ringbuff"><a href="#一-什么是ringbuff" class="headerlink" title="一 什么是ringbuff"></a>一 什么是ringbuff</h2><p>ringbuff是环形buff，是buff缓存的一种，可以用来存放程序运行过程的暂时数据。一般的buff即是一个数组，而环形buff就是将数组的头和尾链接起来的数组。<br>老规矩，源码先放这：<br><a target="_blank" rel="noopener" href="https://gitee.com/killerp/mylib.git">码云：https://gitee.com/killerp/mylib.git</a></p>
+<h3 id="1，ringbuff的优点"><a href="#1，ringbuff的优点" class="headerlink" title="1，ringbuff的优点"></a>1，ringbuff的优点</h3><p>ringbuff比普通的buff使用更加高效灵活，可以边读数据边写数据。</p>
+<h2 id="二-ringbuff的实现"><a href="#二-ringbuff的实现" class="headerlink" title="二 ringbuff的实现"></a>二 ringbuff的实现</h2><p>一个ringbuff的实现至少需要以下四个功能：</p>
+<ul>
+<li>创建ringbuff</li>
+<li>数据写入ringbuff</li>
+<li>从ringbuff读取数据</li>
+<li>删除ringbuff</li>
+</ul>
+<h3 id="0，ringbuff结构体"><a href="#0，ringbuff结构体" class="headerlink" title="0，ringbuff结构体"></a>0，ringbuff结构体</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">RingBuff</span> *<span class="title">RingBuff_handle</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//ringbuff结构体</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">RingBuff</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">char</span> *source;	<span class="comment">//ringbuff的头部</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">char</span> *tail;	<span class="comment">//尾部</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">char</span> *write;	<span class="comment">//写指针</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">char</span> *read;	<span class="comment">//读指针</span></span><br><span class="line">	<span class="type">int</span> size;	<span class="comment">//ringbuff总长度</span></span><br><span class="line">	<span class="type">int</span> writed_size;	<span class="comment">//写入数据的长度</span></span><br><span class="line">	<span class="type">int</span> remain_size;	<span class="comment">//剩余空间</span></span><br><span class="line">	</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>如下图所示，一般一个ringbuff创建后，size，source和tail指针是固定的。当write移动到tail时，如果有数据需要写入，write会移动到source处继续写入，但是write不会覆盖掉未被read指针读取的数据。当read移动到tail时同样，如果需要继续读取数据，会移动到source继续读取。注意！write移动的长度不能超过remain_size（剩余空间）；read移动的长度部能超过write_size(已写入长度)；基本的工作原理就是这样。<br><img src="/2025/05/30/hello-world/other/ringbuff_c_impl/20200828103725680.png" alt="在这里插入图片描述"></p>
+<h3 id="1，ringbuff的创建"><a href="#1，ringbuff的创建" class="headerlink" title="1，ringbuff的创建"></a>1，ringbuff的创建</h3><p>ringbuff的创建实际上是调用malloc();实现动态内存分配，内存的大小由用户输入参数决定，分配的内存的地址指针会赋值给source，同时计算tail的指针，第一次创建也会初始化ringbuff的其他成员。一般的size最好比一次读写的长度大几倍。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">* 创建一个ringbuff 用户定义字节大小</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">RingBuff_handle <span class="title function_">createRingBuff</span><span class="params">(<span class="type">int</span> totalsize)</span></span><br><span class="line">&#123;</span><br><span class="line">	RingBuff_handle ringbuff;</span><br><span class="line">	ringbuff = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> RingBuff));</span><br><span class="line">	ringbuff-&gt;source = <span class="built_in">malloc</span>(totalsize);</span><br><span class="line">	<span class="keyword">if</span>(ringbuff-&gt;source !=<span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		LOGI(<span class="string">&quot;create ringbuff success!&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	ringbuff-&gt;write = ringbuff-&gt;source;</span><br><span class="line">	ringbuff-&gt;read = ringbuff-&gt;source;</span><br><span class="line">	ringbuff-&gt;writed_size = <span class="number">0</span>;</span><br><span class="line">	ringbuff-&gt;tail = ringbuff-&gt;source + totalsize;</span><br><span class="line">	ringbuff-&gt;size = totalsize;</span><br><span class="line">	ringbuff-&gt;remain_size = totalsize;</span><br><span class="line">	<span class="keyword">return</span> ringbuff;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2，计算已写入数据的长度"><a href="#2，计算已写入数据的长度" class="headerlink" title="2，计算已写入数据的长度"></a>2，计算已写入数据的长度</h3><p>计算writed_size的大小非常关键。这里先给出伪代码计算公式：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">writed_size = (size +（write - read)%size</span><br></pre></td></tr></table></figure>
+<p>理解它需要先了解ringbuff的读写指针的两种位置关系：</p>
+<ul>
+<li>写指针在读指针前面</li>
+<li>读指针在写指针前面<br><img src="/2025/05/30/hello-world/other/ringbuff_c_impl/20200828105620827.png" alt="在这里插入图片描述">代码实现：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 获得已写入数据的字节</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">getRingBuffWritedSize</span><span class="params">(RingBuff_handle handle)</span></span><br><span class="line">&#123;</span><br><span class="line">	handle-&gt;writed_size = (handle-&gt;size + (handle-&gt;write - handle-&gt;read)) % handle-&gt;size;</span><br><span class="line">	LOGI(<span class="string">&quot;writed_size = %d&quot;</span>,handle-&gt;writed_size);</span><br><span class="line">	<span class="keyword">return</span> handle-&gt;writed_size;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3，数据写入ringbuff"><a href="#3，数据写入ringbuff" class="headerlink" title="3，数据写入ringbuff"></a>3，数据写入ringbuff</h3><p>在读写数据的处理上都需要分以上两种情况处理。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 写入ringbuff handle 数据 数据字节长度</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">writeRingBuff</span><span class="params">(RingBuff_handle handle,<span class="type">unsigned</span> <span class="type">char</span> *data,<span class="type">int</span> size)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span>(handle-&gt;source == <span class="literal">NULL</span> ||handle == <span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		LOGE(<span class="string">&quot;ringbuff has not been init&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//检查剩余内存是否足够</span></span><br><span class="line">	<span class="keyword">if</span>(handle-&gt;remain_size &gt; size)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="comment">//写指针在读指针前</span></span><br><span class="line">		<span class="keyword">if</span>(handle-&gt;write - handle-&gt;read &gt;<span class="number">0</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="type">int</span> writebytes = handle-&gt;tail - handle-&gt;write - size;</span><br><span class="line">			<span class="comment">//写入的数据小于写指针到内存尾部</span></span><br><span class="line">			<span class="keyword">if</span>(writebytes &gt;= <span class="number">0</span>)</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="built_in">memcpy</span>(handle-&gt;write,data,size);</span><br><span class="line">				handle-&gt;write += size;</span><br><span class="line">		</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">else</span> <span class="comment">//写入的数据大于写指针到内存尾部，需要从头部继续写入</span></span><br><span class="line">			&#123;</span><br><span class="line">				<span class="comment">//写入数据到尾部</span></span><br><span class="line">				<span class="built_in">memcpy</span>(handle-&gt;write,data,handle-&gt;tail - handle-&gt;write);</span><br><span class="line">				data += handle-&gt;tail - handle-&gt;write;</span><br><span class="line">				writebytes = <span class="built_in">abs</span>(writebytes);</span><br><span class="line">				<span class="comment">//从头部继续写入剩余数据</span></span><br><span class="line">				<span class="built_in">memcpy</span>(handle-&gt;source,data,writebytes);</span><br><span class="line">				handle-&gt;write = handle-&gt;source +  writebytes;</span><br><span class="line">			</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span>	<span class="comment">//读指针在写指针前</span></span><br><span class="line">		&#123;</span><br><span class="line">			<span class="built_in">memcpy</span>(handle-&gt;write,data,size);</span><br><span class="line">			handle-&gt;write += size;</span><br><span class="line">			</span><br><span class="line">		&#125;</span><br><span class="line">		LOGI(<span class="string">&quot;write success&quot;</span>);</span><br><span class="line">		<span class="comment">//更新参数</span></span><br><span class="line">		getRingBuffRemainSize(handle);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">1</span>;	</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	&#123;</span><br><span class="line">		LOGE(<span class="string">&quot;write fail&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="4，读取ringbuff数据"><a href="#4，读取ringbuff数据" class="headerlink" title="4，读取ringbuff数据"></a>4，读取ringbuff数据</h3><p>读取数据也要区别指针的位置情况。读取与写入逻辑上差别不大。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 读取ringbuff数据 </span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">readRingBuff</span><span class="params">(RingBuff_handle handle,<span class="type">unsigned</span> <span class="type">char</span> *data,<span class="type">int</span> size)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span>(handle-&gt;source == <span class="literal">NULL</span> ||handle == <span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		LOGE(<span class="string">&quot;ringbuff has not been init&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span>(data == <span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="type">unsigned</span> <span class="type">char</span>));</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//要读取的数据少于已经写入的数据</span></span><br><span class="line">	<span class="keyword">if</span>(handle-&gt;writed_size &gt;= size)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="comment">//写指针在读指针前</span></span><br><span class="line">		<span class="keyword">if</span>(handle-&gt;write - handle-&gt;read &gt;<span class="number">0</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="built_in">memcpy</span>(data,handle-&gt;read,size);</span><br><span class="line">			handle-&gt;read += size;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span>	<span class="comment">//读指针在写指针前</span></span><br><span class="line">		&#123;</span><br><span class="line">			<span class="type">int</span> readbytes = handle-&gt;tail - handle-&gt;read - size;</span><br><span class="line">			</span><br><span class="line">			<span class="comment">//读取，不用从头读</span></span><br><span class="line">			<span class="keyword">if</span>(readbytes &gt; <span class="number">0</span>)</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="built_in">memcpy</span>(data,handle-&gt;read,size);</span><br><span class="line">				handle-&gt;read += size;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">else</span> 	<span class="comment">//需要从头读</span></span><br><span class="line">			&#123;</span><br><span class="line">				<span class="built_in">memcpy</span>(data,handle-&gt;read,handle-&gt;tail - handle-&gt;read);</span><br><span class="line">				readbytes = <span class="built_in">abs</span>(readbytes);</span><br><span class="line">				data += handle-&gt;tail - handle-&gt;read;</span><br><span class="line">				<span class="built_in">memcpy</span>(data,handle-&gt;source,readbytes);</span><br><span class="line">				handle-&gt;read = handle-&gt;source + readbytes;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		LOGI(<span class="string">&quot;read success&quot;</span>);</span><br><span class="line">		<span class="comment">//更新参数</span></span><br><span class="line">		getRingBuffRemainSize(handle);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	&#123;</span><br><span class="line">		LOGE(<span class="string">&quot;read fail&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="5，删除ringbuff"><a href="#5，删除ringbuff" class="headerlink" title="5，删除ringbuff"></a>5，删除ringbuff</h3><p>删除函数其实是调用free();函数释放由malloc();分配的内存。需要检查指针是否空。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 删除ringbuff</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">deleteRingBuff</span><span class="params">(RingBuff_handle handle)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//需要判断指针是否空，否则free()会出错</span></span><br><span class="line">	<span class="keyword">if</span>(handle == <span class="literal">NULL</span> ||handle-&gt;source == <span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		LOGE(<span class="string">&quot;free fail&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">free</span>(handle-&gt;source);</span><br><span class="line">	<span class="built_in">free</span>(handle);</span><br><span class="line">	LOGI(<span class="string">&quot;free ringbuff success&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2025/05/30/hello-world/other/ringbuff_c_impl/20200828110822332.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/other/ringbuff_c_impl/" data-id="cmbcy7rhz003pt8mtelo516py" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-killer-blog/other/C_color_print" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/other/C_color_print/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.657Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>@[toc]</p>
+<h2 id="一，多功能打印"><a href="#一，多功能打印" class="headerlink" title="一，多功能打印"></a>一，多功能打印</h2><p><strong>在c语言中，我们经常用c语言自带的printf();去打印字符串等，这在嵌入式开发过程中可以帮助我们认识程序的运行情况。但是c自带的printf();只能打印一种颜色的字体，在串口中部利于我们清楚的分析程序。所以参考网上其他的打印教程，也写了一个更加多功能的打印函数，可以用在所有使用c语言的程序中。</strong><br><strong>代码地址</strong>：<a target="_blank" rel="noopener" href="https://gitee.com/killerp/mylib.git">https://gitee.com/killerp/mylib.git</a></p>
+<h2 id="二，快速认识log"><a href="#二，快速认识log" class="headerlink" title="二，快速认识log"></a>二，快速认识log</h2><p><strong>三种打印都会自动打印调用打印的文件，打印函数在文件的位置，调用打印的函数名称。这样可以是我们在开发过程中更加清楚的了解程序运行的情况，以及代码出错的位置等。也是一种简单的debug手段。</strong></p>
+<ul>
+<li><strong>普通打印：一般可以用来打印数据，或者初始化成功等。</strong></li>
+<li><strong>警告打印：警告输入数据错误，空指针等。</strong></li>
+<li><strong>错误打印：运行时出现的错误。</strong></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">char</span> *str = <span class="string">&quot;Hello,world!&quot;</span>;</span><br><span class="line">	LOGI(<span class="string">&quot;普通打印&quot;</span>);</span><br><span class="line">	LOGW(<span class="string">&quot;警告打印&quot;</span>);</span><br><span class="line">	LOGE(<span class="string">&quot;错误打印&quot;</span>);</span><br><span class="line">	LOGI(<span class="string">&quot;打印数据 = %d&quot;</span>,<span class="number">8</span>);</span><br><span class="line">	LOGI(<span class="string">&quot;打印字符串：%s&quot;</span>,str);</span><br><span class="line">	LOGI(<span class="string">&quot;打印字符串和数据：%s,I am %d years old&quot;</span>,str,<span class="number">3</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>实现效果如下：</p>
+<p><img src="/2025/05/30/hello-world/other/C_color_print/20200827165139280.png" alt="在这里插入图片描述"><br><em><strong>具体怎么用好这三种其实看个人的习惯。如果你有其他类型的打印情况，也可以添加进，毕竟代码也不难理解，欢迎各位大佬反馈。</strong></em></p>
+<h2 id="三，认识代码"><a href="#三，认识代码" class="headerlink" title="三，认识代码"></a>三，认识代码</h2><p><strong>目前的代码还不是很完善，主要是效率太低了，接下来我将改善代码，减少代码量。<br>目前就只有一个<code>log.h</code>文件，当不需要打印功能时就把LOG_ENABLE 改成0。</strong><br><code>log.h</code> 主要是对打印字体颜色的宏定义等。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifndef</span> _LOG_</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _LOG_</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;stdio.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;stdlib.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;stdarg.h&quot;</span></span></span><br><span class="line"><span class="comment">//LOG功能开关 0则不会进行打印</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOG_ENABLE 1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//颜色的宏定义</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> NONE      <span class="string">&quot;\e[0m&quot;</span>	<span class="comment">//消除颜色</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOG_RED_H <span class="string">&quot;\e[1;31m&quot;</span>	<span class="comment">//亮红色</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOG_RED_L	<span class="string">&quot;\e[0;31m&quot;</span>	<span class="comment">//暗红色</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOG_GREEN_H <span class="string">&quot;\e[1;32m&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOG_GREEN_L	<span class="string">&quot;\e[0;32m&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOG_YELLOW_H <span class="string">&quot;\e[1;33m&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOG_YELLOW_L	<span class="string">&quot;\e[0;33m&quot;</span></span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">log</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *color,<span class="type">const</span> <span class="type">char</span> *fmt,...)</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> LOG_ENABLE</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*普通打印*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOGI(fmt,agr...)	\</span></span><br><span class="line"><span class="meta">do	\</span></span><br><span class="line"><span class="meta">&#123;	\</span></span><br><span class="line"><span class="meta">	log(LOG_GREEN_L,fmt,##agr);\</span></span><br><span class="line"><span class="meta">&#125;while(0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*警告类型*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOGW(fmt,agr...)	\</span></span><br><span class="line"><span class="meta">do	\</span></span><br><span class="line"><span class="meta">&#123;	\</span></span><br><span class="line"><span class="meta">	log(LOG_RED_H,fmt,##agr);\</span></span><br><span class="line"><span class="meta">&#125;while(0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*错误类型*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOGE(fmt,agr...)	\</span></span><br><span class="line"><span class="meta">do	\</span></span><br><span class="line"><span class="meta">&#123;	\</span></span><br><span class="line"><span class="meta">	log(LOG_YELLOW_L,fmt,##agr);\</span></span><br><span class="line"><span class="meta">&#125;while(0)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">else</span>	<span class="comment">//不会打印任何东西</span></span></span><br><span class="line">	</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOGI(fmt,agr...)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOGW(fmt,agr...)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOGE(fmt,agr...)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+<p>比较重要的是函数：</p>
+<blockquote>
+<p>其中的va_list类型是在c标准库<code>stdarg.h</code>中定义的，该库主要是定义了一个变量类型 va_list<br>和三个宏，这三个宏可用于在参数个数未知（即参数个数可变）时获取函数中的参数。可变参数的函数通在参数列表的末尾是使用省略号(,…)定义的。<br>关于<code>stdarg.h</code>的详细介绍访问：<a target="_blank" rel="noopener" href="https://www.runoob.com/cprogramming/c-standard-library-stdarg-h.html">https://www.runoob.com/cprogramming/c-standard-library-stdarg-h.html</a></p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 打印</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">log</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *color,<span class="type">const</span> <span class="type">char</span> *fmt,...)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//打印文件信息，函数信息，设置打印颜色</span></span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%s info &gt;&gt; file:%s; line:%d; fuction:%s :&quot;</span>,color,__FILE__,__LINE__,__FUNCTION__);</span><br><span class="line">	<span class="comment">//获取参数...</span></span><br><span class="line">	va_list <span class="built_in">list</span>;</span><br><span class="line">	<span class="comment">//初始化参数</span></span><br><span class="line">	va_start(<span class="built_in">list</span>,fmt);</span><br><span class="line">	<span class="comment">//打印参数</span></span><br><span class="line">	<span class="built_in">vprintf</span>(fmt,<span class="built_in">list</span>);</span><br><span class="line">	<span class="comment">//关闭参数</span></span><br><span class="line">	va_end(<span class="built_in">list</span>);</span><br><span class="line">	<span class="comment">//消除颜色，并换行</span></span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;\e[0m\r\n&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2025/05/30/hello-world/other/C_color_print/20200827170522333.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/other/C_color_print/" data-id="cmbcy7rhy003jt8mtfpdge6ww" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-killer-blog/lwip/lwip_stm32" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/lwip/lwip_stm32/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.657Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>@[toc]</p>
+<h2 id="一，使用以太网的库"><a href="#一，使用以太网的库" class="headerlink" title="一，使用以太网的库"></a>一，使用以太网的库</h2><p>为了再stm32中使用以太网进行通信，需要使用两个库的代码。<br>如图是stm32和互联网通信的模型，其中的lwip协议栈和驱动就是我们要移植的代码。<br><a target="_blank" rel="noopener" href="https://wws.lanzous.com/b01i3kcdi">点我下载移植所需的文件</a>，密码cmvn。<br><img src="/2025/05/30/hello-world/lwip/lwip_stm32/20210224140406291.png" alt="在这里插入图片描述"></p>
+<p><strong>其中ST提供的以太网库负责处理配置stm32以太网功能，lan8720驱动phy芯片。而LWIP则负责在软件上实现网络层，传输层等上层协议。</strong></p>
+<h2 id="二，ST以太网驱动库的移植"><a href="#二，ST以太网驱动库的移植" class="headerlink" title="二，ST以太网驱动库的移植"></a>二，ST以太网驱动库的移植</h2><p>首先我使用的是正点原子的stm32f4探索者，开发板使用的phy芯片为<strong>LAN8720</strong>。下载好以太网驱动库和LAN8720的驱动文件。然后添加到工程中。</p>
+<p>以太网驱动库<br><img src="/2025/05/30/hello-world/lwip/lwip_stm32/20210224135439156.png" alt="在这里插入图片描述"><br>lan8720驱动<br><img src="/2025/05/30/hello-world/lwip/lwip_stm32/2021022413551574.png" alt="在这里插入图片描述"></p>
+<p><strong>文件说明：</strong></p>
+<h3 id="1，stm32f4x7-eth-c"><a href="#1，stm32f4x7-eth-c" class="headerlink" title="1，stm32f4x7_eth.c"></a>1，stm32f4x7_eth.c</h3><p>stm32f4x7_eth.c中，主要使用的函数有：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">ETH_DeInit</span><span class="params">(<span class="type">void</span>)</span>;	</span><br><span class="line"><span class="type">uint32_t</span> <span class="title function_">ETH_Init</span><span class="params">(ETH_InitTypeDef* ETH_InitStruct, <span class="type">uint16_t</span> PHYAddress)</span>;	<span class="comment">//初始化以太网</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">ETH_StructInit</span><span class="params">(ETH_InitTypeDef* ETH_InitStruct)</span>;	<span class="comment">//结构体参数初始化</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">ETH_SoftwareReset</span><span class="params">(<span class="type">void</span>)</span>;	<span class="comment">//重置以太网mac的寄存器</span></span><br><span class="line"><span class="type">void</span>  <span class="title function_">ETH_Start</span><span class="params">(<span class="type">void</span>)</span>;	<span class="comment">//开启以太网功能</span></span><br><span class="line"><span class="type">void</span>  <span class="title function_">ETH_Stop</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">uint32_t</span> <span class="title function_">ETH_GetRxPktSize</span><span class="params">(ETH_DMADESCTypeDef *DMARxDesc)</span>;	<span class="comment">//读取以太网接收到的数据包大小</span></span><br></pre></td></tr></table></figure>
+<p>另外还需稍微了解DMA描述符。</p>
+<p><strong>以太网外设接收到数据后会将数据放到DMA描述符的缓存中，描述符是链表的结构。发送数据时，软件将数据放入描述符的缓存区。发送和接收共两条描述符链。其定义如下，但被注释了。</strong><br><img src="/2025/05/30/hello-world/lwip/lwip_stm32/20210224143346396.png" alt="在这里插入图片描述"></p>
+<p><img src="/2025/05/30/hello-world/lwip/lwip_stm32/20210224140735784.png" alt="在这里插入图片描述"></p>
+<h3 id="2，lan8720-c"><a href="#2，lan8720-c" class="headerlink" title="2，lan8720.c"></a>2，lan8720.c</h3><p>主要函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">u8 <span class="title function_">LAN8720_Init</span><span class="params">(<span class="type">void</span>)</span>;	<span class="comment">//phy芯片初始化</span></span><br><span class="line">FrameTypeDef <span class="title function_">ETH_Rx_Packet</span><span class="params">(<span class="type">void</span>)</span>;	<span class="comment">//从以太网接收一个数据包</span></span><br><span class="line">u8 <span class="title function_">ETH_Tx_Packet</span><span class="params">(u16 FrameLength)</span>;	<span class="comment">//发送一个数据包</span></span><br><span class="line">u32 <span class="title function_">ETH_GetCurrentTxBuffer</span><span class="params">(<span class="type">void</span>)</span>;	<span class="comment">//获取当前发送描述符的buff地址</span></span><br><span class="line">u8 <span class="title function_">ETH_Mem_Malloc</span><span class="params">(<span class="type">void</span>)</span>;	<span class="comment">//为以太网描述符分配内存</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//以太网dma接收中断服务函数</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">ETH_IRQHandler</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">while</span>(ETH_GetRxPktSize(DMARxDescToGet)!=<span class="number">0</span>) 	</span><br><span class="line">	&#123; </span><br><span class="line">		lwip_pkt_handle();	<span class="comment">//通知lwip处理接收的数据		</span></span><br><span class="line">	&#125;</span><br><span class="line">	ETH_DMAClearITPendingBit(ETH_DMA_IT_R); 	</span><br><span class="line">	ETH_DMAClearITPendingBit(ETH_DMA_IT_NIS);	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：文件中重新声明了以上四个变量，并在函数ETH_Mem_Malloc()中为四个变量申请了内存。原因是这四个变量会占用芯片较多的内存，使用动态内存分配，为变量分配了片外RAM的内存，能提供运行速度。</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">u8 <span class="title function_">ETH_Mem_Malloc</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123; </span><br><span class="line">	DMARxDscrTab=mymalloc(SRAMIN,ETH_RXBUFNB*<span class="keyword">sizeof</span>(ETH_DMADESCTypeDef));</span><br><span class="line">	DMATxDscrTab=mymalloc(SRAMIN,ETH_TXBUFNB*<span class="keyword">sizeof</span>(ETH_DMADESCTypeDef));</span><br><span class="line">	Rx_Buff=mymalloc(SRAMIN,ETH_RX_BUF_SIZE*ETH_RXBUFNB);	</span><br><span class="line">	Tx_Buff=mymalloc(SRAMIN,ETH_TX_BUF_SIZE*ETH_TXBUFNB);</span><br><span class="line">	<span class="keyword">if</span>(!DMARxDscrTab||!DMATxDscrTab||!Rx_Buff||!Tx_Buff)</span><br><span class="line">	&#123;</span><br><span class="line">		ETH_Mem_Free();</span><br><span class="line">		<span class="keyword">return</span> <span class="number">1</span>;	</span><br><span class="line">	&#125;	</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+<h2 id="三，移植LWIP协议栈"><a href="#三，移植LWIP协议栈" class="headerlink" title="三，移植LWIP协议栈"></a>三，移植LWIP协议栈</h2><p>下载并添加lwip源码到工程中。</p>
+<p>文件说明</p>
+<h3 id="1，lwip-comm-c"><a href="#1，lwip-comm-c" class="headerlink" title="1，lwip_comm.c"></a>1，lwip_comm.c</h3><p>主要函数:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//初始化lwip</span></span><br><span class="line">u8 <span class="title function_">lwip_comm_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">netif</span> *<span class="title">Netif_Init_Flag</span>;</span>		</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">ip_addr</span> <span class="title">ipaddr</span>;</span>  			</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">ip_addr</span> <span class="title">netmask</span>;</span> 			</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">ip_addr</span> <span class="title">gw</span>;</span>      			</span><br><span class="line">	<span class="keyword">if</span>(ETH_Mem_Malloc())<span class="keyword">return</span> <span class="number">1</span>;	<span class="comment">//为以太网dma描述符分配内存	</span></span><br><span class="line">	<span class="keyword">if</span>(lwip_comm_mem_malloc())<span class="keyword">return</span> <span class="number">1</span>;	<span class="comment">//为lwip分配内存</span></span><br><span class="line">	<span class="keyword">if</span>(LAN8720_Init())<span class="keyword">return</span> <span class="number">2</span>;		<span class="comment">//phy芯片初始化	</span></span><br><span class="line">	lwip_init();	<span class="comment">//lwip协议栈初始化						</span></span><br><span class="line">	lwip_comm_default_ip_set(&amp;lwipdev);	<span class="comment">//暂时设置默认ip	</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//以下代码是根据情况获取ip地址</span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> LWIP_DHCP			</span></span><br><span class="line">	ipaddr.addr = <span class="number">0</span>;</span><br><span class="line">	netmask.addr = <span class="number">0</span>;</span><br><span class="line">	gw.addr = <span class="number">0</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span>				</span></span><br><span class="line">	IP4_ADDR(&amp;ipaddr,lwipdev.ip[<span class="number">0</span>],lwipdev.ip[<span class="number">1</span>],lwipdev.ip[<span class="number">2</span>],lwipdev.ip[<span class="number">3</span>]);</span><br><span class="line">	IP4_ADDR(&amp;netmask,lwipdev.netmask[<span class="number">0</span>],lwipdev.netmask[<span class="number">1</span>] ,lwipdev.netmask[<span class="number">2</span>],lwipdev.netmask[<span class="number">3</span>]);</span><br><span class="line">	IP4_ADDR(&amp;gw,lwipdev.gateway[<span class="number">0</span>],lwipdev.gateway[<span class="number">1</span>],lwipdev.gateway[<span class="number">2</span>],lwipdev.gateway[<span class="number">3</span>]);</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">	<span class="comment">//到此，获取到ip地址，创建一个netif接口，并为接口添加ip地址等，添加接口初始化函数和输入函数</span></span><br><span class="line">	Netif_Init_Flag=netif_add(&amp;lwip_netif,&amp;ipaddr,&amp;netmask,&amp;gw,<span class="literal">NULL</span>,&amp;ethernetif_init,&amp;ethernet_input);<span class="comment">//</span></span><br><span class="line">	</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> LWIP_DHCP			</span></span><br><span class="line">	lwipdev.dhcpstatus=<span class="number">0</span>;	</span><br><span class="line">	dhcp_start(&amp;lwip_netif);	</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">if</span>(Netif_Init_Flag==<span class="literal">NULL</span>)</span><br><span class="line">		<span class="keyword">return</span> <span class="number">3</span>;</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="comment">//完成netif设置</span></span><br><span class="line">		netif_set_default(&amp;lwip_netif); </span><br><span class="line">		netif_set_up(&amp;lwip_netif);		</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;   </span><br></pre></td></tr></table></figure>
+<p><strong>该函数主要是调用其他初始化函数，完成硬件和软件的初始化配置。重点是netif_add创建了网络接口lwip_netif，并为该网络接口设置ip和以太网输入函数ethernet_input()。</strong></p>
+<p>在netif_add()中，调用ethernetif_init()函数对lwip_netif进行初始化</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">err_t</span> <span class="title function_">ethernetif_init</span><span class="params">(<span class="keyword">struct</span> netif *netif)</span></span><br><span class="line">&#123;</span><br><span class="line">	LWIP_ASSERT(<span class="string">&quot;netif!=NULL&quot;</span>,(netif!=<span class="literal">NULL</span>));</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> LWIP_NETIF_HOSTNAME			<span class="comment">//LWIP_NETIF_HOSTNAME </span></span></span><br><span class="line">	netif-&gt;hostname=<span class="string">&quot;lwip&quot;</span>;  	<span class="comment">//初始化名称</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span> </span></span><br><span class="line">	netif-&gt;name[<span class="number">0</span>]=IFNAME0; 	<span class="comment">//初始化变量netif的name字段</span></span><br><span class="line">	netif-&gt;name[<span class="number">1</span>]=IFNAME1; 	<span class="comment">//在文件外定义这里不用关心具体值</span></span><br><span class="line">	netif-&gt;output=etharp_output;<span class="comment">//IP层发送数据包函数，由lwip提供，功能如下</span></span><br><span class="line">	netif-&gt;linkoutput=low_level_output;<span class="comment">//ARP模块发送数据包函数</span></span><br><span class="line">	low_level_init(netif); 		<span class="comment">//底层硬件初始化函数</span></span><br><span class="line">	<span class="keyword">return</span> ERR_OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>该函数为lwip_netif 设置了以太网输出函数etharp_output()，和ARP发送函数low_level_output()，这些函数是一个网络接口功能实现的逻辑。如下图：</strong><br><img src="/2025/05/30/hello-world/lwip/lwip_stm32/2021022415194521.png" alt="在这里插入图片描述"></p>
+<p>在以太网dma中断中还会调用下面的函数，其实就是调用ethernetif_input(),这个函数待会分析</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">lwip_pkt_handle</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line"> ethernetif_input(&amp;lwip_netif);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">lwip_periodic_handle</span><span class="params">()</span>;	<span class="comment">//lwip轮询</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">lwip_dhcp_process_handle</span><span class="params">(<span class="type">void</span>)</span> <span class="comment">//dhcp处理任务</span></span><br></pre></td></tr></table></figure>
+<h3 id="2，ethernetif-c"><a href="#2，ethernetif-c" class="headerlink" title="2，ethernetif.c"></a>2，ethernetif.c</h3><p>上文提到的lwip_netif功能实现的四个重要函数，在此分析</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//从dma描述符缓存中读取数据到pbuf并返回pbuf</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">struct</span> pbuf * <span class="title function_">low_level_input</span><span class="params">(<span class="keyword">struct</span> netif *netif)</span></span><br><span class="line">&#123;  </span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">pbuf</span> *<span class="title">p</span>, *<span class="title">q</span>;</span></span><br><span class="line">	<span class="type">u16_t</span> len;</span><br><span class="line">	<span class="type">int</span> l =<span class="number">0</span>;</span><br><span class="line">	FrameTypeDef frame;</span><br><span class="line">	u8 *buffer;</span><br><span class="line">	p = <span class="literal">NULL</span>;</span><br><span class="line">	frame=ETH_Rx_Packet();<span class="comment">//调用以太网接收函数，获取一帧数据包</span></span><br><span class="line">	len=frame.length;<span class="comment">//得到包大小</span></span><br><span class="line">	buffer=(u8 *)frame.buffer;<span class="comment">//得到包数据地址 </span></span><br><span class="line">	p=pbuf_alloc(PBUF_RAW,len,PBUF_POOL);<span class="comment">//内存池分配新的pbuf</span></span><br><span class="line">	<span class="keyword">if</span>(p!=<span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="comment">//将数据包复制到q</span></span><br><span class="line">		<span class="keyword">for</span>(q=p;q!=<span class="literal">NULL</span>;q=q-&gt;next)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="built_in">memcpy</span>((<span class="type">u8_t</span>*)q-&gt;payload,(<span class="type">u8_t</span>*)&amp;buffer[l], q-&gt;len);</span><br><span class="line">			l=l+q-&gt;len;</span><br><span class="line">		&#125;    </span><br><span class="line">	&#125;</span><br><span class="line">	frame.descriptor-&gt;Status=ETH_DMARxDesc_OWN;<span class="comment">//设置Rx描述符OWN位,buffer重归ETH DMA </span></span><br><span class="line">	<span class="keyword">if</span>((ETH-&gt;DMASR&amp;ETH_DMASR_RBUS)!=(u32)RESET)<span class="comment">//当Rx Buffer不可用位(RBUS)被设置的时候,重置它.恢复传输</span></span><br><span class="line">	&#123; </span><br><span class="line">		ETH-&gt;DMASR=ETH_DMASR_RBUS;<span class="comment">//重置ETH DMA RBUS位 </span></span><br><span class="line">		ETH-&gt;DMARPDR=<span class="number">0</span>;<span class="comment">//恢复DMA接收</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">err_t</span> <span class="title function_">ethernetif_input</span><span class="params">(<span class="keyword">struct</span> netif *netif)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">err_t</span> err;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">pbuf</span> *<span class="title">p</span>;</span></span><br><span class="line">	p=low_level_input(netif);   <span class="comment">//读取输入的一帧pbuf数据</span></span><br><span class="line">	<span class="keyword">if</span>(p==<span class="literal">NULL</span>) <span class="keyword">return</span> ERR_MEM;</span><br><span class="line">	err=netif-&gt;input(p, netif); <span class="comment">//调用ethernet_input()将pbuf交给lwip内核</span></span><br><span class="line">	<span class="keyword">if</span>(err!=ERR_OK)</span><br><span class="line">	&#123;</span><br><span class="line">		LWIP_DEBUGF(NETIF_DEBUG,(<span class="string">&quot;ethernetif_input: IP input error\n&quot;</span>));</span><br><span class="line">		pbuf_free(p);</span><br><span class="line">		p = <span class="literal">NULL</span>;</span><br><span class="line">	&#125; </span><br><span class="line">	<span class="keyword">return</span> err;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">err_t</span> <span class="title function_">low_level_output</span><span class="params">(<span class="keyword">struct</span> netif *netif, <span class="keyword">struct</span> pbuf *p)</span></span><br><span class="line">&#123;</span><br><span class="line">	u8 res;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">pbuf</span> *<span class="title">q</span>;</span></span><br><span class="line">	<span class="type">int</span> l = <span class="number">0</span>;</span><br><span class="line">	u8 *buffer=(u8 *)ETH_GetCurrentTxBuffer(); <span class="comment">//获取当前要发送的DMA描述符中的缓冲区地址</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">//将pbuf中的数据复制到dma描述符</span></span><br><span class="line">	<span class="keyword">for</span>(q=p;q!=<span class="literal">NULL</span>;q=q-&gt;next) </span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">memcpy</span>((<span class="type">u8_t</span>*)&amp;buffer[l], q-&gt;payload, q-&gt;len);</span><br><span class="line">		l=l+q-&gt;len;</span><br><span class="line">	&#125; </span><br><span class="line">	res=ETH_Tx_Packet(l); <span class="comment">//调用以太网外设的发送函数发送数据</span></span><br><span class="line">	<span class="keyword">if</span>(res==ETH_ERROR)<span class="keyword">return</span> ERR_MEM;<span class="comment">//返回错误状态</span></span><br><span class="line">	<span class="keyword">return</span> ERR_OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="四，逻辑梳理"><a href="#四，逻辑梳理" class="headerlink" title="四，逻辑梳理"></a>四，逻辑梳理</h2><h3 id="1，数据输出"><a href="#1，数据输出" class="headerlink" title="1，数据输出"></a>1，数据输出</h3><p>当lwip输出数据时，先由上层调用netif-&gt;output()，将pbuf传递给netif，netif调用low_level_output()将数据发送到dma描述符，再由硬件发送出去。</p>
+<h3 id="2，数据输入"><a href="#2，数据输入" class="headerlink" title="2，数据输入"></a>2，数据输入</h3><p>当有数据经过硬件进入stm32的以太网控制器时，会将数据放入dma描述符，并进入dma接收中断，调用low_level_input()将数据复制到pbuf中，netif再调用netif-&gt;input()将pbuf传递给上层协议。</p>
+<p>总之还是这图<br><img src="/2025/05/30/hello-world/lwip/lwip_stm32/20210224153927406.png" alt="在这里插入图片描述"><br><img src="/2025/05/30/hello-world/lwip/lwip_stm32/20210224154228483.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/lwip/lwip_stm32/" data-id="cmbcy7rhy003kt8mt686k6fn7" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-killer-blog/other/Fourier_Transform" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/other/Fourier_Transform/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.657Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="一，信号与系统学的是什么？"><a href="#一，信号与系统学的是什么？" class="headerlink" title="一，信号与系统学的是什么？"></a>一，信号与系统学的是什么？</h2><p><strong>信号与系统两个基本的概念：信号可以表示成有若干变量的函数，而系统则对信号作出响应，产生新的信号。这个科目研究的就是这一大类问题。</strong></p>
+<blockquote>
+<p>例如：在电路系统中，电源电压和电流可以当成随时间变换的函数，而负载上的电压和电流可以看作是电源电压电流经过整个电路系统后输出的响应。</p>
+</blockquote>
+<p>实现信号的分析的方法是傅里叶分析方法，而在实际生活中，最常遇到的就是线性时不变系统(LTI)。我们就以这两个点为重点，入门信号与系统。</p>
+<h2 id="二，信号与系统的两大部分"><a href="#二，信号与系统的两大部分" class="headerlink" title="二，信号与系统的两大部分"></a>二，信号与系统的两大部分</h2><h3 id="2-1-信号"><a href="#2-1-信号" class="headerlink" title="2.1 信号"></a>2.1 信号</h3><h4 id="2-1-1-信号分类"><a href="#2-1-1-信号分类" class="headerlink" title="2.1.1 信号分类"></a>2.1.1 信号分类</h4><p>连续时间信号：电路中电源电压随时间变化的信号，可以表示为函数v(t)，或者声音信号，声压随时间变化的波形也可以作为一个信号。这些信号在时间上是连续的，看起来像一条线。</p>
+<p>离散时间信号：如股票市场指数随日期的变化；人口数量随年份的变化；这些信号在时间是离散的，是一个个点组成。</p>
+<p>以t表示连续时间，n表示离散时间。它们<strong>大部分情况下</strong>是相同的。本章主要以连续时间信号为重点。</p>
+<h4 id="2-1-2-重要的基本信号"><a href="#2-1-2-重要的基本信号" class="headerlink" title="2.1.2 重要的基本信号"></a>2.1.2 重要的基本信号</h4><p>下面的三种信号在接下来的学习中会经常使用，先熟悉他们。</p>
+<p><strong>1,复指数信号</strong></p>
+<p>复指数信号是一个周期信号，频率为w。</p>
+<p><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p><strong>2,冲激信号</strong><br><img src="/2025/05/30/hello-world/other/Fourier_Transform/20210126225834152.png" alt="在这里插入图片描述"></p>
+<p><strong>3，阶跃信号</strong></p>
+<p><img src="/2025/05/30/hello-world/other/Fourier_Transform/20210126225847936.png" alt="在这里插入图片描述"></p>
+<p>以及他们的关系:<br><img src="/2025/05/30/hello-world/other/Fourier_Transform/20210126225900418.png" alt="在这里插入图片描述"></p>
+<h3 id="2-2-系统"><a href="#2-2-系统" class="headerlink" title="2.2 系统"></a>2.2 系统</h3><p>系统就是一个黑盒子，包括输入和输出。一般的，可以用微分方程来表示一个系统。</p>
+<h4 id="2-2-1，两个重要的性质"><a href="#2-2-1，两个重要的性质" class="headerlink" title="2.2.1，两个重要的性质"></a>2.2.1，两个重要的性质</h4><p><strong>1，线性叠加</strong>：</p>
+<p>假设输入x1(t)，输出y1(t)；和输入x2(t)，输出y2(t)；</p>
+<p>具有线性叠加性质的系统有如下：</p>
+<p>输入x1(t)+x2(t)，输出y1(t)+y2(t)；</p>
+<p><strong>2，时不变性：</strong></p>
+<p>系统的性质不会随着时间而改变。</p>
+<p>即输入x(t),输出y(t),当输入产生一个时延x(t-1),那么输出也会是y(t-1).</p>
+<h4 id="2-2-2-线性时不变系统卷积和"><a href="#2-2-2-线性时不变系统卷积和" class="headerlink" title="2.2.2 线性时不变系统卷积和"></a>2.2.2 线性时不变系统卷积和</h4><p>为了引入信号线性组合的概念，我们先从离散信号入手，一个离散信号如下：</p>
+<p><img src="/2025/05/30/hello-world/other/Fourier_Transform/2021012623001855.png" alt="在这里插入图片描述"></p>
+<p>我们把这个离散信号看成是以下一个个无数的冲激函数的叠加：</p>
+<p><img src="/2025/05/30/hello-world/other/Fourier_Transform/20210126230101951.png" alt="在这里插入图片描述"></p>
+<p>这些冲激函数可以表示为：</p>
+<p><img src="/2025/05/30/hello-world/other/Fourier_Transform/20210126230154870.png" alt="在这里插入图片描述"></p>
+<p><img src="/2025/05/30/hello-world/other/Fourier_Transform/20210126230141104.png" alt="在这里插入图片描述"><br><img src="/2025/05/30/hello-world/other/Fourier_Transform/20210126230214341.png" alt="在这里插入图片描述"></p>
+<p>………..</p>
+<p>将上式在全时域上求和，就能得到原函数x[n]，即：</p>
+<p><strong>x[n] &#x3D; …….+x[1] δ[n-1] + x[2] δ[n-2] + x[3] δ[n-3]+…；</strong></p>
+<p>使用求和符号整理得：</p>
+<p><img src="/2025/05/30/hello-world/other/Fourier_Transform/20210126231637385.png" alt="在这里插入图片描述"></p>
+<p><strong>这个方法的思路就是将原信号表示成无数个冲激函数的叠加</strong></p>
+<p><strong>为何要将原信号分解成冲激信号呢？这是因为冲激信号是一个非常简单的信号，δ[n]经过系统后得到输出y[n] &#x3D; h[n]，h[n]称为冲激响应，也是一个相对简单的信号。利用线性时不变系统的两个性质，线性和时不变性，可得：</strong></p>
+<p><img src="/2025/05/30/hello-world/other/Fourier_Transform/2021012623165825.png" alt="在这里插入图片描述"></p>
+<p>可以发现，只需要将δ[n-k],替换成响应h[n-k]，就能表示原信号经过系统后的总响应。这就是线性时不变系统的特性，也是本章最基本的思想。shang</p>
+<p><strong>与离散时间相同，连续时间也可以以同样的方法，只需要将求和变成积分，这种方法的思想就是分解，组合。（此处用时间符号代替k）</strong></p>
+<p><img src="/2025/05/30/hello-world/other/Fourier_Transform/20210126231533630.png" alt="在这里插入图片描述"><br><img src="/2025/05/30/hello-world/other/Fourier_Transform/20210126231733298.png" alt="在这里插入图片描述"></p>
+<p>将上式表示成比较简单的形式：</p>
+<p><strong>y(t) &#x3D; x(t) * h(t)</strong></p>
+<p>这个就是卷积积分。</p>
+<h2 id="三，从傅里叶级数开始"><a href="#三，从傅里叶级数开始" class="headerlink" title="三，从傅里叶级数开始"></a>三，从傅里叶级数开始</h2><blockquote>
+<p>为了更好的理解傅里叶变换，我们先从更容易掌握的傅里叶级数开始</p>
+</blockquote>
+<p>这一节，我们暂时只讨论<code>周期信号</code>。</p>
+<p>想想在上一节，我们介绍的复指数信号e^jwt^,这就是一个典型的周期信号。介绍这个信号是因为<strong>一个复指数信号经过一个线性时不变系统后，输出仍然是一个复指数信号。也就是：</strong></p>
+<p>e^jwt^经过LTI系统后输出为：H(jw) e^jwt^;<br><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>再回忆上一节我们应用冲激信号的情况。既然复指数信号经过LTI系统只在幅度上变化，那么能否利用复指数信号的这个特性，去简化复杂的信号。答案是ok，思路与上一节一样，将原信号分解为成谐波关系的复指数信号的组合。</p>
+<p><strong>若一个信号可以表示成复指数信号的线性组合。即：</strong></p>
+<p><img src="/2025/05/30/hello-world/other/Fourier_Transform/20210126231808791.png" alt="在这里插入图片描述"></p>
+<p>（其中a<del>k</del>称为<code>傅里叶级数</code>，e^jkwt^是成谐波关系的复指数信号。我们知道<code>kw</code>就是复指数信号的频率,上式表明，输入信号由不同频率的复指数信号组合成，这些频率成谐波关系。）</p>
+<p><strong>那么该信号经过系统的输出可表示为：</strong></p>
+<p><img src="/2025/05/30/hello-world/other/Fourier_Transform/20210126231820381.jpg" alt="在这里插入图片描述"></p>
+<p>其中H(jw)为：</p>
+<p><img src="/2025/05/30/hello-world/other/Fourier_Transform/20210126231834995.png" alt="在这里插入图片描述"></p>
+<p>这样就使得输出的计算变得简单了。</p>
+<p><strong>在上式x(t)中，傅里叶级数a<del>k</del>是我们需要求得的，下面推导a<del>k</del>的计算方法：</strong></p>
+<p><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p><strong>到此，若给我们一个周期信号，我们就能根据上式求出其傅里叶级数a<del>k</del>，继而得到原信号的傅里叶展开式，再给我们系统的频率响应H（jw）,利用复指数信号的性质，就能求出输出信号。从原信号到傅里叶展开式的目的也就是为了输出信号计算的方便。此时的a<del>k</del>也可以称为频谱系数。</strong></p>
+<p>终于完成傅里叶级数的学习，现在让我们欣赏一下傅里叶级数的美，放松一下：</p>
+<p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1o4411D7vm">用傅里叶级数能画啥？</a></p>
+<h2 id="四，傅里叶变换"><a href="#四，傅里叶变换" class="headerlink" title="四，傅里叶变换"></a>四，傅里叶变换</h2><blockquote>
+<p>有了傅里叶级数的铺垫，傅里叶变换也就顺水推舟。</p>
+</blockquote>
+<h3 id="4-1-非周期信号傅里叶变换推导"><a href="#4-1-非周期信号傅里叶变换推导" class="headerlink" title="4.1 非周期信号傅里叶变换推导"></a>4.1 非周期信号傅里叶变换推导</h3><p>上一节讨论的信号局限于周期信号，当信号是非周期信号时，我们又该如何求a<del>k</del>呢。<strong>一个思路是尝试利用上一节学到的经验，将非周期信号看成周期信号来处理，下面开始推导：</strong></p>
+<p>假设有一个非周期信号x(t)，她具有有限的持续时间，也就是说在|t|&gt;T<del>1</del>,时，x(t)为0。如图：</p>
+<p><img src="/2025/05/30/hello-world/other/Fourier_Transform/20210126231907823.png" alt="在这里插入图片描述"></p>
+<p>我们以x(t)为一个周期，构造一个周期信号g(t)，如图，这样我们就能以处理周期信号的方式进行：</p>
+<p><img src="/2025/05/30/hello-world/other/Fourier_Transform/20210126231918432.png" alt="在这里插入图片描述"></p>
+<p>还记得上一节么，我们可以得到以下方程组：</p>
+<p><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>由于在(-T&#x2F;2,T&#x2F;2)内，x(t) &#x3D;&#x3D; g(t)，故上式②可改写成：</p>
+<p><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>同时，由于x(t)在(-T&#x2F;2,T&#x2F;2)外为0，故积分区间可修改为全时域：</p>
+<p><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>我们把T移到等式左边，得到Ta<del>k</del>的表达式，<strong>定义X(jw)&#x3D;Ta<del>k</del>为x(t)的傅里叶变换</strong>：<br><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>此时我们再用X(jw)来表示周期信号g(t):</p>
+<p><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>由于T&#x3D;2Π&#x2F;w<del>0</del>,所以上式可修改为：</p>
+<p><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>当T趋近无穷大时，结合图像可得：g(t) &#x3D;&#x3D; x(t)，同时等式右边的求和变成积分，这点我们从图像上来证明：</p>
+<p><strong>上式求和式中的每一项的面积S &#x3D; X(jkw<del>0</del>t)e^jkwt^w<del>0</del>;当T趋向无穷大时，求和就会过渡到积分，w<del>0</del>也会变成dw.</strong></p>
+<p><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>此时x(t)就能表示为：</p>
+<p><img src="/2025/05/30/hello-world/other/Fourier_Transform/20210126232204431.png" alt="在这里插入图片描述"></p>
+<p><strong>这就是傅里叶逆变换，从这个表达式可以看出，非周期x(t)可以表示成复指数信号的线性组合，与周期信号不同的是，这些复指数信号在频率w上的连续的，而不呈现谐波关系。同时，也可以发现傅里叶变换X(jw)与a<del>k</del>具有相似性，这里我们也称X(jw)为信号的频谱,她表示某频率分量的复指数信号在原信号中所占的比重。</strong></p>
+<h3 id="4-2-用傅里叶变换求出输出"><a href="#4-2-用傅里叶变换求出输出" class="headerlink" title="4.2 用傅里叶变换求出输出"></a>4.2 用傅里叶变换求出输出</h3><p>现在我们知道了原信号的傅里叶变换X(jw)，我们如何继续求系统的输出呢?</p>
+<p><strong>在第三节的时候，我们计算过，一个单位冲激响应为h(t)的系统，对复指数信号e^jwt^的响应为H(jw)e^jwt^。由线性叠加原理可得输出信号为：</strong></p>
+<p><img src="/2025/05/30/hello-world/other/Fourier_Transform/20210126232242189.png" alt="在这里插入图片描述"></p>
+<p>从图像上理解傅里叶变换，也是一种不错的途径：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1pW411J7s8">形象展示傅里叶变换</a></p>
+<p><strong>最后献上一张关于傅里叶变换的图片，左边黄色是时域的波形，右边深蓝的是频域的波形，中间浅蓝色就是不同频率分量的复指数信号。</strong></p>
+<p><img src="/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDgyMTY0NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/other/Fourier_Transform/" data-id="cmbcy7rhy003lt8mt7xhw8xp4" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -215,6 +1048,11 @@
 
   
 
+
+  <nav id="page-nav">
+    
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+  </nav>
 
 </section>
         
@@ -232,7 +1070,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
     </div>
   </div>
 
@@ -245,11 +1083,23 @@
       <ul>
         
           <li>
-            <a href="/2025/05/30/linux/dma-buf/">DMA BUF</a>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
           </li>
         
           <li>
-            <a href="/2025/05/30/hello-world/">Hello World</a>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
           </li>
         
       </ul>

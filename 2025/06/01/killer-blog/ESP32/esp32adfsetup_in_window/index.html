@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="搭建ESP32A1S的ADF开发环境@[toc] 一，获取IDF和IDF-TOOLadf是乐鑫的音频开发框架，里面有许多乐鑫的音频开发API，同时ADF是基于IDF的。这一部分可以按照官网的教程一步一步来。官网教程地址：ADF安装指南首先下载esp-idf，如果是第一次使用idf，可以在官网下载一个idf工具安装器，通过这个安装器直接安装idf，同时还可以安装编译工具链。下载的速度也还可以接受。大">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/ESP32/esp32adfsetup_in_window/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="搭建ESP32A1S的ADF开发环境@[toc] 一，获取IDF和IDF-TOOLadf是乐鑫的音频开发框架，里面有许多乐鑫的音频开发API，同时ADF是基于IDF的。这一部分可以按照官网的教程一步一步来。官网教程地址：ADF安装指南首先下载esp-idf，如果是第一次使用idf，可以在官网下载一个idf工具安装器，通过这个安装器直接安装idf，同时还可以安装编译工具链。下载的速度也还可以接受。大">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/2020080914172936.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/20200810201832419.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/20200809142013990.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/20200809142212112.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/20200911145513313.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/20200809144825414.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/2020080914513124.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/20200809145422861.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/2020080914561261.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/2020080915021254.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/20200809150325969.png">
+<meta property="og:image" content="http://example.com/2020081110095759.%60%E5%9C%A8%E8%BF%99%E9%87%8C%E6%8F%92%E5%85%A5%E4%BB%A3%E7%A0%81%E7%89%87%60png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/20200811101431911.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/20200811101635795.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.636Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:26.981Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/2020080914172936.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/ESP32/esp32adfsetup_in_window" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/ESP32/esp32adfsetup_in_window/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.636Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="搭建ESP32A1S的ADF开发环境"><a href="#搭建ESP32A1S的ADF开发环境" class="headerlink" title="搭建ESP32A1S的ADF开发环境"></a>搭建ESP32A1S的ADF开发环境</h2><p>@[toc]</p>
+<h2 id="一，获取IDF和IDF-TOOL"><a href="#一，获取IDF和IDF-TOOL" class="headerlink" title="一，获取IDF和IDF-TOOL"></a>一，获取IDF和IDF-TOOL</h2><p>adf是乐鑫的音频开发框架，里面有许多乐鑫的音频开发API，同时ADF是基于IDF的。<br>这一部分可以按照官网的教程一步一步来。<br>官网教程地址：<a target="_blank" rel="noopener" href="https://docs.espressif.com/projects/esp-adf/zh_CN/latest/get-started/index.html#get-started-setup-esp-idf">ADF安装指南</a><br><em><strong>首先下载esp-idf，如果是第一次使用idf，可以在官网下载一个<a target="_blank" rel="noopener" href="https://docs.espressif.com/projects/esp-idf/zh_CN/release-v4.1/get-started/windows-setup.html#get-started-windows-tools-installer">idf工具安装器</a>，通过这个安装器直接安装idf，同时还可以安装编译工具链。下载的速度也还可以接受。大概三十分钟就可以搞定。</strong></em></p>
+<blockquote>
+<p>本安装器可为您安装所需的交叉编译器、OpenOCD、cmake 和 Ninja 编译工具，以及一款 mconf-idf 配置工具。此外，本安装器还可在有需要时下载、运行 Python 3.7 和 Git For Windows 的安装器。本安装器还可用于下载任意 ESP-IDF 发布版本。</p>
+</blockquote>
+<p>下载完安装器后直接运行如下（安装器运行时需要python3和git的支持）：</p>
+<p><img src="/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/2020080914172936.png" alt="在这里插入图片描述"><br>选择要安装的idf的<code>3.3</code>版本，记住路径不要有空格。<em><strong>使用ADF开发时最好用3.3的idf，比较稳定不会出错</strong></em><br><img src="/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/20200810201832419.png" alt="在这里插入图片描述"></p>
+<p>接下来是选择idf-tool的安装路径：<br><img src="/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/20200809142013990.png" alt="在这里插入图片描述"><br>等个半小时左右安装完成。测试工具链能不能正常工作。我们的桌面会生成这一个cmd<br><img src="/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/20200809142212112.png" alt="在这里插入图片描述">双击运行后它会自动为我们设置idf_path等编译需要的环境变量，我们直接cd到idf里examples里一个工程，例如：<br><code>D:\ESP\idf3.3\examples\get-started\hello_world</code><br>然后执行<code>idf.py build</code><br>如果编译成功的话就说明编译工具和idf安装成功。</p>
+<h2 id="二，安装ADF"><a href="#二，安装ADF" class="headerlink" title="二，安装ADF"></a>二，安装ADF</h2><p>乐鑫把ADF放在了github，仓库地址是：<a target="_blank" rel="noopener" href="https://github.com/espressif/esp-adf">https://github.com/espressif/esp-adf</a>；<br>这是一个带子模块的仓库，如何加速下载请参考博客<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/107574297">提升github下载速度</a>里带子模块的下载。<br><strong>步骤：创建ESP文件夹，然后cmd，执行以下命令克隆仓库:</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://gitclone.com/github.com/espressif/esp-adf.git</span><br></pre></td></tr></table></figure>
+
+<p><strong>等待clone完成后，再打开<code>esp-adf</code>目录下的<code>.gitsubmodules</code>文件,可以看到该目录下有三个子模块仓库：<br>idf模块，esp-adf-libs模块：adf音频库，esp-sr：识别语音库</strong><br>在<code>esp-adf-libs</code>目录下执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://gitclone.com/github.com/espressif/esp-adf-libs</span><br></pre></td></tr></table></figure>
+<p>在<code>esp-sr</code>目录下执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://gitclone.com/github.com/espressif/esp-sr.git</span><br></pre></td></tr></table></figure>
+<p>在<code>esp-idf</code>目录下执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://gitclone.com/github.com/espressif/esp-idf</span><br></pre></td></tr></table></figure>
+
+<p>以上仓库下载完成后，修改<code>adf目录下.gitsubmodules</code>的内容如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[submodule <span class="string">&quot;esp-idf&quot;</span>]</span><br><span class="line">	path = esp-idf</span><br><span class="line">	url = https://gitclone.com/github.com/espressif/esp-idf</span><br><span class="line">[submodule <span class="string">&quot;components/esp-adf-libs&quot;</span>]</span><br><span class="line">	path = components/esp-adf-libs</span><br><span class="line">	url = https://gitclone.com/github.com/espressif/esp-adf-libs</span><br><span class="line">[submodule <span class="string">&quot;components/esp-sr&quot;</span>]</span><br><span class="line">	path = components/esp-sr</span><br><span class="line">	url = https://gitclone.com/github.com/espressif/esp-sr.git</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<p><strong>当两个仓库下载完成后 在<code>adf</code>目录下cmd执行<code>git submodule update --init</code></strong>，<strong>这一步将两个子模块切换到当前ADF要求的版本。至此ADF已经完成安装，这时要测试一下ADF是否能编译成功。打开之前的桌面cmd，<code>需要注意的是，在每次打开cmd之前要设置ADF_PATH</code><br>在cmd执行<code>set ADF_PATH=你的ADF目录</code>例如我的是：<code>set ADF_PATH=D:\ESP\esp-adf</code>，（路径不要有空格<br>或者在<code>ESP\.espressif</code>目录下添加该语句，如图，一劳永逸：</strong><br><img src="/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/20200911145513313.png" alt="在这里插入图片描述"></p>
+<p><strong>然后cd到随便ADF目录下examples下随意一个工程，与之前一样<code>idf.py build</code>测试能否成功通过编译。</strong></p>
+<h2 id="三，适配ADF到ESP32A1S"><a href="#三，适配ADF到ESP32A1S" class="headerlink" title="三，适配ADF到ESP32A1S"></a>三，适配ADF到ESP32A1S</h2><p>由于ADF里是没有ESP32A1S的初始化代码的，所以需要自己添加进去。</p>
+<p><strong>1，首先修改<code>esp-adf\components\audio_board</code>目录下的三个配置文件，如下：</strong><br><img src="/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/20200809144825414.png" alt="在这里插入图片描述"><br>1.1，CMakeLists.txt 添加内容如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (CONFIG_ESP_AI_THINKER_V2_2_BOARD)</span><br><span class="line">message(STATUS <span class="string">&quot;Current board name is &quot;</span> CONFIG_ESP_AI_THINKER_V2_2_BOARD)</span><br><span class="line">list(APPEND COMPONENT_ADD_INCLUDEDIRS ./ai_thinker_audio_kit_v2_2)</span><br><span class="line"><span class="built_in">set</span>(COMPONENT_SRCS</span><br><span class="line">./ai_thinker_audio_kit_v2_2/board.c</span><br><span class="line">./ai_thinker_audio_kit_v2_2/board_pins_config.c</span><br><span class="line">)</span><br><span class="line">endif()</span><br></pre></td></tr></table></figure>
+<p>1.2，compoment.mk 添加如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ifdef CONFIG_ESP_AI_THINKER_V2_2_BOARD</span><br><span class="line">COMPONENT_ADD_INCLUDEDIRS += ./ai_thinker_audio_kit_v2_2</span><br><span class="line">COMPONENT_SRCDIRS += ./ai_thinker_audio_kit_v2_2</span><br><span class="line">endif</span><br></pre></td></tr></table></figure>
+<p>1.3，Kconfig.projbuild 修改如下<br><img src="/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/2020080914513124.png" alt="在这里插入图片描述"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">choice AUDIO_BOARD</span><br><span class="line">    prompt <span class="string">&quot;Ai-Thinker Audio board&quot;</span></span><br><span class="line">    default ESP_AI_THINKER_V2_2_BOARD</span><br><span class="line">    <span class="built_in">help</span></span><br><span class="line">        Select an audio board to use with the ESP-ADF</span><br><span class="line">config AUDIO_BOARD_CUSTOM</span><br><span class="line">    bool <span class="string">&quot;Custom audio board&quot;</span></span><br><span class="line">config ESP_LYRAT_V4_3_BOARD</span><br><span class="line">    bool <span class="string">&quot;ESP32-Lyrat V4.3&quot;</span></span><br><span class="line">config ESP_LYRAT_V4_2_BOARD</span><br><span class="line">    bool <span class="string">&quot;ESP32-Lyrat V4.2&quot;</span></span><br><span class="line">config ESP_LYRATD_MSC_V2_1_BOARD</span><br><span class="line">    bool <span class="string">&quot;ESP32-LyraTD-MSC V2.1&quot;</span></span><br><span class="line">config ESP_LYRATD_MSC_V2_2_BOARD</span><br><span class="line">    bool <span class="string">&quot;ESP32-LyraTD-MSC V2.2&quot;</span></span><br><span class="line">config ESP_LYRAT_MINI_V1_1_BOARD</span><br><span class="line">    bool <span class="string">&quot;ESP32-Lyrat-Mini V1.1&quot;</span></span><br><span class="line">config ESP32_KORVO_DU1906_BOARD</span><br><span class="line">    bool <span class="string">&quot;ESP32_KORVO_DU1906&quot;</span></span><br><span class="line">config ESP32_S2_KALUGA_1_V1_2_BOARD</span><br><span class="line">    bool <span class="string">&quot;ESP32-S2-Kaluga-1 v1.2&quot;</span></span><br><span class="line">config ESP_AI_THINKER_V2_2_BOARD   </span><br><span class="line">    bool <span class="string">&quot;ESP32-AiThinker-audio V2.2&quot;</span></span><br><span class="line">endchoice</span><br></pre></td></tr></table></figure>
+
+
+<p>1.4 <a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1B_MmV_SK1fMe7AtmEfvCTA">下载ai_thinker_audio_kit_v2_2</a>，<strong>提取码：kill</strong></p>
+<p>添加<code>ai_thinker_audio_kit_v2_2</code>文件夹到<code>esp-adf\components\audio_board</code>目录下，board.c是板子的初始化代码，board_def.h是对板子IO口的定义， board_pins_config.c是配置iis和iic的IO<br>引脚的代码。</p>
+<p><strong>2，添加音频驱动文件，修改<code>esp-adf\components\audio_hal</code>文件夹下的CMakeLists.txt和compoment.mk</strong><br><img src="/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/20200809145422861.png" alt="在这里插入图片描述"><br>2.1 CMakeLists.txt 修改后如下<br><img src="/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/2020080914561261.png" alt="在这里插入图片描述"><br>2.2 compoment.mk 添加以下内容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">COMPONENT_ADD_INCLUDEDIRS += ./driver/ac101</span><br><span class="line">COMPONENT_SRCDIRS += ./driver/ac101</span><br></pre></td></tr></table></figure>
+<p>2.3 在driver文件夹下新建ac101文件夹，并添加ac101.c和ac101.h驱动文件。<a target="_blank" rel="noopener" href="https://wws.lanzous.com/iETsVfg6sni">ac101驱动下载</a><br><strong>至此，移植完成！接下来就是测试了。老套路打开cmd，设置ADF_PATH，然后cd到测试项目，先执行<code>idf.py menuconfig</code>叫出配置菜单来切换A1S开发板。在<code>Audio HAL</code>选项中选择安信可的板子，然后<code>save</code>保存配置，最后<code>idf.py build</code>.(第一次编译大概5分钟把)</strong><br><img src="/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/2020080915021254.png" alt="在这里插入图片描述"><br>出现以下画面时就是编译通过：<br><img src="/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/20200809150325969.png" alt="在这里插入图片描述"><br><strong>最后进行烧录，插入开发板，查看开发板的端口号 例如我的是COM4,接着执行<code>idf.py -p  COM4 flash monitor</code>烧录进开发板的同时开启了串口监视器，可以看到串口打印</strong></p>
+<h2 id="四，使用asr语音识别例程"><a href="#四，使用asr语音识别例程" class="headerlink" title="四，使用asr语音识别例程"></a>四，使用asr语音识别例程</h2><p>由于asr例程的app固件大于2M，所以需要修改项目分区表使app固件在flash有足够的内存空间，否则烧录后会出现以下错误：<br><img src="/2020081110095759.%60%E5%9C%A8%E8%BF%99%E9%87%8C%E6%8F%92%E5%85%A5%E4%BB%A3%E7%A0%81%E7%89%87%60png" alt="在这里插入图片描述"><br>步骤：<br>1，首先设置<code>menuconfig-&gt;Serial Flash config</code>,配置如下：<br><img src="/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/20200811101431911.png" alt="在这里插入图片描述"><br>2,设置项目使用本地分区表：<br><code>menuconfig-&gt;Partition Table-&gt;</code>,如下<br><img src="/2025/05/30/hello-world/ESP32/esp32adfsetup_in_window/20200811101635795.png" alt="在这里插入图片描述"><br>3，修改项目根目录下的partitions.csv，如下<br>修改factory的size为2M或者更大的内存。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Espressif ESP32 Partition Table</span></span><br><span class="line"><span class="comment"># Name,   Type, SubType, Offset,  Size</span></span><br><span class="line">nvs,      data, nvs,     0x9000,  0x6000,</span><br><span class="line">phy_init, data, phy,     0xf000,  0x1000,</span><br><span class="line">factory,  app,  factory, 0x10000, 0x200000,</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>参考文章：<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/xh870189248/article/details/104160104">esp32-a1s 音频开发板移植最新 esp-adf 音频框架</a><br><a target="_blank" rel="noopener" href="https://docs.espressif.com/projects/esp-adf/zh_CN/latest/get-started/index.html#get-started-setup-esp-idf">ADF安装指南</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/ESP32/esp32adfsetup_in_window/" data-id="cmbcy7rh2000ut8mt0tx250qo" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/ESP32/esp32adf_audio_pipeline/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/ESP32/esp32_IREXT/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

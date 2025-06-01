@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="@[toc] 一，多功能打印在c语言中，我们经常用c语言自带的printf();去打印字符串等，这在嵌入式开发过程中可以帮助我们认识程序的运行情况。但是c自带的printf();只能打印一种颜色的字体，在串口中部利于我们清楚的分析程序。所以参考网上其他的打印教程，也写了一个更加多功能的打印函数，可以用在所有使用c语言的程序中。代码地址：https:&#x2F;&#x2F;gitee.com&#x2F;killerp&#x2F;mylib">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/other/C_color_print/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="@[toc] 一，多功能打印在c语言中，我们经常用c语言自带的printf();去打印字符串等，这在嵌入式开发过程中可以帮助我们认识程序的运行情况。但是c自带的printf();只能打印一种颜色的字体，在串口中部利于我们清楚的分析程序。所以参考网上其他的打印教程，也写了一个更加多功能的打印函数，可以用在所有使用c语言的程序中。代码地址：https:&#x2F;&#x2F;gitee.com&#x2F;killerp&#x2F;mylib">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/other/C_color_print/20200827165139280.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/other/C_color_print/20200827170522333.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.657Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:26.827Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/other/C_color_print/20200827165139280.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/other/C_color_print" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/other/C_color_print/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.657Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>@[toc]</p>
+<h2 id="一，多功能打印"><a href="#一，多功能打印" class="headerlink" title="一，多功能打印"></a>一，多功能打印</h2><p><strong>在c语言中，我们经常用c语言自带的printf();去打印字符串等，这在嵌入式开发过程中可以帮助我们认识程序的运行情况。但是c自带的printf();只能打印一种颜色的字体，在串口中部利于我们清楚的分析程序。所以参考网上其他的打印教程，也写了一个更加多功能的打印函数，可以用在所有使用c语言的程序中。</strong><br><strong>代码地址</strong>：<a target="_blank" rel="noopener" href="https://gitee.com/killerp/mylib.git">https://gitee.com/killerp/mylib.git</a></p>
+<h2 id="二，快速认识log"><a href="#二，快速认识log" class="headerlink" title="二，快速认识log"></a>二，快速认识log</h2><p><strong>三种打印都会自动打印调用打印的文件，打印函数在文件的位置，调用打印的函数名称。这样可以是我们在开发过程中更加清楚的了解程序运行的情况，以及代码出错的位置等。也是一种简单的debug手段。</strong></p>
+<ul>
+<li><strong>普通打印：一般可以用来打印数据，或者初始化成功等。</strong></li>
+<li><strong>警告打印：警告输入数据错误，空指针等。</strong></li>
+<li><strong>错误打印：运行时出现的错误。</strong></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">char</span> *str = <span class="string">&quot;Hello,world!&quot;</span>;</span><br><span class="line">	LOGI(<span class="string">&quot;普通打印&quot;</span>);</span><br><span class="line">	LOGW(<span class="string">&quot;警告打印&quot;</span>);</span><br><span class="line">	LOGE(<span class="string">&quot;错误打印&quot;</span>);</span><br><span class="line">	LOGI(<span class="string">&quot;打印数据 = %d&quot;</span>,<span class="number">8</span>);</span><br><span class="line">	LOGI(<span class="string">&quot;打印字符串：%s&quot;</span>,str);</span><br><span class="line">	LOGI(<span class="string">&quot;打印字符串和数据：%s,I am %d years old&quot;</span>,str,<span class="number">3</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>实现效果如下：</p>
+<p><img src="/2025/05/30/hello-world/other/C_color_print/20200827165139280.png" alt="在这里插入图片描述"><br><em><strong>具体怎么用好这三种其实看个人的习惯。如果你有其他类型的打印情况，也可以添加进，毕竟代码也不难理解，欢迎各位大佬反馈。</strong></em></p>
+<h2 id="三，认识代码"><a href="#三，认识代码" class="headerlink" title="三，认识代码"></a>三，认识代码</h2><p><strong>目前的代码还不是很完善，主要是效率太低了，接下来我将改善代码，减少代码量。<br>目前就只有一个<code>log.h</code>文件，当不需要打印功能时就把LOG_ENABLE 改成0。</strong><br><code>log.h</code> 主要是对打印字体颜色的宏定义等。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifndef</span> _LOG_</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _LOG_</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;stdio.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;stdlib.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;stdarg.h&quot;</span></span></span><br><span class="line"><span class="comment">//LOG功能开关 0则不会进行打印</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOG_ENABLE 1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//颜色的宏定义</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> NONE      <span class="string">&quot;\e[0m&quot;</span>	<span class="comment">//消除颜色</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOG_RED_H <span class="string">&quot;\e[1;31m&quot;</span>	<span class="comment">//亮红色</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOG_RED_L	<span class="string">&quot;\e[0;31m&quot;</span>	<span class="comment">//暗红色</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOG_GREEN_H <span class="string">&quot;\e[1;32m&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOG_GREEN_L	<span class="string">&quot;\e[0;32m&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOG_YELLOW_H <span class="string">&quot;\e[1;33m&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOG_YELLOW_L	<span class="string">&quot;\e[0;33m&quot;</span></span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">log</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *color,<span class="type">const</span> <span class="type">char</span> *fmt,...)</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> LOG_ENABLE</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*普通打印*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOGI(fmt,agr...)	\</span></span><br><span class="line"><span class="meta">do	\</span></span><br><span class="line"><span class="meta">&#123;	\</span></span><br><span class="line"><span class="meta">	log(LOG_GREEN_L,fmt,##agr);\</span></span><br><span class="line"><span class="meta">&#125;while(0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*警告类型*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOGW(fmt,agr...)	\</span></span><br><span class="line"><span class="meta">do	\</span></span><br><span class="line"><span class="meta">&#123;	\</span></span><br><span class="line"><span class="meta">	log(LOG_RED_H,fmt,##agr);\</span></span><br><span class="line"><span class="meta">&#125;while(0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*错误类型*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOGE(fmt,agr...)	\</span></span><br><span class="line"><span class="meta">do	\</span></span><br><span class="line"><span class="meta">&#123;	\</span></span><br><span class="line"><span class="meta">	log(LOG_YELLOW_L,fmt,##agr);\</span></span><br><span class="line"><span class="meta">&#125;while(0)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">else</span>	<span class="comment">//不会打印任何东西</span></span></span><br><span class="line">	</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOGI(fmt,agr...)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOGW(fmt,agr...)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOGE(fmt,agr...)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+<p>比较重要的是函数：</p>
+<blockquote>
+<p>其中的va_list类型是在c标准库<code>stdarg.h</code>中定义的，该库主要是定义了一个变量类型 va_list<br>和三个宏，这三个宏可用于在参数个数未知（即参数个数可变）时获取函数中的参数。可变参数的函数通在参数列表的末尾是使用省略号(,…)定义的。<br>关于<code>stdarg.h</code>的详细介绍访问：<a target="_blank" rel="noopener" href="https://www.runoob.com/cprogramming/c-standard-library-stdarg-h.html">https://www.runoob.com/cprogramming/c-standard-library-stdarg-h.html</a></p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 打印</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">log</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *color,<span class="type">const</span> <span class="type">char</span> *fmt,...)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//打印文件信息，函数信息，设置打印颜色</span></span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%s info &gt;&gt; file:%s; line:%d; fuction:%s :&quot;</span>,color,__FILE__,__LINE__,__FUNCTION__);</span><br><span class="line">	<span class="comment">//获取参数...</span></span><br><span class="line">	va_list <span class="built_in">list</span>;</span><br><span class="line">	<span class="comment">//初始化参数</span></span><br><span class="line">	va_start(<span class="built_in">list</span>,fmt);</span><br><span class="line">	<span class="comment">//打印参数</span></span><br><span class="line">	<span class="built_in">vprintf</span>(fmt,<span class="built_in">list</span>);</span><br><span class="line">	<span class="comment">//关闭参数</span></span><br><span class="line">	va_end(<span class="built_in">list</span>);</span><br><span class="line">	<span class="comment">//消除颜色，并换行</span></span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;\e[0m\r\n&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2025/05/30/hello-world/other/C_color_print/20200827170522333.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/other/C_color_print/" data-id="cmbcy7rhy003jt8mtfpdge6ww" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/other/ringbuff_c_impl/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/lwip/lwip_stm32/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

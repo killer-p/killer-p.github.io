@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="@[toc]  cJSON系列：  零基础学习cJSON 源码详解与应用（一）如何学习cJSON 零基础学习cJSON 源码详解与应用（二）创建json数据 零基础学习cJSON 源码详解与应用 （三）cJSON_Print()；打印json  零基础学习cJSON 源码详解与应用 （四）cJSON_Parse()；解析json字符串零基础学习cJSON 源码详解与应用 （五）修改，复制，比较cj">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/cJSON/1.how_to_study_cjson/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="@[toc]  cJSON系列：  零基础学习cJSON 源码详解与应用（一）如何学习cJSON 零基础学习cJSON 源码详解与应用（二）创建json数据 零基础学习cJSON 源码详解与应用 （三）cJSON_Print()；打印json  零基础学习cJSON 源码详解与应用 （四）cJSON_Parse()；解析json字符串零基础学习cJSON 源码详解与应用 （五）修改，复制，比较cj">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/cJSON/1.how_to_study_cjson/1.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/cJSON/1.how_to_study_cjson/2.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/cJSON/1.how_to_study_cjson/3.png">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/cJSON/1.how_to_study_cjson/4.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.651Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:26.804Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/cJSON/1.how_to_study_cjson/1.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/cJSON/1.how_to_study_cjson" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/cJSON/1.how_to_study_cjson/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.651Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>@[toc]</p>
+<blockquote>
+<p>cJSON系列：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/110395913">零基础学习cJSON 源码详解与应用（一）如何学习cJSON</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/110406265">零基础学习cJSON 源码详解与应用（二）创建json数据</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/110475966">零基础学习cJSON 源码详解与应用 （三）cJSON_Print()；打印json
+</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/110481533">零基础学习cJSON 源码详解与应用 （四）cJSON_Parse()；解析json字符串</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44821644/article/details/110499109">零基础学习cJSON 源码详解与应用 （五）修改，复制，比较cjson</a></li>
+</ul>
+</blockquote>
+<h2 id="一，什么是json"><a href="#一，什么是json" class="headerlink" title="一，什么是json"></a>一，什么是json</h2><p><strong>JSON(JavaScript Object Notation) 是一种轻量级的数据交换格式。 易于人阅读和编写。同时也易于机器解析和生成。</strong><br>在程序之间进行数据交换过程中，特别是在互联网的轻量数据通信中json格式数据广泛应用。<br>以下是一个简单的json数据的例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;years&quot;</span>: <span class="number">22</span>,</span><br><span class="line">    <span class="string">&quot;name&quot;</span>: <span class="string">&quot;fool&quot;</span>,</span><br><span class="line">    <span class="string">&quot;man&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="string">&quot;adult&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="string">&quot;season&quot;</span>: [<span class="string">&quot;spring&quot;</span>, <span class="string">&quot;summer&quot;</span>, <span class="string">&quot;fall&quot;</span>,<span class="string">&quot;winter&quot;</span>],</span><br><span class="line">    <span class="string">&quot;money&quot;</span>: null,</span><br><span class="line">    <span class="string">&quot;child&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;girlfriend&quot;</span>: <span class="string">&quot;june&quot;</span>,</span><br><span class="line">        <span class="string">&quot;boyfriend&quot;</span> : null</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>上述例子表明json是以“键-值”对的形式保存数据，每一个键值对可以称为一个item，一个json类型的数据可以有多个item，item数据类型包括：整型，字符串，布尔值，null，数组，以及json。</strong></p>
+<blockquote>
+<p>冒号左边的字符串是键，右边则是值。键必须是字符串，而值可有多种数据类型。在读取，写入，修改，删除数据时，都是根据键来对值进行操作。</p>
+</blockquote>
+<h2 id="二，应用场景示例"><a href="#二，应用场景示例" class="headerlink" title="二，应用场景示例"></a>二，应用场景示例</h2><p>当需要从互联网获取天气数据时，可向<a target="_blank" rel="noopener" href="https://www.showapi.com/apiGateway/view/9/4">查询天气接口</a>发起请求，注意它的返回数据格式就是json<br><img src="/2025/05/30/hello-world/cJSON/1.how_to_study_cjson/1.png" alt="在这里插入图片描述"><br>点击进入API测试工具，点击模拟调用接口，右侧的窗口就会返回以json格式的天气数据。<br><img src="/2025/05/30/hello-world/cJSON/1.how_to_study_cjson/2.png" alt="在这里插入图片描述"></p>
+<h2 id="三，学习cjson的关键"><a href="#三，学习cjson的关键" class="headerlink" title="三，学习cjson的关键"></a>三，学习cjson的关键</h2><p>cjson就是用来处理json格式数据的一个库。cjson是使用c语言编写的，它十分轻量级，可用在内存有限的嵌入式设备中，来处理与互联网的交互数据。</p>
+<p>cjson的github地址：<a target="_blank" rel="noopener" href="https://github.com/DaveGamble/cJSON">https://github.com/DaveGamble/cJSON</a>；cjson的代码主要在<code>cJSON.c</code>和<code>cJSON_Utils.c</code>这两个文件中，其中最主要功能的是由<code>cJSON.c</code>实现。</p>
+<p>它实现了对json数据的基本操作，如：生成json数据，解析json数据，对json的增删改读等。</p>
+<p><strong>因为json的所有操作都是以cjson结构体为对象的，所以学习cjson的关键在于掌握cjson结构体与json格式数据的对应关系，理解了这一点，对于源码的逻辑就会有更加清晰的认识。</strong></p>
+<p>cjson结构体的定义以及类型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* cJSON Types: */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> cJSON_Invalid (0)   <span class="comment">//非法类型</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> cJSON_False  (1 &lt;&lt; 0) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> cJSON_True   (1 &lt;&lt; 1)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> cJSON_NULL   (1 &lt;&lt; 2)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> cJSON_Number (1 &lt;&lt; 3)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> cJSON_String (1 &lt;&lt; 4)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> cJSON_Array  (1 &lt;&lt; 5) <span class="comment">//数组类型</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> cJSON_Object (1 &lt;&lt; 6) <span class="comment">//json类型</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> cJSON_Raw    (1 &lt;&lt; 7) <span class="comment">/* raw json */</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> cJSON_IsReference 256 <span class="comment">//cjson是否参考外部另一个cjson</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> cJSON_StringIsConst 512 <span class="comment">//字符串是否是常量</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* The cJSON structure: */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">cJSON</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">cJSON</span> *<span class="title">next</span>;</span>		<span class="comment">//链表中的下一个cjson</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">cJSON</span> *<span class="title">prev</span>;</span>		<span class="comment">//链表中的上一个cjson</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">cJSON</span> *<span class="title">child</span>;</span>  <span class="comment">//指向下一层的cjson(object或数组)</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> type;   <span class="comment">//json类型</span></span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *valuestring;  <span class="comment">//存放字符串</span></span><br><span class="line">    <span class="type">int</span> valueint;   <span class="comment">//存放整型值</span></span><br><span class="line">    <span class="comment">/* The item&#x27;s number, if type==cJSON_Number */</span></span><br><span class="line">    <span class="type">double</span> valuedouble; <span class="comment">//存放双精度数据</span></span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *<span class="built_in">string</span>;   <span class="comment">//键key</span></span><br><span class="line">&#125; cJSON;</span><br></pre></td></tr></table></figure>
+<p><strong>cjson与json的具体对应关系如下：一个cjson结构体可以看作一个item，也就是一个”键-值”对(eg:”years”: 22)，当item的类型为object时，表示这个item是一个json数据，这个json数据下可以有若干个item，以此实现嵌套。请认真理解下图的关系。</strong><br><img src="/2025/05/30/hello-world/cJSON/1.how_to_study_cjson/3.png" alt="在这里插入图片描述"></p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>随着物联网的越来越热闹，嵌入式设备中应对数据交换的情况也越复杂，具备对json数据的处理能力是一个嵌入式物联网设备的必须能力要求。</p>
+<p><strong>在下一篇我将介绍如何简单的使用cjson创建json数据。</strong></p>
+<p>linux下安装cjson<br>参考博客：<a target="_blank" rel="noopener" href="https://blog.csdn.net/woay2008/article/details/94367652">https://blog.csdn.net/woay2008/article/details/94367652</a><br><img src="/2025/05/30/hello-world/cJSON/1.how_to_study_cjson/4.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/cJSON/1.how_to_study_cjson/" data-id="cmbcy7rhs002yt8mtcoeyhu6v" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/cJSON/2.create_json/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/Web/MySQL_setup/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="NetDevWIFI 芯片属于网络设备，自然也要归OpenHarmony的网络框架管理，本文用于了解 网络数据如何在协议栈和网络驱动之间传输。 网络设备的使用需要配合网络协议栈，OpenHarmony的网络协议栈有两种，一种是liteos-a内核使用的lwip协议栈，一种是标准系统linux内核网络协议栈。 本文以lwip协议栈为例来了解。 一、前提网络数据的通路：（这里的网口驱动是具体wifi芯">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/05/31/killer-blog/OpenHarmony/NetDev/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="NetDevWIFI 芯片属于网络设备，自然也要归OpenHarmony的网络框架管理，本文用于了解 网络数据如何在协议栈和网络驱动之间传输。 网络设备的使用需要配合网络协议栈，OpenHarmony的网络协议栈有两种，一种是liteos-a内核使用的lwip协议栈，一种是标准系统linux内核网络协议栈。 本文以lwip协议栈为例来了解。 一、前提网络数据的通路：（这里的网口驱动是具体wifi芯">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-31T02:36:45.815Z">
+<meta property="article:modified_time" content="2025-06-01T00:19:46.469Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/OpenHarmony/NetDev" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/05/31/killer-blog/OpenHarmony/NetDev/" class="article-date">
+  <time class="dt-published" datetime="2025-05-31T02:36:45.815Z" itemprop="datePublished">2025-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="NetDev"><a href="#NetDev" class="headerlink" title="NetDev"></a>NetDev</h2><p>WIFI 芯片属于网络设备，自然也要归OpenHarmony的网络框架管理，本文用于了解 网络数据如何在协议栈和网络驱动之间传输。</p>
+<p>网络设备的使用需要配合网络协议栈，OpenHarmony的网络协议栈有两种，一种是liteos-a内核使用的lwip协议栈，一种是标准系统linux内核网络协议栈。</p>
+<p>本文以lwip协议栈为例来了解。</p>
+<h3 id="一、前提"><a href="#一、前提" class="headerlink" title="一、前提"></a>一、前提</h3><p>网络数据的通路：（这里的网口驱动是具体wifi芯片的驱动程序，由厂商实现。）</p>
+<p>发送数据：应用程序-&gt;lwip-&gt;网口驱动</p>
+<p>接受数据：网口驱动-&gt;lwip-&gt;应用程序</p>
+<h3 id="二、NetDevice"><a href="#二、NetDevice" class="headerlink" title="二、NetDevice"></a>二、NetDevice</h3><p>openharmony使用NetDevice结构体来描述所有的网络设备（网口）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">NetDevice</span> &#123;</span></span><br><span class="line">    NetIfCategory netifCateg;                 <span class="comment">//内核类型</span></span><br><span class="line">    <span class="type">char</span> name[IFNAMSIZ];                      <span class="comment">//设备名称</span></span><br><span class="line">    NetLinkType LinkLayerType;                <span class="comment">//链路层类型：以太网或wifi</span></span><br><span class="line">    IfType funType;                           <span class="comment">//网络端口类型 including AP, STA, and P2P</span></span><br><span class="line">    <span class="type">uint8_t</span> macAddr[MAC_ADDR_SIZE];           <span class="comment">//mac地址</span></span><br><span class="line">    ....</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">NetDeviceInterFace</span> *<span class="title">netDeviceIf</span>;</span>   <span class="comment">//提供给驱动厂商的接口</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">NetDevice</span> *<span class="title">owner</span>;</span>                  <span class="comment">/**&lt; Network device */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">NetDevStats</span> <span class="title">stats</span>;</span>                 <span class="comment">/**&lt; Network statistics */</span></span><br><span class="line">&#125; NetDevice;</span><br></pre></td></tr></table></figure>
+
+<p>其中 NetDeviceInterFace 对象的作用是初始化、打开、关闭一个网络设备等以下功能，必须由驱动开发厂商根据具体的wifi芯片编写的驱动来实现其中的函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">NetDeviceInterFace</span> &#123;</span></span><br><span class="line">    <span class="type">int32_t</span> (*init)(<span class="keyword">struct</span> NetDevice *netDev);  <span class="comment">//初始化网络设备</span></span><br><span class="line">    <span class="type">void</span> (*deInit)(<span class="keyword">struct</span> NetDevice *netDev);   </span><br><span class="line">    <span class="type">int32_t</span> (*open)(<span class="keyword">struct</span> NetDevice *netDev);  <span class="comment">//打开数据链路层</span></span><br><span class="line">    <span class="type">int32_t</span> (*stop)(<span class="keyword">struct</span> NetDevice *netDev);  </span><br><span class="line">    NetDevTxResult (*xmit)(<span class="keyword">struct</span> NetDevice *netDev, NetBuf *netBuff);        <span class="comment">//发送数据</span></span><br><span class="line">    <span class="type">int32_t</span> (*ioctl)(<span class="keyword">struct</span> NetDevice *netDev, IfReq *req, <span class="type">int32_t</span> cmd);      <span class="comment">/**&lt; Used for the control command word. */</span></span><br><span class="line">    <span class="type">int32_t</span> (*setMacAddr)(<span class="keyword">struct</span> NetDevice *netDev, <span class="type">void</span> *addr);              <span class="comment">//设置mac地址</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">NetDevStats</span> *(*<span class="title">getStats</span>)(<span class="keyword">struct</span> <span class="title">NetDevice</span> *<span class="title">netDev</span>);</span>                <span class="comment">//获取设备状态</span></span><br><span class="line">    <span class="type">void</span> (*setNetIfStatus)(<span class="keyword">struct</span> NetDevice *netDev, NetIfStatus status);     <span class="comment">//设置状态</span></span><br><span class="line">    <span class="type">uint16_t</span> (*selectQueue)(<span class="keyword">struct</span> NetDevice *netDev, NetBuf *netBuff);       <span class="comment">//选择一个队列</span></span><br><span class="line">    <span class="type">uint32_t</span> (*netifNotify)(<span class="keyword">struct</span> NetDevice *netDev, NetDevNotify *notify);  <span class="comment">/**&lt; Notifies the network port status. */</span></span><br><span class="line">    <span class="type">int32_t</span> (*changeMtu)(<span class="keyword">struct</span> NetDevice *netDev, <span class="type">int32_t</span> newMtu);           <span class="comment">//改变mtu</span></span><br><span class="line">    <span class="type">void</span> (*linkStatusChanged)(<span class="keyword">struct</span> NetDevice *netDev);   	<span class="comment">//检查以太网连接状态</span></span><br><span class="line">    ProcessingResult (*specialEtherTypeProcess)(<span class="type">const</span> <span class="keyword">struct</span> NetDevice *netDev, NetBuf *buff);</span><br><span class="line">                                                                              <span class="comment">/**&lt; Performs private processing without</span></span><br><span class="line"><span class="comment">                                                                               * involving network-layer data.</span></span><br><span class="line"><span class="comment">                                                                               */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>根据HdfWlanDevice 创建NetDevice：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> NetDevice *<span class="title function_">AllocPlatformNetDevice</span><span class="params">(<span class="keyword">struct</span> HdfWlanDevice *device)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">NetDevice</span> *<span class="title">result</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">    <span class="type">char</span> ifName[IFNAMSIZ] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">HdfWifiNetDeviceData</span> *<span class="title">data</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">    data = (<span class="keyword">struct</span> HdfWifiNetDeviceData *)OsalMemCalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> HdfWifiNetDeviceData));</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="comment">//分配网卡编号</span></span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; MAX_IF_COUNT; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (((g_allocatedIfMap &gt;&gt; i) &amp; <span class="number">0x1</span>) != <span class="number">0x1</span>) &#123;</span><br><span class="line">                id = i;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">		<span class="comment">//生成网卡名称：wlan0</span></span><br><span class="line">        ret = GetPlatformIfName(id, ifName, IFNAMSIZ);</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> _PRE_HDF_LINUX</span></span><br><span class="line">        result = NetDeviceInit(ifName, <span class="built_in">strlen</span>(ifName), WIFI_LINK, FULL_OS);</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">        <span class="comment">//获取netdev</span></span><br><span class="line">        result = NetDeviceInit(ifName, <span class="built_in">strlen</span>(ifName), WIFI_LINK, LITE_OS);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="literal">false</span>);</span><br><span class="line">    result-&gt;classDriverName = HDF_WIFI_PLATFORM_DRIVER_NAME;</span><br><span class="line">    result-&gt;classDriverPriv = data;</span><br><span class="line">    data-&gt;netInterfaceId = id;</span><br><span class="line">    SET_BIT(device-&gt;netIfMap, id);</span><br><span class="line">    SET_BIT(g_allocatedIfMap, id);</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="三、NetBuf"><a href="#三、NetBuf" class="headerlink" title="三、NetBuf"></a>三、NetBuf</h3><p>NetBuf用于描述网络数据，以在网络协议栈和网络驱动之间传输数据。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//记录一段网络数据的偏移和长度</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">BufField</span> &#123;</span></span><br><span class="line">    <span class="type">uint32_t</span> offset;      <span class="comment">/**&lt; Offset of the buffer segment */</span></span><br><span class="line">    <span class="type">uint32_t</span> len;         <span class="comment">/**&lt; Length of the buffer segment */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">NetBuf</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">DListHead</span> <span class="title">dlist</span>;</span>             <span class="comment">//双链表</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">BufField</span> <span class="title">bufs</span>[<span class="title">MAX_BUF_NUM</span>];</span>  </span><br><span class="line">    <span class="type">uint8_t</span>     *mem;                   <span class="comment">//内存地址</span></span><br><span class="line">    <span class="type">uint32_t</span>    len;                    <span class="comment">//内存长度</span></span><br><span class="line">    <span class="type">uint32_t</span>    dataLen;                <span class="comment">//真实数据长度</span></span><br><span class="line">    <span class="type">void</span>        *dev;                   <span class="comment">//接受到该数据的netdev</span></span><br><span class="line">    <span class="type">uint32_t</span>    qmap;                   <span class="comment">/**&lt; Queue mappings of the network data buffer */</span></span><br><span class="line">    <span class="type">uint8_t</span>     rsv[MAX_NETBUF_RESEVER_SIZE]; <span class="comment">/**&lt; Reserved field. For details, see &#123;@link MAX_NETBUF_RESEVER_SIZE&#125;. */</span></span><br><span class="line">&#125; NetBuf;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="四、适配器-NetDeviceImpl"><a href="#四、适配器-NetDeviceImpl" class="headerlink" title="四、适配器 NetDeviceImpl"></a>四、适配器 NetDeviceImpl</h3><p>这里有一个问题，就是openharmony使用NetDev来描述网口，用NetBuf来描述网口数据，但是在lwip协议栈中，有他自己的一套机制来描述网口和网络数据。</p>
+<p>这里就存在一个适配（adapt）的问题，需要一个适配器（adapter）来适配这两套机制，使得数据能在这两者之间顺利传递。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">NetDev ------&gt; netif</span><br><span class="line">NetBuf ------&gt; pbuf</span><br></pre></td></tr></table></figure>
+
+<p>NetDeviceImpl结构体应运而生，该部分的代码在bearpi_micro&#x2F;drivers&#x2F;adapter&#x2F;khdf&#x2F;liteos&#x2F;network&#x2F;src&#x2F;net_device_adapter.c，net_device_adapter顾名思义就是把net_device适配到lwip的netif。同理netbuf_adapter.c实现的就是把netbuf适配到lwip的pbuf。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">NetDeviceImpl</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">NetDevice</span> *<span class="title">netDevice</span>;</span>	<span class="comment">//可通过netDevice-&gt;NetDeviceInterFace 调用芯片驱动程序</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">NetDeviceImplOp</span> *<span class="title">interFace</span>;</span>	<span class="comment">//调用lwip的接口</span></span><br><span class="line">    <span class="type">void</span> *osPrivate;	<span class="comment">//指向 lwip的netif对象</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>所以NetDeviceImpl 就是芯片驱动程序 和 lwip协议栈沟通的中介，其成员的作用很明显：</p>
+<ul>
+<li>NetDevice：可通过netDevice-&gt;NetDeviceInterFace 调用芯片驱动程序</li>
+<li>NetDeviceImplOp：提供给开发者的接口</li>
+<li>osPrivate：指向 lwip的netif对象</li>
+</ul>
+<h4 id="NetDeviceImplOp"><a href="#NetDeviceImplOp" class="headerlink" title="NetDeviceImplOp"></a>NetDeviceImplOp</h4><p>NetDeviceImplOp结构体就是提供给开发者的接口，使得网口驱动程序能与lwip协议栈交互。在net_device_adapter.c中的g_liteNdImplOps就是NetDeviceImplOp。我们将通过这个结构体，看lwip协议栈如何收发数据。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">NetDeviceImplOp</span> &#123;</span></span><br><span class="line">   	<span class="comment">//初始化netdev</span></span><br><span class="line">    <span class="type">int32_t</span> (*init)(<span class="keyword">struct</span> NetDeviceImpl *netDevice);</span><br><span class="line">    <span class="type">int32_t</span> (*deInit)(<span class="keyword">struct</span> NetDeviceImpl *netDevice);</span><br><span class="line">    <span class="type">int32_t</span> (*add)(<span class="keyword">struct</span> NetDeviceImpl *netDevice);</span><br><span class="line">    <span class="type">int32_t</span> (*delete)(<span class="keyword">struct</span> NetDeviceImpl *netDevice);</span><br><span class="line">    <span class="type">int32_t</span> (*setStatus)(<span class="keyword">struct</span> NetDeviceImpl *netDevice, NetIfStatus status);</span><br><span class="line">    <span class="type">int32_t</span> (*setLinkStatus)(<span class="keyword">struct</span> NetDeviceImpl *netDevice, NetIfLinkStatus status);</span><br><span class="line">    <span class="type">int32_t</span> (*getLinkStatus)(<span class="keyword">struct</span> NetDeviceImpl *netDevice, NetIfLinkStatus *status);</span><br><span class="line">    <span class="type">int32_t</span> (*receive)(<span class="keyword">struct</span> NetDeviceImpl *netDevice, NetBuf *buff, ReceiveFlag flag);</span><br><span class="line">    <span class="type">int32_t</span> (*setIpAddr)(<span class="keyword">struct</span> NetDeviceImpl *netDevice, <span class="type">const</span> IpV4Addr *ipAddr, <span class="type">const</span> IpV4Addr *netMask,</span><br><span class="line">        <span class="type">const</span> IpV4Addr *gw);</span><br><span class="line">    <span class="type">int32_t</span> (*dhcpsStart)(<span class="keyword">struct</span> NetDeviceImpl *netDevice, <span class="type">char</span> *ip, <span class="type">uint16_t</span> ipNum);</span><br><span class="line">    <span class="type">int32_t</span> (*dhcpsStop)(<span class="keyword">struct</span> NetDeviceImpl *netDevice);</span><br><span class="line">    <span class="type">int32_t</span> (*dhcpStart)(<span class="keyword">struct</span> NetDeviceImpl *netDevice);</span><br><span class="line">    <span class="type">int32_t</span> (*dhcpStop)(<span class="keyword">struct</span> NetDeviceImpl *netDevice);</span><br><span class="line">    <span class="type">int32_t</span> (*dhcpIsBound)(<span class="keyword">struct</span> NetDeviceImpl *netDevice);</span><br><span class="line">    <span class="type">int32_t</span> (*changeMacAddr)(<span class="keyword">struct</span> NetDeviceImpl *netDevice);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">NetDeviceImplOp</span> <span class="title">g_liteNdImplOps</span> =</span> &#123;</span><br><span class="line">    .init = LiteNetDevInit,		<span class="comment">//创建netif</span></span><br><span class="line">    .deInit = LiteNetDevDeInit,</span><br><span class="line">    .add = LiteNetDevAdd,	<span class="comment">//创建netif并添加到协议栈</span></span><br><span class="line">    .delete = LiteNetDevDelete,</span><br><span class="line">    .setStatus = LiteNetDevSetStatus,</span><br><span class="line">    .setLinkStatus = LiteNetDevSetLinkStatus,</span><br><span class="line">    .getLinkStatus = LiteNetDevGetLinkStatus,</span><br><span class="line">    .receive = LiteNetDevReceive,	<span class="comment">//将数据上传到协议栈</span></span><br><span class="line">    .setIpAddr = LiteNetSetIpAddr,	<span class="comment">//设置ip</span></span><br><span class="line">    .dhcpsStart = LiteNetDhcpsStart,	<span class="comment">//开始dhcp</span></span><br><span class="line">    .dhcpsStop = LiteNetDhcpsStop,</span><br><span class="line">    .dhcpStart = LiteNetDhcpStart,</span><br><span class="line">    .dhcpStop = LiteNetDhcpStop,</span><br><span class="line">    .dhcpIsBound = LiteNetDhcpIsBound,</span><br><span class="line">    .changeMacAddr = LiteNetChangeMacAddr,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="五、netif"><a href="#五、netif" class="headerlink" title="五、netif"></a>五、netif</h3><p>要使用lwip协议栈，就需要创建一个netif来描述所使用的wifi 网口。NetDeviceImplOp结构体提供给开发者创建netif的接口：</p>
+<p>创建初始化lwip netif的接口：</p>
+<ul>
+<li>g_liteNdImplOps.init()</li>
+<li>g_liteNdImplOps.add()</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">NetDeviceAdapterLite</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">netif</span> *<span class="title">lwipNetif</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//创建netif</span></span><br><span class="line"><span class="type">static</span> <span class="type">int32_t</span> <span class="title function_">LiteNetDevInit</span><span class="params">(<span class="keyword">struct</span> NetDeviceImpl *netDeviceImpl)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">NetDeviceAdapterLite</span> *<span class="title">liteNdPri</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    liteNdPri = (<span class="keyword">struct</span> NetDeviceAdapterLite *)OsalMemCalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> NetDeviceAdapterLite));</span><br><span class="line">    (<span class="type">void</span>)memset_s(liteNdPri, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> NetDeviceAdapterLite), <span class="number">0</span>, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> NetDeviceAdapterLite));</span><br><span class="line">    netDeviceImpl-&gt;osPrivate = (<span class="type">void</span> *)liteNdPri;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//创建netif并添加到协议栈</span></span><br><span class="line"><span class="type">static</span> <span class="type">int32_t</span> <span class="title function_">LiteNetDevAdd</span><span class="params">(<span class="keyword">struct</span> NetDeviceImpl *netDeviceImpl)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">NetDeviceAdapterLite</span> *<span class="title">liteNdPri</span> =</span> (<span class="keyword">struct</span> NetDeviceAdapterLite *)netDeviceImpl-&gt;osPrivate;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">NetDevice</span> *<span class="title">lwipNd</span> =</span> netDeviceImpl-&gt;netDevice;</span><br><span class="line">	<span class="comment">//根据lwipNd创建netif</span></span><br><span class="line">    lwipNf = CreateLwipNetIf(netDeviceImpl, lwipNd创建netif);</span><br><span class="line">    <span class="keyword">if</span> ((ret = netifapi_netif_add(lwipNf, &amp;ipaddr, &amp;netmask, &amp;gw)) != ERR_OK) &#123;</span><br><span class="line">        <span class="keyword">return</span> HDF_FAILURE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//复制mac地址</span></span><br><span class="line">    <span class="keyword">if</span> (memcpy_s(lwipNf-&gt;hwaddr, NETIF_MAX_HWADDR_LEN, lwipNd-&gt;macAddr, MAC_ADDR_SIZE) != EOK) &#123;</span><br><span class="line">        <span class="keyword">return</span> HDF_FAILURE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    liteNdPri-&gt;lwipNetif = lwipNf;</span><br><span class="line">    IpV6SpecialProc(lwipNd, lwipNf);</span><br><span class="line">    <span class="comment">/* set netif default status */</span></span><br><span class="line">    netifapi_netif_set_default(lwipNf);</span><br><span class="line">    netif_set_link_callback(lwipNf, LiteNetifLinkChangeCallback);</span><br><span class="line">    <span class="keyword">return</span> HDF_SUCCESS;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>创建netif的同时实现了netif的一些函数如drv_send、drv_set_hwaddr，这些函数需要调用芯片驱动。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">struct</span> netif *<span class="title function_">CreateLwipNetIf</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> NetDeviceImpl *netDeviceImpl, <span class="type">const</span> <span class="keyword">struct</span> NetDevice *netDev)</span></span><br><span class="line">&#123;</span><br><span class="line">    lwipNf = (<span class="keyword">struct</span> netif *)OsalMemCalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> netif));</span><br><span class="line">    (<span class="type">void</span>)memset_s(lwipNf, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> netif), <span class="number">0</span>, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> netif));</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* register netif to lwip */</span></span><br><span class="line">    lwipNf-&gt;state = (<span class="type">void</span> *)netDeviceImpl;</span><br><span class="line">    lwipNf-&gt;drv_send = LwipSend;</span><br><span class="line">    lwipNf-&gt;drv_set_hwaddr = LwipSetHwaddr;</span><br><span class="line">    lwipNf-&gt;link_layer_type = netDev-&gt;LinkLayerType;</span><br><span class="line">    lwipNf-&gt;hwaddr_len = MAC_ADDR_SIZE;</span><br><span class="line">    lwipNf-&gt;drv_config = LwipDrvConfig;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> lwipNf;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="网口发送数据到lwip"><a href="#网口发送数据到lwip" class="headerlink" title="网口发送数据到lwip"></a>网口发送数据到lwip</h4><p>在网口的驱动程序收到数据后，需要传递给lwip协议栈，这时调用NetDeviceImplOp-&gt;reveive()函数来传递数据：</p>
+<p>首先把netdev转换成netif，把netbuf转换成pbuf，再调用driverif_input()传递pbuf给lwip协议栈。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int32_t</span> <span class="title function_">LiteNetDevReceive</span><span class="params">(<span class="keyword">struct</span> NetDeviceImpl *netDeviceImpl, <span class="keyword">struct</span> NetBuf *buff, ReceiveFlag flag)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//get lwip netif</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">netif</span> *<span class="title">lwipNf</span> =</span> GetNetIfFromDevImpl(netDeviceImpl);</span><br><span class="line">    ProcessingResult ret = LiteNetDevDataFilter(netDeviceImpl, buff);</span><br><span class="line">    <span class="keyword">if</span> (ret == PROCESSING_CONTINUE) &#123;</span><br><span class="line">        <span class="comment">//call LiteNetDevDataReceive to send pbuf</span></span><br><span class="line">        <span class="keyword">return</span> LiteNetDevDataReceive(netDeviceImpl, buff);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (ret == PROCESSING_COMPLETE) &#123;</span><br><span class="line">        <span class="keyword">return</span> HDF_SUCCESS;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> HDF_FAILURE;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int32_t</span> <span class="title function_">LiteNetDevDataReceive</span><span class="params">(<span class="keyword">struct</span> NetDeviceImpl *netDeviceImpl, <span class="keyword">struct</span> NetBuf *buff)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">netif</span> *<span class="title">lwipNf</span> =</span> GetNetIfFromDevImpl(netDeviceImpl);</span><br><span class="line">    <span class="comment">//Conver NetBuf To PBuf</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">pbuf</span> *<span class="title">pBuff</span> =</span> ConverNetBufToPBuf(buff);</span><br><span class="line">	<span class="comment">//post pbuff to lwip</span></span><br><span class="line">    driverif_input(lwipNf, pBuff);</span><br><span class="line">    NetBufFree(buff);</span><br><span class="line">    <span class="keyword">return</span> HDF_SUCCESS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>driverif_input()是由lwip提供的接口，定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * This function should be called by network driver to pass the input packet to LwIP.</span></span><br><span class="line"><span class="comment"> * Before calling this API, driver has to keep the packet in pbuf structure. Driver has to</span></span><br><span class="line"><span class="comment"> * call pbuf_alloc() with type as PBUF_RAM to create pbuf structure. Then driver</span></span><br><span class="line"><span class="comment"> * has to pass the pbuf structure to this API. This will add the pbuf into the TCPIP thread.</span></span><br><span class="line"><span class="comment"> * Once this packet is processed by TCPIP thread, pbuf will be freed. Driver is not required to</span></span><br><span class="line"><span class="comment"> * free the pbuf.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @param netif the lwip network interface structure for this driverif</span></span><br><span class="line"><span class="comment"> * @param p packet in pbuf structure format</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">driverif_input</span><span class="params">(<span class="keyword">struct</span> netif *netif, <span class="keyword">struct</span> pbuf *p)</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="网口从lwip接收数据"><a href="#网口从lwip接收数据" class="headerlink" title="网口从lwip接收数据"></a>网口从lwip接收数据</h4><p>lwip协议栈的数据会传递到netif结构体，而我们在创建netif结构体时，设置了drv_send()等函数，lwip协议栈就会调用该函数，在这个函数中我们就需要实现netif和netdev，pbuf和netbuf的转换，调用NetDeviceInterFace 里的函数发送数据。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">LwipSend</span><span class="params">(<span class="keyword">struct</span> netif *netif, <span class="keyword">struct</span> pbuf *lwipBuf)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">NetDeviceImpl</span> *<span class="title">ndImpl</span> =</span> (<span class="keyword">struct</span> NetDeviceImpl *)netif-&gt;state;</span><br><span class="line">    <span class="comment">//get netdev</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">NetDevice</span> *<span class="title">netDev</span> =</span> ndImpl-&gt;netDevice;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">NetDeviceInterFace</span> *<span class="title">netDevIf</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">	<span class="comment">//get netbuf</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">NetBuf</span> *<span class="title">netBuff</span> =</span> ConverPbuffToNetBuf(netDev, lwipBuf);</span><br><span class="line">	<span class="comment">//get NetDeviceInterFace </span></span><br><span class="line">    netDevIf = netDev-&gt;netDeviceIf;</span><br><span class="line">    <span class="comment">//send netbuf</span></span><br><span class="line">    netDevIf-&gt;xmit(netDev, netBuff);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/05/31/killer-blog/OpenHarmony/NetDev/" data-id="cmbcy7rhm002gt8mt4gdhh7nf" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/05/31/killer-blog/OpenHarmony/4.softbus_core_2/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/05/31/killer-blog/Linux/start_kernel/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

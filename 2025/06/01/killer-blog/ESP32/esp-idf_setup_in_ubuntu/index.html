@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="简述乐鑫为了解决国内用户在安装idf开发环境时，因下载过慢导致下载失败的问题，在gitee（码云）上提出了一套解决方案。使得国内用户能快速安装开发环境。具体项目地址：https:&#x2F;&#x2F;gitee.com&#x2F;EspressifSystems同时参考 乐鑫官网环境安装指南 一，克隆idf国内用户可到码云克隆最新的idf：esp-idf,执行以下命令在esp文件夹中克隆idf。 12mkdir espgit">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2025/06/01/killer-blog/ESP32/esp-idf_setup_in_ubuntu/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="简述乐鑫为了解决国内用户在安装idf开发环境时，因下载过慢导致下载失败的问题，在gitee（码云）上提出了一套解决方案。使得国内用户能快速安装开发环境。具体项目地址：https:&#x2F;&#x2F;gitee.com&#x2F;EspressifSystems同时参考 乐鑫官网环境安装指南 一，克隆idf国内用户可到码云克隆最新的idf：esp-idf,执行以下命令在esp文件夹中克隆idf。 12mkdir espgit">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2025/05/30/hello-world/ESP32/esp-idf_setup_in_ubuntu/20210401225448954.png">
+<meta property="article:published_time" content="2025-06-01T00:24:26.635Z">
+<meta property="article:modified_time" content="2025-06-01T00:26:26.937Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2025/05/30/hello-world/ESP32/esp-idf_setup_in_ubuntu/20210401225448954.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-killer-blog/ESP32/esp-idf_setup_in_ubuntu" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/06/01/killer-blog/ESP32/esp-idf_setup_in_ubuntu/" class="article-date">
+  <time class="dt-published" datetime="2025-06-01T00:24:26.635Z" itemprop="datePublished">2025-06-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h2><p>乐鑫为了解决国内用户在安装idf开发环境时，因下载过慢导致下载失败的问题，在gitee（码云）上提出了一套解决方案。使得国内用户能快速安装开发环境。<br>具体项目地址：<a target="_blank" rel="noopener" href="https://gitee.com/EspressifSystems">https://gitee.com/EspressifSystems</a><br>同时参考 <a target="_blank" rel="noopener" href="https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/get-started/index.html#">乐鑫官网环境安装指南</a></p>
+<h2 id="一，克隆idf"><a href="#一，克隆idf" class="headerlink" title="一，克隆idf"></a>一，克隆idf</h2><p>国内用户可到码云克隆最新的idf：<a target="_blank" rel="noopener" href="https://gitee.com/EspressifSystems/esp-idf">esp-idf</a>,执行以下命令在esp文件夹中克隆idf。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> esp</span><br><span class="line">git <span class="built_in">clone</span> https://gitee.com/EspressifSystems/esp-idf.git</span><br></pre></td></tr></table></figure>
+
+<p>克隆完成后的idf还需要安装一些依赖的仓库，这些仓库放在github上，下载会很慢；乐鑫提供了<a target="_blank" rel="noopener" href="https://gitee.com/EspressifSystems/esp-gitee-tools">esp-gitee-tools</a>来加速下载这些仓库。<br>首先下载esp-gitee-tools</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /esp</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://gitee.com/EspressifSystems/esp-gitee-tools.git</span><br></pre></td></tr></table></figure>
+
+<p>其中install.sh和submodule-update.sh是分别用于安装开发环境和更新依赖仓库的脚本。</p>
+<h2 id="二，更新依赖仓库"><a href="#二，更新依赖仓库" class="headerlink" title="二，更新依赖仓库"></a>二，更新依赖仓库</h2><p>进入idf目录下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /esp/esp-idf</span><br></pre></td></tr></table></figure>
+
+<p>执行esp-gitee-tools的submodule-update.sh</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">. /esp/esp-gitee-tools/submodule-update.sh</span><br></pre></td></tr></table></figure>
+
+<p>等待依赖仓库安装完成。</p>
+<h2 id="三，安装开发环境"><a href="#三，安装开发环境" class="headerlink" title="三，安装开发环境"></a>三，安装开发环境</h2><p>方式一：<br>进入idf目录下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /esp/esp-idf</span><br></pre></td></tr></table></figure>
+
+<p>执行esp-gitee-tools的install.sh</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">. /esp/esp-gitee-tools/install.sh</span><br></pre></td></tr></table></figure>
+
+
+
+<p>方式二：<br>从乐鑫服务器下载工具链。</p>
+<p>进入idf目录下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /esp/esp-idf</span><br></pre></td></tr></table></figure>
+<p>设置路径：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> IDF_GITHUB_ASSETS=<span class="string">&quot;dl.espressif.com/github_assets&quot;</span></span><br></pre></td></tr></table></figure>
+<p>执行目录下的安装脚本</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./install.sh</span><br></pre></td></tr></table></figure>
+<p>等待工具安装完成，提示可执行”idf.py build”</p>
+<p><img src="/2025/05/30/hello-world/ESP32/esp-idf_setup_in_ubuntu/20210401225448954.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/06/01/killer-blog/ESP32/esp-idf_setup_in_ubuntu/" data-id="cmbcy7rgz000mt8mt6rsj5crg" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2025/06/01/killer-blog/ESP32/esp32_IREXT/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2025/06/01/killer-blog/ESP32/esp32_ir_control/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">June 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/05/">May 2025</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/pwm/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/uart/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/worklife/2025%E6%B1%82%E8%81%8C%E5%87%86%E5%A4%87/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/other/tools/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2025/06/01/killer-blog/sifive/i2c_LSM303AGR/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
