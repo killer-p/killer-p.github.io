@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"killer-p.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="ESP32 时间系统一，简介该系统拥有一个全局时间变量global_clk，该变量记录了当前的时间（年，月，日，小时，分钟，秒），并维持一个定时任务列表。用户可以添加定时任务，删除定时任务等。定时任务执行完成后会被移除列表，但不会被释放。 二，结构体12345678910111213141516171819202122232425262728293031323334&#x2F;&#x2F;日历结构体struct ca">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ESP32 时间系统">
+<meta property="og:url" content="https://killer-p.github.io/killer-blog/ESP32/esp32_time_system/index.html">
+<meta property="og:site_name" content="killer-p blog">
+<meta property="og:description" content="ESP32 时间系统一，简介该系统拥有一个全局时间变量global_clk，该变量记录了当前的时间（年，月，日，小时，分钟，秒），并维持一个定时任务列表。用户可以添加定时任务，删除定时任务等。定时任务执行完成后会被移除列表，但不会被释放。 二，结构体12345678910111213141516171819202122232425262728293031323334&#x2F;&#x2F;日历结构体struct ca">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/ESP32/esp32_time_system/20210324130446764.png">
+<meta property="article:published_time" content="2025-06-01T10:11:17.225Z">
+<meta property="article:modified_time" content="2025-06-02T02:09:02.475Z">
+<meta property="article:author" content="killer-p">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://killer-p.github.io/killer-blog/ESP32/esp32_time_system/20210324130446764.png">
+
+
+<link rel="canonical" href="https://killer-p.github.io/killer-blog/ESP32/esp32_time_system/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://killer-p.github.io/killer-blog/ESP32/esp32_time_system/","path":"killer-blog/ESP32/esp32_time_system/","title":"ESP32 时间系统"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ESP32 时间系统 | killer-p blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">killer-p blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <img class="custom-logo-image" src="/upload/killer-p.png" alt="killer-p blog">
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/home/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ESP32-%E6%97%B6%E9%97%B4%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.</span> <span class="nav-text">ESP32 时间系统</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%EF%BC%8C%E7%AE%80%E4%BB%8B"><span class="nav-number">1.0.1.</span> <span class="nav-text">一，简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%EF%BC%8C%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">1.0.2.</span> <span class="nav-text">二，结构体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%EF%BC%8C%E5%87%BD%E6%95%B0%E6%8E%A5%E5%8F%A3"><span class="nav-number">1.0.3.</span> <span class="nav-text">三，函数接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%EF%BC%8C%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.0.4.</span> <span class="nav-text">四，使用示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%94%EF%BC%8C%E4%BB%A3%E7%A0%81%E8%AF%A6%E8%A7%A3"><span class="nav-number">1.0.5.</span> <span class="nav-text">五，代码详解</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-clk-t-get-current-nettime"><span class="nav-number">1.0.5.1.</span> <span class="nav-text">1,clk_t get_current_nettime();</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-struct-timer-tmr-new-clk-t-conf-timer-cb-cb-void-arg-char-name"><span class="nav-number">1.0.5.2.</span> <span class="nav-text">2,struct timer *tmr_new(clk_t *conf, timer_cb cb, void *arg, char *name);</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-int-tmr-add-struct-timer-tmr"><span class="nav-number">1.0.5.3.</span> <span class="nav-text">3, int tmr_add(struct timer *tmr);</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-int-tmr-remove-struct-timer-tmr-and-int-tmr-delete-struct-timer-tmr"><span class="nav-number">1.0.5.4.</span> <span class="nav-text">4,int tmr_remove(struct timer *tmr); and int tmr_delete(struct timer *tmr);</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-void-tmr-process-void-arg"><span class="nav-number">1.0.5.5.</span> <span class="nav-text">5,void tmr_process(void *arg);</span></a></li></ol></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">killer-p</p>
+  <div class="site-description" itemprop="description">share Linux, arm, and some skillful things</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdnjs.cloudflare.com/ajax/libs/creativecommons-vocabulary/2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://killer-p.github.io/killer-blog/ESP32/esp32_time_system/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="killer-p">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="killer-p blog">
+      <meta itemprop="description" content="share Linux, arm, and some skillful things">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="ESP32 时间系统 | killer-p blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ESP32 时间系统
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-06-01 18:11:17" itemprop="dateCreated datePublished" datetime="2025-06-01T18:11:17+08:00">2025-06-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-06-02 10:09:02" itemprop="dateModified" datetime="2025-06-02T10:09:02+08:00">2025-06-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/ESP32/" itemprop="url" rel="index"><span itemprop="name">ESP32</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="ESP32-时间系统"><a href="#ESP32-时间系统" class="headerlink" title="ESP32 时间系统"></a>ESP32 时间系统</h1><h3 id="一，简介"><a href="#一，简介" class="headerlink" title="一，简介"></a>一，简介</h3><p>该系统拥有一个全局时间变量<code>global_clk</code>，该变量记录了当前的时间（年，月，日，小时，分钟，秒），并维持一个定时任务列表。用户可以添加定时任务，删除定时任务等。定时任务执行完成后会被移除列表，但不会被释放。</p>
+<h3 id="二，结构体"><a href="#二，结构体" class="headerlink" title="二，结构体"></a>二，结构体</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//日历结构体</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">calendar</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> second : <span class="number">6</span> ;	<span class="comment">//低位</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> minute : <span class="number">6</span> ;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> hour : <span class="number">5</span> ;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> date : <span class="number">5</span> ;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> month : <span class="number">4</span> ;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> year : <span class="number">6</span> ;	<span class="comment">//高位</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//时间结构体，cal的值决定了value</span></span><br><span class="line"><span class="class"><span class="keyword">union</span> <span class="title">clk</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">calendar</span> <span class="title">cal</span>;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> value;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">union</span> <span class="title">clk</span> <span class="title">clk_t</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timer</span>;</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="title function_">char</span> <span class="params">(*timer_cb)</span><span class="params">(<span class="keyword">struct</span> timer *tmr ,<span class="type">void</span> *arg)</span>;	<span class="comment">//回调函数</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//定时任务结构体</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timer</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="type">char</span> *name;	<span class="comment">//名称</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timer</span> *<span class="title">next</span>;</span>	<span class="comment">//指向下一个定时</span></span><br><span class="line">    <span class="type">clk_t</span> timeout;	<span class="comment">//定时的时间</span></span><br><span class="line">    timer_cb cb;	<span class="comment">//回调函数</span></span><br><span class="line">    <span class="type">void</span> *arg;	<span class="comment">//回调参数</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">extern</span> <span class="type">clk_t</span> global_clk;	<span class="comment">//全局时间</span></span><br><span class="line"><span class="keyword">extern</span> <span class="class"><span class="keyword">struct</span> <span class="title">timer</span> *<span class="title">timer_list</span>;</span>	<span class="comment">//定时任务列表</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="三，函数接口"><a href="#三，函数接口" class="headerlink" title="三，函数接口"></a>三，函数接口</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">printf_tmrlist</span><span class="params">()</span>;	<span class="comment">//打印定时列表</span></span><br><span class="line"><span class="keyword">struct</span> timer *<span class="title function_">tmr_new</span><span class="params">(<span class="type">clk_t</span> *conf,timer_cb cb,<span class="type">void</span> *arg,<span class="type">char</span> *name)</span>; <span class="comment">//新建闹钟</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">update_clk</span><span class="params">(<span class="type">clk_t</span> *clk)</span>;	<span class="comment">//更新时间</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">tmr_add</span><span class="params">(<span class="keyword">struct</span> timer *tmr)</span>;	<span class="comment">//添加定时任务</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">tmr_remove</span><span class="params">(<span class="keyword">struct</span> timer *tmr)</span>;	<span class="comment">//移除定时任务</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">tmr_delete</span><span class="params">(<span class="keyword">struct</span> timer *tmr)</span>;	<span class="comment">//删除定时任务</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">tmr_set_global</span><span class="params">(<span class="type">clk_t</span> conf)</span>;	<span class="comment">//设置全局时间</span></span><br><span class="line"><span class="type">clk_t</span> <span class="title function_">get_current_nettime</span><span class="params">()</span>;	<span class="comment">//获取当前时间</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">global_clk_init</span><span class="params">()</span>;	<span class="comment">//全局时间初始化</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">tmr_process</span><span class="params">(<span class="type">void</span> *arg)</span>;	<span class="comment">//定时任务处理</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">clock_task</span><span class="params">(<span class="type">void</span> *arg)</span>;	<span class="comment">//时间系统线程</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="四，使用示例"><a href="#四，使用示例" class="headerlink" title="四，使用示例"></a>四，使用示例</h3><p>首先需要对全局时间来一个初始化，确定当前的时间，这个部分是通过网络获取北京时间的。同时，该示例设置一个定时任务，每24小时就通过网络更新时间，当24小时也就是一天的定时到了，update_global_cb()就会被执行。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 定时器回调函数：更新全局时间</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">timer_cb <span class="title function_">update_global_cb</span><span class="params">(<span class="keyword">struct</span> timer *tmr, <span class="type">void</span> *agr)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">clk_t</span> t = get_current_nettime();</span><br><span class="line">	tmr_set_global(t); <span class="comment">//更新全局时间</span></span><br><span class="line">	tmr-&gt;timeout.value = global_clk.value;</span><br><span class="line">	tmr-&gt;timeout.cal.date += <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">	tmr_add(tmr); <span class="comment">//将更新任务再次添加进</span></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 全局时间初始化</span></span><br><span class="line"><span class="comment"> * 获取网络事件，设置定时器，自动更新全局时间</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">global_clk_init</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">clk_t</span> t = get_current_nettime();	<span class="comment">//获取网络时间</span></span><br><span class="line">	tmr_set_global(t); <span class="comment">//更新全局时间</span></span><br><span class="line">	t.cal.date += <span class="number">1</span>;	<span class="comment">//日期+1</span></span><br><span class="line">	tmr_new(&amp;t, update_global_cb, <span class="literal">NULL</span>, <span class="string">&quot;UPDATE&quot;</span>); <span class="comment">//创建定时器，每24小时更新网络时间，并添加到列表</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>接下来，在线程中，每秒调用tmr_process();保证时间系统的正常运行。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 时钟任务，每秒执行，处理定时任务及时间更新</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">clock_task</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">	esp_log_level_set(TAG, ESP_LOG_INFO);</span><br><span class="line">	<span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">	&#123;</span><br><span class="line"></span><br><span class="line">		vTaskDelay(<span class="number">1000</span> / portTICK_RATE_MS);</span><br><span class="line">		tmr_process(<span class="literal">NULL</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="五，代码详解"><a href="#五，代码详解" class="headerlink" title="五，代码详解"></a>五，代码详解</h3><h4 id="1-clk-t-get-current-nettime"><a href="#1-clk-t-get-current-nettime" class="headerlink" title="1,clk_t get_current_nettime();"></a>1,clk_t get_current_nettime();</h4><p>该函数先调用获取网络时间的代码。<a href="/killer-blog/ESP32/esp_get_time">esp32获取网络时间</a>;将时间字符串转换成数字格式，复制到结构体并返回；</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 获取当前网络时间</span></span><br><span class="line"><span class="comment"> * 返回：时间结构体</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">clk_t</span> <span class="title function_">get_current_nettime</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">char</span> *origin = get_Time_String(); <span class="comment">//调用myhttp.c,获取时间字符串：&quot;2021-03-24 04:49:53&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="type">char</span> str[<span class="number">6</span>][<span class="number">10</span>] = &#123;<span class="string">&#x27;\0&#x27;</span>&#125;; <span class="comment">//year,month,date,hour,minute,second</span></span><br><span class="line">	<span class="comment">//printf(&quot;origin = %s\n&quot;, origin);</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//分别提取出时间</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= <span class="number">5</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="type">char</span> *c = str[i];</span><br><span class="line">		<span class="keyword">while</span> (!((*origin == <span class="string">&#x27;-&#x27;</span>) || (*origin == <span class="string">&#x27; &#x27;</span>) || (*origin == <span class="string">&#x27;:&#x27;</span>)))</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">if</span> (*origin == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			*c = *origin;</span><br><span class="line">			origin++;</span><br><span class="line">			c++;</span><br><span class="line">		&#125;</span><br><span class="line">		origin++;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> x[<span class="number">6</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">	<span class="comment">//将字符串转换成数字</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">6</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		x[i] = (<span class="type">unsigned</span> <span class="type">int</span>)atoi(str[i]);</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;x = %d\n&quot;</span>, x[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//赋值给时间结构体</span></span><br><span class="line">	<span class="type">clk_t</span> conf;</span><br><span class="line">	conf.cal.year = x[<span class="number">0</span>] - <span class="number">2000</span>;</span><br><span class="line">	conf.cal.month = x[<span class="number">1</span>];</span><br><span class="line">	conf.cal.date = x[<span class="number">2</span>];</span><br><span class="line">	conf.cal.hour = x[<span class="number">3</span>] + <span class="number">8</span>;</span><br><span class="line">	conf.cal.minute = x[<span class="number">4</span>];</span><br><span class="line">	conf.cal.second = x[<span class="number">5</span>];</span><br><span class="line">	<span class="keyword">return</span> conf;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-struct-timer-tmr-new-clk-t-conf-timer-cb-cb-void-arg-char-name"><a href="#2-struct-timer-tmr-new-clk-t-conf-timer-cb-cb-void-arg-char-name" class="headerlink" title="2,struct timer *tmr_new(clk_t *conf, timer_cb cb, void *arg, char *name);"></a>2,struct timer *tmr_new(clk_t *conf, timer_cb cb, void *arg, char *name);</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 创建一个定时器 并添加进定时队列</span></span><br><span class="line"><span class="comment"> * conf：定时时间</span></span><br><span class="line"><span class="comment"> * cb：定时回调函数</span></span><br><span class="line"><span class="comment"> * arg：回调函数参数</span></span><br><span class="line"><span class="comment"> * name：定时器名</span></span><br><span class="line"><span class="comment"> * 返回：定时器结构体指针</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">struct</span> timer *<span class="title function_">tmr_new</span><span class="params">(<span class="type">clk_t</span> *conf, timer_cb cb, <span class="type">void</span> *arg, <span class="type">char</span> *name)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">timer</span> *<span class="title">tmr</span>;</span></span><br><span class="line">	<span class="type">clk_t</span> clk;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//tmr must &gt; global_clk</span></span><br><span class="line">	<span class="keyword">if</span> (conf == <span class="literal">NULL</span> || (conf-&gt;value &lt;= global_clk.value))</span><br><span class="line">	&#123;</span><br><span class="line">		ESP_LOGI(TAG,<span class="string">&quot;new tmr error\n&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	tmr = (<span class="keyword">struct</span> timer *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> timer));</span><br><span class="line">	<span class="comment">//chcek the conf</span></span><br><span class="line"></span><br><span class="line">	clk.value = conf-&gt;value;</span><br><span class="line">	update_clk(&amp;clk); <span class="comment">//规范化clk</span></span><br><span class="line">	ESP_LOGI(TAG,<span class="string">&quot;new timer %s: 20%d-%d-%d %d:%d:%d values =%u\r\n&quot;</span>, name, clk.cal.year, clk.cal.month, clk.cal.date, clk.cal.hour, clk.cal.minute, clk.cal.second, clk.value);</span><br><span class="line">	<span class="comment">//printf(&quot;new timer %s: 20%d-%d-%d %d:%d:%d values =%u\r\n&quot;, name, clk.cal.year, clk.cal.month, clk.cal.date, clk.cal.hour, clk.cal.minute, clk.cal.second, clk.value);</span></span><br><span class="line">	tmr-&gt;timeout.value = clk.value; <span class="comment">//将clk赋值给定时器</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (cb != <span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		tmr-&gt;cb = cb;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (arg != <span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		tmr-&gt;arg = arg;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (name != <span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="type">char</span> *dest = (<span class="type">char</span> *)<span class="built_in">malloc</span>(<span class="built_in">strlen</span>(name));</span><br><span class="line">		<span class="built_in">strncpy</span>(dest, name, <span class="built_in">strlen</span>(name) + <span class="number">1</span>);</span><br><span class="line">		tmr-&gt;name = dest;</span><br><span class="line">	&#125;</span><br><span class="line">	tmr-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">	tmr_add(tmr);</span><br><span class="line">	printf_tmrlist();</span><br><span class="line">	<span class="keyword">return</span> tmr;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 更新时间结构体，使其成员符合时间规则</span></span><br><span class="line"><span class="comment"> * clk：要更新的时间</span></span><br><span class="line"><span class="comment"> * 返回：0 年份更新；1 年份未更新</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">update_clk</span><span class="params">(<span class="type">clk_t</span> *clk)</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (clk-&gt;cal.second &gt;= <span class="number">60</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="comment">//one minute</span></span><br><span class="line">		clk-&gt;cal.second = clk-&gt;cal.second - <span class="number">60</span>;</span><br><span class="line">		clk-&gt;cal.minute++;</span><br><span class="line">		<span class="keyword">if</span> (clk-&gt;cal.minute &gt;= <span class="number">60</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="comment">//one hour</span></span><br><span class="line">			clk-&gt;cal.minute = clk-&gt;cal.minute - <span class="number">60</span>;</span><br><span class="line">			clk-&gt;cal.hour++;</span><br><span class="line">			<span class="keyword">if</span> (clk-&gt;cal.hour &gt;= <span class="number">24</span>)</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="comment">//date +1</span></span><br><span class="line">				clk-&gt;cal.hour = clk-&gt;cal.hour - <span class="number">24</span>;</span><br><span class="line">				clk-&gt;cal.date = clk-&gt;cal.date + <span class="number">1</span>;</span><br><span class="line">				<span class="keyword">switch</span> (clk-&gt;cal.month)</span><br><span class="line">				&#123;</span><br><span class="line">				<span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">				<span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">				<span class="keyword">case</span> <span class="number">5</span>:</span><br><span class="line">				<span class="keyword">case</span> <span class="number">7</span>:</span><br><span class="line">				<span class="keyword">case</span> <span class="number">8</span>:</span><br><span class="line">				<span class="keyword">case</span> <span class="number">10</span>:</span><br><span class="line">				<span class="keyword">case</span> <span class="number">12</span>:</span><br><span class="line">					<span class="keyword">if</span> (clk-&gt;cal.date == <span class="number">32</span>)</span><br><span class="line">					&#123;</span><br><span class="line"></span><br><span class="line">						<span class="keyword">goto</span> <span class="built_in">exit</span>;</span><br><span class="line">					&#125;</span><br><span class="line">					<span class="keyword">break</span>;</span><br><span class="line">				<span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">					<span class="comment">//29 or 28 in february</span></span><br><span class="line">					<span class="keyword">if</span> (((clk-&gt;cal.year % <span class="number">4</span>) == <span class="number">0</span> &amp;&amp; clk-&gt;cal.date == <span class="number">30</span>) || ((clk-&gt;cal.year % <span class="number">4</span> != <span class="number">0</span>) &amp;&amp; (clk-&gt;cal.date == <span class="number">29</span>)))</span><br><span class="line">					&#123;</span><br><span class="line"></span><br><span class="line">						<span class="keyword">goto</span> <span class="built_in">exit</span>;</span><br><span class="line">					&#125;</span><br><span class="line">					<span class="keyword">break</span>;</span><br><span class="line">				<span class="keyword">default</span>:</span><br><span class="line">					<span class="keyword">if</span> (clk-&gt;cal.date == <span class="number">31</span>)</span><br><span class="line">					&#123;</span><br><span class="line">						<span class="keyword">goto</span> <span class="built_in">exit</span>;</span><br><span class="line">					&#125;</span><br><span class="line">					<span class="keyword">break</span>;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line"><span class="comment">//month +1</span></span><br><span class="line"><span class="built_in">exit</span>:</span><br><span class="line">	clk-&gt;cal.date = <span class="number">1</span>;</span><br><span class="line">	clk-&gt;cal.month++;</span><br><span class="line">	<span class="keyword">if</span> (clk-&gt;cal.month == <span class="number">13</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		clk-&gt;cal.month = <span class="number">1</span>;</span><br><span class="line">		clk-&gt;cal.year++; <span class="comment">//max to 2064</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="3-int-tmr-add-struct-timer-tmr"><a href="#3-int-tmr-add-struct-timer-tmr" class="headerlink" title="3, int tmr_add(struct timer *tmr);"></a>3, int tmr_add(struct timer *tmr);</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 将定时器插入链表，按时间先后顺序</span></span><br><span class="line"><span class="comment"> * tmr：要插入的定时器</span></span><br><span class="line"><span class="comment"> * 返回：0失败；1成功</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">tmr_add</span><span class="params">(<span class="keyword">struct</span> timer *tmr)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">timer</span> *<span class="title">t</span>, *<span class="title">prev</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">	ESP_LOGI(TAG,<span class="string">&quot;adding timer to timerlist:&quot;</span>);</span><br><span class="line">	<span class="keyword">if</span> (tmr == <span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		ESP_LOGI(TAG, <span class="string">&quot;new timer is null&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//若当前无定时器则，tmr将作为第一个定时器</span></span><br><span class="line">	<span class="keyword">if</span> (timer_list == <span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		ESP_LOGI(TAG, <span class="string">&quot;timer %s is the only timer&quot;</span>,tmr-&gt;name);</span><br><span class="line">		<span class="comment">//first tmr</span></span><br><span class="line">		tmr-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line">		timer_list = tmr;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="comment">//按时间先后顺序将tmr插入链表</span></span><br><span class="line">	&#123;</span><br><span class="line">		t = timer_list;</span><br><span class="line">		<span class="comment">//时间小的在前面</span></span><br><span class="line">		<span class="keyword">while</span> (((t-&gt;timeout.value) &lt; (tmr-&gt;timeout.value)))</span><br><span class="line">		&#123;</span><br><span class="line">			ESP_LOGI(TAG, <span class="string">&quot;step for next timer&quot;</span>);</span><br><span class="line">			prev = t; <span class="comment">//保存t的上一个</span></span><br><span class="line">			<span class="keyword">if</span> (t-&gt;next == <span class="literal">NULL</span>)</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="comment">//若t是最后一个定时器</span></span><br><span class="line">				t-&gt;next = tmr; <span class="comment">//将tmr插入t后</span></span><br><span class="line">				tmr-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line">				ESP_LOGI(TAG, <span class="string">&quot;add timer %s to the tail of the list &quot;</span>,tmr-&gt;name);</span><br><span class="line">				<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			t = t-&gt;next; <span class="comment">//检查下一个定时器</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//上一个为空，说明tmr是最早的定时器</span></span><br><span class="line">		<span class="keyword">if</span> (prev == <span class="literal">NULL</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			</span><br><span class="line">			<span class="comment">//tmr less than the first one</span></span><br><span class="line">			tmr-&gt;next = timer_list; <span class="comment">//tmr插入timer_list的前面</span></span><br><span class="line">			timer_list = tmr;		<span class="comment">//再更新timer_list</span></span><br><span class="line">			ESP_LOGI(TAG, <span class="string">&quot;add timer %s to the head of list&quot;</span>,timer_list-&gt;name);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">		&#123;</span><br><span class="line">			</span><br><span class="line">			tmr-&gt;next = t; <span class="comment">//tmr插入t之前</span></span><br><span class="line"></span><br><span class="line">			prev-&gt;next = tmr; <span class="comment">//tmr插入prev之后</span></span><br><span class="line">			ESP_LOGI(TAG, <span class="string">&quot;add timer %s behind %s&quot;</span>,tmr-&gt;name,prev-&gt;name);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-int-tmr-remove-struct-timer-tmr-and-int-tmr-delete-struct-timer-tmr"><a href="#4-int-tmr-remove-struct-timer-tmr-and-int-tmr-delete-struct-timer-tmr" class="headerlink" title="4,int tmr_remove(struct timer *tmr); and int tmr_delete(struct timer *tmr);"></a>4,int tmr_remove(struct timer *tmr); and int tmr_delete(struct timer *tmr);</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 将定时器从链表移除</span></span><br><span class="line"><span class="comment"> * tmr：要移除的定时器</span></span><br><span class="line"><span class="comment"> * 返回 0失败；1成功</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">tmr_remove</span><span class="params">(<span class="keyword">struct</span> timer *tmr)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">timer</span> *<span class="title">t</span>, *<span class="title">prev</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">	<span class="keyword">if</span> (tmr == <span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//check if the tmr is in the list</span></span><br><span class="line">	<span class="keyword">if</span> (timer_list == <span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	t = timer_list;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//find the tmr</span></span><br><span class="line">	<span class="keyword">while</span> (t != tmr)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span> (t-&gt;next == <span class="literal">NULL</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="number">0</span>; <span class="comment">//no match</span></span><br><span class="line">		&#125;</span><br><span class="line">		prev = t;</span><br><span class="line">		t = t-&gt;next;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//t==tmr</span></span><br><span class="line">	<span class="keyword">if</span> (prev == <span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="comment">//t is the first</span></span><br><span class="line">		timer_list = t-&gt;next;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span> (t-&gt;next == <span class="literal">NULL</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="comment">//t is the last</span></span><br><span class="line">			prev-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">		&#123;</span><br><span class="line">			<span class="comment">//t in the middle</span></span><br><span class="line">			prev-&gt;next = t-&gt;next;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	t-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 删除定时器，释放定时器占用的内存</span></span><br><span class="line"><span class="comment"> * tmr：要删除的定时器</span></span><br><span class="line"><span class="comment"> * 返回：0失败，1成功</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">tmr_delete</span><span class="params">(<span class="keyword">struct</span> timer *tmr)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span> (tmr == <span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	tmr_remove(tmr);</span><br><span class="line"></span><br><span class="line">	<span class="built_in">free</span>(tmr-&gt;name);</span><br><span class="line"></span><br><span class="line">	<span class="built_in">free</span>(tmr);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-void-tmr-process-void-arg"><a href="#5-void-tmr-process-void-arg" class="headerlink" title="5,void tmr_process(void *arg);"></a>5,void tmr_process(void *arg);</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">clk_t</span> global_clk; <span class="comment">//全局时间</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 时间任务进程 负责更新全局时间以及触发定时器</span></span><br><span class="line"><span class="comment"> * 在定时器中断中，每秒执行</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">tmr_process</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">timer</span> *<span class="title">t</span>;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//update the global_clk</span></span><br><span class="line">	global_clk.cal.second++;</span><br><span class="line"></span><br><span class="line">	update_clk(&amp;global_clk);</span><br><span class="line"></span><br><span class="line">	<span class="comment">//check if timer_list is null</span></span><br><span class="line">	<span class="keyword">if</span> (timer_list == <span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//check the first timer in list</span></span><br><span class="line">	t = timer_list;</span><br><span class="line">	<span class="comment">//printf(&quot;timer_list value = %d\n&quot;,t-&gt;timeout.value);</span></span><br><span class="line">	<span class="keyword">if</span> (global_clk.value == (t-&gt;timeout.value))</span><br><span class="line">	&#123;</span><br><span class="line">		tmr_remove(t); <span class="comment">//若要重复定时，只需要在回调函数中调用tmr_add()</span></span><br><span class="line"></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;timer %s\n&quot;</span>, t-&gt;name);</span><br><span class="line">		t-&gt;cb(t, t-&gt;arg); <span class="comment">//callback func</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 设置全局事件</span></span><br><span class="line"><span class="comment"> * conf：新的时间</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">tmr_set_global</span><span class="params">(<span class="type">clk_t</span> conf)</span></span><br><span class="line">&#123;</span><br><span class="line">	global_clk.value = conf.value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/killer-blog/ESP32/esp32_time_system/20210324130446764.png" alt="在这里插入图片描述"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>killer-p
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://killer-p.github.io/killer-blog/ESP32/esp32_time_system/" title="ESP32 时间系统">https://killer-p.github.io/killer-blog/ESP32/esp32_time_system/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/killer-blog/ESP32/esp32_weather_report/" rel="prev" title="ESP32 实现天气预报">
+                  <i class="fa fa-angle-left"></i> ESP32 实现天气预报
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/killer-blog/ESP32/esp32_ir_control/" rel="next" title="ESP32实现红外遥控">
+                  ESP32实现红外遥控 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">killer-p</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

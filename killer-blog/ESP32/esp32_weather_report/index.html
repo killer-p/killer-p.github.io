@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"killer-p.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="ESP32 实现天气预报 本文即将为你示例如何使用esp32的wifi，http组件以及百度在线语音合成等功能，实现获取天气数据并通过语音播放。  @[toc] 效果演示[video(video-9Nehbmpp-1604736367570)(type-bilibili)(url-https:&#x2F;&#x2F;player.bilibili.com&#x2F;player.html?aid&#x3D;797685523)(imag">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ESP32 实现天气预报">
+<meta property="og:url" content="https://killer-p.github.io/killer-blog/ESP32/esp32_weather_report/index.html">
+<meta property="og:site_name" content="killer-p blog">
+<meta property="og:description" content="ESP32 实现天气预报 本文即将为你示例如何使用esp32的wifi，http组件以及百度在线语音合成等功能，实现获取天气数据并通过语音播放。  @[toc] 效果演示[video(video-9Nehbmpp-1604736367570)(type-bilibili)(url-https:&#x2F;&#x2F;player.bilibili.com&#x2F;player.html?aid&#x3D;797685523)(imag">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/ESP32/esp32_weather_report/20201105225915438.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/ESP32/esp32_weather_report/20201105165502804.png">
+<meta property="article:published_time" content="2025-06-01T10:11:17.225Z">
+<meta property="article:modified_time" content="2025-06-02T02:09:56.619Z">
+<meta property="article:author" content="killer-p">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://killer-p.github.io/killer-blog/ESP32/esp32_weather_report/20201105225915438.png">
+
+
+<link rel="canonical" href="https://killer-p.github.io/killer-blog/ESP32/esp32_weather_report/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://killer-p.github.io/killer-blog/ESP32/esp32_weather_report/","path":"killer-blog/ESP32/esp32_weather_report/","title":"ESP32 实现天气预报"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ESP32 实现天气预报 | killer-p blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">killer-p blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <img class="custom-logo-image" src="/upload/killer-p.png" alt="killer-p blog">
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/home/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ESP32-%E5%AE%9E%E7%8E%B0%E5%A4%A9%E6%B0%94%E9%A2%84%E6%8A%A5"><span class="nav-number">1.</span> <span class="nav-text">ESP32 实现天气预报</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%88%E6%9E%9C%E6%BC%94%E7%A4%BA"><span class="nav-number">1.1.</span> <span class="nav-text">效果演示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%EF%BC%8C%E8%AF%B7%E6%B1%82%E5%A4%A9%E6%B0%94%E6%95%B0%E6%8D%AE"><span class="nav-number">1.2.</span> <span class="nav-text">一，请求天气数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E6%80%9D%E8%B7%AF"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.1 思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E6%B3%A8%E5%86%8C%E8%B4%A6%E5%8F%B7"><span class="nav-number">1.2.2.</span> <span class="nav-text">1.2 注册账号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE"><span class="nav-number">1.2.3.</span> <span class="nav-text">1.3 获取数据</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%EF%BC%8C%E8%A7%A3%E6%9E%90JSON%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">1.3.</span> <span class="nav-text">二，解析JSON字符串</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E5%A4%A9%E6%B0%94%E6%95%B0%E6%8D%AE"><span class="nav-number">1.3.1.</span> <span class="nav-text">2.1 天气数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E4%BD%BF%E7%94%A8cJSON%E8%A7%A3%E6%9E%90%E5%87%BA%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">1.3.2.</span> <span class="nav-text">2.2 使用cJSON解析出字符串</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%EF%BC%8C%E8%AF%AD%E9%9F%B3%E5%90%88%E6%88%90"><span class="nav-number">1.4.</span> <span class="nav-text">三，语音合成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%EF%BC%8C%E5%B0%8F%E7%BB%93"><span class="nav-number">1.5.</span> <span class="nav-text">四，小结</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">killer-p</p>
+  <div class="site-description" itemprop="description">share Linux, arm, and some skillful things</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdnjs.cloudflare.com/ajax/libs/creativecommons-vocabulary/2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://killer-p.github.io/killer-blog/ESP32/esp32_weather_report/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="killer-p">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="killer-p blog">
+      <meta itemprop="description" content="share Linux, arm, and some skillful things">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="ESP32 实现天气预报 | killer-p blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ESP32 实现天气预报
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-06-01 18:11:17" itemprop="dateCreated datePublished" datetime="2025-06-01T18:11:17+08:00">2025-06-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-06-02 10:09:56" itemprop="dateModified" datetime="2025-06-02T10:09:56+08:00">2025-06-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/ESP32/" itemprop="url" rel="index"><span itemprop="name">ESP32</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="ESP32-实现天气预报"><a href="#ESP32-实现天气预报" class="headerlink" title="ESP32 实现天气预报"></a>ESP32 实现天气预报</h1><blockquote>
+<p>本文即将为你示例如何使用esp32的wifi，http组件以及百度在线语音合成等功能，实现获取天气数据并通过语音播放。</p>
+</blockquote>
+<p>@[toc]</p>
+<h2 id="效果演示"><a href="#效果演示" class="headerlink" title="效果演示"></a>效果演示</h2><p>[video(video-9Nehbmpp-1604736367570)(type-bilibili)(url-<a target="_blank" rel="noopener" href="https://player.bilibili.com/player.html?aid=797685523)(image-https://ss.csdn.net/p?http://i2.hdslb.com/bfs/archive/8eebf58ba36e0518b66f8ec8d28300f84186be1d.jpg)(title-esp32%E8%AF%AD%E9%9F%B3%E6%92%AD%E6%94%BE%E5%A4%A9%E6%B0%94%E9%A2%84%E6%8A%A5)%5D">https://player.bilibili.com/player.html?aid=797685523)(image-https://ss.csdn.net/p?http://i2.hdslb.com/bfs/archive/8eebf58ba36e0518b66f8ec8d28300f84186be1d.jpg)(title-esp32语音播放天气预报)]</a></p>
+<h2 id="一，请求天气数据"><a href="#一，请求天气数据" class="headerlink" title="一，请求天气数据"></a>一，请求天气数据</h2><h3 id="1-1-思路"><a href="#1-1-思路" class="headerlink" title="1.1 思路"></a>1.1 思路</h3><p>利用esp32的http组件，向Web API请求天气数据，我使用的是万维易源提供的API接口，这个接口的调用比较简单，而且提供了1000次的额度，还是比较良心的。</p>
+<p><strong>请求的方式也很简单，使用GET方式向天气接口发起请求，服务端会返回json格式的当地城市的天气数据。后续我们只要解析出json中的数据，提取我们想要的天气数据。</strong></p>
+<h3 id="1-2-注册账号"><a href="#1-2-注册账号" class="headerlink" title="1.2 注册账号"></a>1.2 注册账号</h3><p>在<a target="_blank" rel="noopener" href="https://www.showapi.com/">官网</a>注册账号，进入控制台，找到<code>接口使用者-》我的应用</code>，系统默认创建了一个应用，<code>just_test_app</code>，将这个应用的<code>showapi_appid</code>，和<code>sercret</code>保存下来，我们需要这两个数据作为请求参数。<br>然后进入<a target="_blank" rel="noopener" href="https://www.showapi.com/apiGateway/view/9?tab=productPrice&skuid=5ee9cb656e36cf1eb67506c1">天气api接口文档</a>，购买0.00元档的套餐，到这一步，你已经可用使用它的接口了。<br>在接口文档中，可以选择根据不同的参数来获取天气数据，这里我选择ip查询。当ip的参数为空时，会默认返回客户端的ip地址的城市的信息。<br><img src="/killer-blog/ESP32/esp32_weather_report/20201105225915438.png" alt="在这里插入图片描述"></p>
+<h3 id="1-3-获取数据"><a href="#1-3-获取数据" class="headerlink" title="1.3 获取数据"></a>1.3 获取数据</h3><p><strong>通过ip获取天气的url是<code>https://route.showapi.com/9-4</code>，我们只需要在url后加入<code>showapi_appid</code>和<code>showapi_sign</code>两个参数(showapi_sign就是上文的sercret)，然后发起GET请求，就能接收到返回的json字符串。</strong><br>例如我的url是：</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://route.showapi.com/9-4?showapi_appid=421387&showapi_sign=f5f3b508fd6c43e09457be788b251a32">https://route.showapi.com/9-4?showapi_appid=421387&amp;showapi_sign=f5f3b508fd6c43e09457be788b251a32</a></p>
+</blockquote>
+<p>http请求代码，<strong>具体逻辑见代码注释</strong></p>
+<p>全局变量</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">char</span> http_data[MX_HTTP_BUFF]; <span class="comment">//! 需要定义为全局静态变量，否则会导致任务的堆栈溢出</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> WEATHER_URL <span class="string">&quot;https://route.showapi.com/9-4?showapi_appid=421387&amp;showapi_sign=f5f3b508fd6c43e09457be788b251a32&quot;</span></span></span><br></pre></td></tr></table></figure>
+
+
+
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">esp_err_t</span> err;</span><br><span class="line"><span class="type">esp_http_client_config_t</span> config = &#123;</span><br><span class="line">            .url = WEATHER_URL,     <span class="comment">//http请求地址</span></span><br><span class="line">            .event_handler = _http_event_handle,    <span class="comment">//http请求回调函数</span></span><br><span class="line">            .method = HTTP_METHOD_GET,      <span class="comment">//GET方式</span></span><br><span class="line">            </span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">esp_http_client_handle_t</span> client = esp_http_client_init(&amp;config);</span><br><span class="line">AUDIO_MEM_CHECK(TAG, client, <span class="keyword">return</span> <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//发起请求</span></span><br><span class="line"><span class="keyword">if</span>(esp_http_client_open(client,<span class="number">0</span>)!=ESP_OK)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取返回头</span></span><br><span class="line">esp_http_client_fetch_headers(client);</span><br><span class="line">ESP_LOGI(TAG, <span class="string">&quot;Status = %d, content_length = %d&quot;</span>,esp_http_client_get_status_code(client),esp_http_client_get_content_length(client));</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//读取返回的数据到http_data</span></span><br><span class="line">	<span class="type">int</span> read_len = esp_http_client_read(client, http_data + index, max_len - index);</span><br><span class="line">	<span class="comment">//读取完毕</span></span><br><span class="line">    <span class="keyword">if</span>(read_len &lt;= <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">    	<span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    index += read_len;</span><br><span class="line">    total += read_len;</span><br><span class="line">    http_data[index] = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(total&lt;<span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">		ESP_LOGI(TAG,<span class="string">&quot;read error&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	esp_http_client_close(client);</span><br><span class="line">	esp_http_client_cleanup(client);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="二，解析JSON字符串"><a href="#二，解析JSON字符串" class="headerlink" title="二，解析JSON字符串"></a>二，解析JSON字符串</h2><h3 id="2-1-天气数据"><a href="#2-1-天气数据" class="headerlink" title="2.1 天气数据"></a>2.1 天气数据</h3><p>通过将返回的json数据格式化，可得到下面的json数据：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="string">&quot;showapi_res_error&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">	<span class="string">&quot;showapi_res_id&quot;</span>: <span class="string">&quot;5fa415b48d57ba1617db793e&quot;</span>,</span><br><span class="line">	<span class="string">&quot;showapi_res_code&quot;</span>: 0,</span><br><span class="line">	<span class="string">&quot;showapi_res_body&quot;</span>: &#123;</span><br><span class="line">		<span class="string">&quot;time&quot;</span>: <span class="string">&quot;20201105180000&quot;</span>,</span><br><span class="line">		<span class="string">&quot;ret_code&quot;</span>: 0,</span><br><span class="line">		<span class="string">&quot;now&quot;</span>: &#123;</span><br><span class="line">			<span class="string">&quot;weather_code&quot;</span>: <span class="string">&quot;00&quot;</span>,</span><br><span class="line">			<span class="string">&quot;aqiDetail&quot;</span>: &#123;</span><br><span class="line">				<span class="string">&quot;num&quot;</span>: <span class="string">&quot;95&quot;</span>,</span><br><span class="line">				<span class="string">&quot;co&quot;</span>: <span class="string">&quot;0.5&quot;</span>,</span><br><span class="line">				<span class="string">&quot;so2&quot;</span>: <span class="string">&quot;6&quot;</span>,</span><br><span class="line">				<span class="string">&quot;area&quot;</span>: <span class="string">&quot;深圳&quot;</span>,</span><br><span class="line">				<span class="string">&quot;o3&quot;</span>: <span class="string">&quot;84&quot;</span>,</span><br><span class="line">				<span class="string">&quot;no2&quot;</span>: <span class="string">&quot;32&quot;</span>,</span><br><span class="line">				<span class="string">&quot;aqi&quot;</span>: <span class="string">&quot;51&quot;</span>,</span><br><span class="line">				<span class="string">&quot;quality&quot;</span>: <span class="string">&quot;良好&quot;</span>,</span><br><span class="line">				<span class="string">&quot;pm10&quot;</span>: <span class="string">&quot;52&quot;</span>,</span><br><span class="line">				<span class="string">&quot;pm2_5&quot;</span>: <span class="string">&quot;25&quot;</span>,</span><br><span class="line">				<span class="string">&quot;o3_8h&quot;</span>: <span class="string">&quot;98&quot;</span>,</span><br><span class="line">				<span class="string">&quot;primary_pollutant&quot;</span>: <span class="string">&quot;颗粒物(PM10)&quot;</span></span><br><span class="line">			&#125;,</span><br><span class="line">			<span class="string">&quot;wind_direction&quot;</span>: <span class="string">&quot;东风&quot;</span>,</span><br><span class="line">			<span class="string">&quot;temperature_time&quot;</span>: <span class="string">&quot;23:00&quot;</span>,</span><br><span class="line">			<span class="string">&quot;wind_power&quot;</span>: <span class="string">&quot;1级&quot;</span>,</span><br><span class="line">			<span class="string">&quot;aqi&quot;</span>: <span class="string">&quot;51&quot;</span>,</span><br><span class="line">			<span class="string">&quot;sd&quot;</span>: <span class="string">&quot;78%&quot;</span>,</span><br><span class="line">			<span class="string">&quot;weather_pic&quot;</span>: <span class="string">&quot;http://app1.showapi.com/weather/icon/night/00.png&quot;</span>,</span><br><span class="line">			<span class="string">&quot;weather&quot;</span>: <span class="string">&quot;晴&quot;</span>,</span><br><span class="line">			<span class="string">&quot;temperature&quot;</span>: <span class="string">&quot;22&quot;</span></span><br><span class="line">		&#125;,</span><br><span class="line">		<span class="string">&quot;cityInfo&quot;</span>: &#123;</span><br><span class="line">			<span class="string">&quot;c6&quot;</span>: <span class="string">&quot;guangdong&quot;</span>,</span><br><span class="line">			<span class="string">&quot;c5&quot;</span>: <span class="string">&quot;深圳&quot;</span>,</span><br><span class="line">			<span class="string">&quot;c4&quot;</span>: <span class="string">&quot;shenzhen&quot;</span>,</span><br><span class="line">			<span class="string">&quot;c3&quot;</span>: <span class="string">&quot;宝安&quot;</span>,</span><br><span class="line">			<span class="string">&quot;c9&quot;</span>: <span class="string">&quot;中国&quot;</span>,</span><br><span class="line">			<span class="string">&quot;c8&quot;</span>: <span class="string">&quot;china&quot;</span>,</span><br><span class="line">			<span class="string">&quot;c7&quot;</span>: <span class="string">&quot;广东&quot;</span>,</span><br><span class="line">			<span class="string">&quot;c17&quot;</span>: <span class="string">&quot;+8&quot;</span>,</span><br><span class="line">			<span class="string">&quot;c16&quot;</span>: <span class="string">&quot;AZ9755&quot;</span>,</span><br><span class="line">			<span class="string">&quot;c1&quot;</span>: <span class="string">&quot;101280605&quot;</span>,</span><br><span class="line">			<span class="string">&quot;c2&quot;</span>: <span class="string">&quot;baoan&quot;</span>,</span><br><span class="line">			<span class="string">&quot;c0&quot;</span>: <span class="string">&quot;440306&quot;</span>,</span><br><span class="line">			<span class="string">&quot;longitude&quot;</span>: 113.878,</span><br><span class="line">			<span class="string">&quot;c11&quot;</span>: <span class="string">&quot;0755&quot;</span>,</span><br><span class="line">			<span class="string">&quot;c10&quot;</span>: <span class="string">&quot;3&quot;</span>,</span><br><span class="line">			<span class="string">&quot;latitude&quot;</span>: 22.556,</span><br><span class="line">			<span class="string">&quot;c12&quot;</span>: <span class="string">&quot;518001&quot;</span>,</span><br><span class="line">			<span class="string">&quot;c15&quot;</span>: <span class="string">&quot;1&quot;</span></span><br><span class="line">		&#125;,</span><br><span class="line">		<span class="string">&quot;showapi_fee_code&quot;</span>: 0,</span><br><span class="line">		<span class="string">&quot;f1&quot;</span>: &#123;</span><br><span class="line">			<span class="string">&quot;night_weather_code&quot;</span>: <span class="string">&quot;00&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day_weather&quot;</span>: <span class="string">&quot;晴&quot;</span>,</span><br><span class="line">			<span class="string">&quot;night_weather&quot;</span>: <span class="string">&quot;晴&quot;</span>,</span><br><span class="line">			<span class="string">&quot;jiangshui&quot;</span>: <span class="string">&quot;0%&quot;</span>,</span><br><span class="line">			<span class="string">&quot;air_press&quot;</span>: <span class="string">&quot;1005 hPa&quot;</span>,</span><br><span class="line">			<span class="string">&quot;night_wind_power&quot;</span>: <span class="string">&quot;0-3级 &lt;5.4m/s&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day_wind_power&quot;</span>: <span class="string">&quot;0-3级 &lt;5.4m/s&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day_weather_code&quot;</span>: <span class="string">&quot;00&quot;</span>,</span><br><span class="line">			<span class="string">&quot;sun_begin_end&quot;</span>: <span class="string">&quot;06:25|16:20&quot;</span>,</span><br><span class="line">			<span class="string">&quot;ziwaixian&quot;</span>: <span class="string">&quot;很强&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day_weather_pic&quot;</span>: <span class="string">&quot;http://app1.showapi.com/weather/icon/day/00.png&quot;</span>,</span><br><span class="line">			<span class="string">&quot;weekday&quot;</span>: 4,</span><br><span class="line">			<span class="string">&quot;night_air_temperature&quot;</span>: <span class="string">&quot;20&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day_air_temperature&quot;</span>: <span class="string">&quot;27&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day_wind_direction&quot;</span>: <span class="string">&quot;北风&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day&quot;</span>: <span class="string">&quot;20201105&quot;</span>,</span><br><span class="line">			<span class="string">&quot;night_weather_pic&quot;</span>: <span class="string">&quot;http://app1.showapi.com/weather/icon/night/00.png&quot;</span>,</span><br><span class="line">			<span class="string">&quot;night_wind_direction&quot;</span>: <span class="string">&quot;无持续风向&quot;</span></span><br><span class="line">		&#125;,</span><br><span class="line">		<span class="string">&quot;f3&quot;</span>: &#123;</span><br><span class="line">			<span class="string">&quot;night_weather_code&quot;</span>: <span class="string">&quot;07&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day_weather&quot;</span>: <span class="string">&quot;小雨&quot;</span>,</span><br><span class="line">			<span class="string">&quot;night_weather&quot;</span>: <span class="string">&quot;小雨&quot;</span>,</span><br><span class="line">			<span class="string">&quot;jiangshui&quot;</span>: <span class="string">&quot;70%&quot;</span>,</span><br><span class="line">			<span class="string">&quot;air_press&quot;</span>: <span class="string">&quot;1005 hPa&quot;</span>,</span><br><span class="line">			<span class="string">&quot;night_wind_power&quot;</span>: <span class="string">&quot;0-3级 &lt;5.4m/s&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day_wind_power&quot;</span>: <span class="string">&quot;0-3级 &lt;5.4m/s&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day_weather_code&quot;</span>: <span class="string">&quot;07&quot;</span>,</span><br><span class="line">			<span class="string">&quot;sun_begin_end&quot;</span>: <span class="string">&quot;06:28|16:17&quot;</span>,</span><br><span class="line">			<span class="string">&quot;ziwaixian&quot;</span>: <span class="string">&quot;最弱&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day_weather_pic&quot;</span>: <span class="string">&quot;http://app1.showapi.com/weather/icon/day/07.png&quot;</span>,</span><br><span class="line">			<span class="string">&quot;weekday&quot;</span>: 6,</span><br><span class="line">			<span class="string">&quot;night_air_temperature&quot;</span>: <span class="string">&quot;21&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day_air_temperature&quot;</span>: <span class="string">&quot;28&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day_wind_direction&quot;</span>: <span class="string">&quot;东北风&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day&quot;</span>: <span class="string">&quot;20201107&quot;</span>,</span><br><span class="line">			<span class="string">&quot;night_weather_pic&quot;</span>: <span class="string">&quot;http://app1.showapi.com/weather/icon/night/07.png&quot;</span>,</span><br><span class="line">			<span class="string">&quot;night_wind_direction&quot;</span>: <span class="string">&quot;东北风&quot;</span></span><br><span class="line">		&#125;,</span><br><span class="line">		<span class="string">&quot;f2&quot;</span>: &#123;</span><br><span class="line">			<span class="string">&quot;night_weather_code&quot;</span>: <span class="string">&quot;07&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day_weather&quot;</span>: <span class="string">&quot;晴&quot;</span>,</span><br><span class="line">			<span class="string">&quot;night_weather&quot;</span>: <span class="string">&quot;小雨&quot;</span>,</span><br><span class="line">			<span class="string">&quot;jiangshui&quot;</span>: <span class="string">&quot;0%&quot;</span>,</span><br><span class="line">			<span class="string">&quot;air_press&quot;</span>: <span class="string">&quot;1005 hPa&quot;</span>,</span><br><span class="line">			<span class="string">&quot;night_wind_power&quot;</span>: <span class="string">&quot;0-3级 &lt;5.4m/s&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day_wind_power&quot;</span>: <span class="string">&quot;0-3级 &lt;5.4m/s&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day_weather_code&quot;</span>: <span class="string">&quot;00&quot;</span>,</span><br><span class="line">			<span class="string">&quot;sun_begin_end&quot;</span>: <span class="string">&quot;06:27|16:18&quot;</span>,</span><br><span class="line">			<span class="string">&quot;ziwaixian&quot;</span>: <span class="string">&quot;很强&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day_weather_pic&quot;</span>: <span class="string">&quot;http://app1.showapi.com/weather/icon/day/00.png&quot;</span>,</span><br><span class="line">			<span class="string">&quot;weekday&quot;</span>: 5,</span><br><span class="line">			<span class="string">&quot;night_air_temperature&quot;</span>: <span class="string">&quot;21&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day_wind_direction&quot;</span>: <span class="string">&quot;无持续风向&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day_air_temperature&quot;</span>: <span class="string">&quot;28&quot;</span>,</span><br><span class="line">			<span class="string">&quot;night_wind_direction&quot;</span>: <span class="string">&quot;东北风&quot;</span>,</span><br><span class="line">			<span class="string">&quot;night_weather_pic&quot;</span>: <span class="string">&quot;http://app1.showapi.com/weather/icon/night/07.png&quot;</span>,</span><br><span class="line">			<span class="string">&quot;day&quot;</span>: <span class="string">&quot;20201106&quot;</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="2-2-使用cJSON解析出字符串"><a href="#2-2-使用cJSON解析出字符串" class="headerlink" title="2.2 使用cJSON解析出字符串"></a>2.2 使用cJSON解析出字符串</h3><p><strong>cJSON</strong>是一个用C语言写的专门用于处理json数据的库。官方地址：<a target="_blank" rel="noopener" href="http://www.json.org/">http://www.json.org/</a>。idf中已经集成了cjson组件。</p>
+<p>以下代码示例展示了如何使用cjson解析出json字符串里的数据，并将字符串拼接成一句流畅的句子。简单的展示，只读取json中的天气和温度数据。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;cJSON.h&quot;</span></span></span><br><span class="line"><span class="type">char</span> data[<span class="number">1024</span>]=&#123;<span class="number">0</span>&#125;;</span><br><span class="line"><span class="type">void</span> <span class="title function_">demo</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//解析整个json</span></span><br><span class="line">	cJSON *root = cJSON_Parse(http_data);</span><br><span class="line">	<span class="keyword">if</span>(!root)</span><br><span class="line">    &#123;</span><br><span class="line">          ESP_LOGI(TAG, <span class="string">&quot;error,json parse error&quot;</span>);</span><br><span class="line">          <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;	</span><br><span class="line">    <span class="comment">//获取showapi_res_body </span></span><br><span class="line">    cJSON *showapi_res_body = cJSON_GetObjectItem(root,<span class="string">&quot;showapi_res_body&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/*---------今天天气数据----------------------------*/</span></span><br><span class="line">	cJSON *f1 = cJSON_GetObjectItem(showapi_res_body, <span class="string">&quot;f1&quot;</span>);</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//白天的天气</span></span><br><span class="line">	cJSON *item = cJSON_GetObjectItem(f1, <span class="string">&quot;day_weather&quot;</span>);</span><br><span class="line">	<span class="type">char</span> *day_weather = cJSON_GetStringValue(item);</span><br><span class="line"></span><br><span class="line">	<span class="comment">//白天的气温</span></span><br><span class="line">	item = cJSON_GetObjectItem(f1, <span class="string">&quot;day_air_temperature&quot;</span>);</span><br><span class="line">	<span class="type">char</span> *day_air_temperature = cJSON_GetStringValue(item);</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//拼接成一句话，如：今天，天气晴，气温26度</span></span><br><span class="line">	<span class="built_in">snprintf</span>(data, <span class="number">50</span>, <span class="string">&quot;今天，天气%s,气温%s度&quot;</span>, day_weather,day_air_temperature);</span><br><span class="line">	</span><br><span class="line">	cJSON_Delete(root);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>几个重要的函数：</p>
+<p><strong>将json字符串转化成json类型的对象，这个函数必须在其他函数之前执行。</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cJSON_Parse(<span class="type">const</span> <span class="type">char</span> *value)</span><br></pre></td></tr></table></figure>
+
+
+<p><strong>根据键值获取cjson对象的一个成员，这个成员可以也是一个json对象</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cJSON_GetObjectItem(<span class="type">const</span> cJSON * <span class="type">const</span> object, <span class="type">const</span> <span class="type">char</span> * <span class="type">const</span> <span class="built_in">string</span>)</span><br></pre></td></tr></table></figure>
+
+<p><strong>获取json对象数组中的指定成员。</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cJSON_GetArrayItem(<span class="type">const</span> cJSON *<span class="built_in">array</span>, <span class="type">int</span> index);</span><br></pre></td></tr></table></figure>
+
+<p><strong>获取json对象里的字符串</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cJSON_GetStringValue(cJSON *item);</span><br></pre></td></tr></table></figure>
+
+<h2 id="三，语音合成"><a href="#三，语音合成" class="headerlink" title="三，语音合成"></a>三，语音合成</h2><p>使用百度语音合成，将拼接的字符串转换成语音，通过喇叭播放出来。<br>如何将文字转换成语音，请参考另一篇博客：<a href="/killer-blog/ESP32/esp32adf_play_mp3">ESP32使用百度语音合成 实现文字转语音播放</a></p>
+<h2 id="四，小结"><a href="#四，小结" class="headerlink" title="四，小结"></a>四，小结</h2><p>天气API只是一个例子，网上有许多开放的API可玩，各位有什么好玩的API也可以在评论留言<br><img src="/killer-blog/ESP32/esp32_weather_report/20201105165502804.png" alt="在这里插入图片描述"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>killer-p
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://killer-p.github.io/killer-blog/ESP32/esp32_weather_report/" title="ESP32 实现天气预报">https://killer-p.github.io/killer-blog/ESP32/esp32_weather_report/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/killer-blog/ESP32/esp32adf_audio_pipeline/" rel="prev" title="ESP32 ADF音频流原理">
+                  <i class="fa fa-angle-left"></i> ESP32 ADF音频流原理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/killer-blog/ESP32/esp32_time_system/" rel="next" title="ESP32 时间系统">
+                  ESP32 时间系统 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">killer-p</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

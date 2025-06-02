@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"killer-p.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="国内加速github访问、下载代码仓库的方法前言github上下载仓库或者克隆仓库，速度基本稳定在20k以下，这老哥是真的稳。当克隆一些大的仓库时，以这乌龟速度，很容易出现克隆超时的错误，等了几十分钟的下载一夜回到解放前，那种感觉我猜各位或多或少都经历过。本博客会整理几种亲测可用的方案，下载速度很大地提升，一个大的仓库一分钟左右就可以搞定，也会持续的更新一些可用新方法，希望对你有帮助以下方案均来自">
+<meta property="og:type" content="article">
+<meta property="og:title" content="国内加速github访问、下载代码仓库的方法">
+<meta property="og:url" content="https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/index.html">
+<meta property="og:site_name" content="killer-p blog">
+<meta property="og:description" content="国内加速github访问、下载代码仓库的方法前言github上下载仓库或者克隆仓库，速度基本稳定在20k以下，这老哥是真的稳。当克隆一些大的仓库时，以这乌龟速度，很容易出现克隆超时的错误，等了几十分钟的下载一夜回到解放前，那种感觉我猜各位或多或少都经历过。本博客会整理几种亲测可用的方案，下载速度很大地提升，一个大的仓库一分钟左右就可以搞定，也会持续的更新一些可用新方法，希望对你有帮助以下方案均来自">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/1.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/2.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/3.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/4.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/5.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/6.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/7.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/8.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/9.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/10.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/11.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/12.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/13.png">
+<meta property="article:published_time" content="2025-06-01T10:11:17.230Z">
+<meta property="article:modified_time" content="2025-06-02T02:06:20.683Z">
+<meta property="article:author" content="killer-p">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/1.png">
+
+
+<link rel="canonical" href="https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/","path":"killer-blog/Git/speed_github_in_cn/","title":"国内加速github访问、下载代码仓库的方法"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>国内加速github访问、下载代码仓库的方法 | killer-p blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">killer-p blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <img class="custom-logo-image" src="/upload/killer-p.png" alt="killer-p blog">
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/home/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%BD%E5%86%85%E5%8A%A0%E9%80%9Fgithub%E8%AE%BF%E9%97%AE%E3%80%81%E4%B8%8B%E8%BD%BD%E4%BB%A3%E7%A0%81%E4%BB%93%E5%BA%93%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">国内加速github访问、下载代码仓库的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.1.</span> <span class="nav-text">前言</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%EF%BC%8C%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8%E6%8F%92%E4%BB%B6%E5%8A%A0%E9%80%9F"><span class="nav-number">1.1.1.</span> <span class="nav-text">一，谷歌浏览器插件加速</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%EF%BC%8Cgitclone-com"><span class="nav-number">1.1.2.</span> <span class="nav-text">二，gitclone.com</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%EF%BC%8C%E7%A0%81%E4%BA%91%E4%B8%8B%E8%BD%BD"><span class="nav-number">1.1.3.</span> <span class="nav-text">三，码云下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%EF%BC%8Cgithubd"><span class="nav-number">1.1.4.</span> <span class="nav-text">四，githubd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%94%EF%BC%8Cgithub%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD%E5%8A%A0%E9%80%9F"><span class="nav-number">1.1.5.</span> <span class="nav-text">五，github文件下载加速</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AD%EF%BC%8Cgithub%E5%8A%A0%E9%80%9F%E4%B8%8B%E8%BD%BD%E9%93%BE%E6%8E%A5"><span class="nav-number">1.1.6.</span> <span class="nav-text">六，github加速下载链接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%83%EF%BC%8Cgithub%E9%95%9C%E5%83%8F%E8%AE%BF%E9%97%AE"><span class="nav-number">1.1.7.</span> <span class="nav-text">七，github镜像访问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%EF%BC%8C-%E5%B8%A6%E5%AD%90%E6%A8%A1%E5%9D%97%E7%9A%84%E5%A4%A7%E5%9E%8B%E4%BB%93%E5%BA%93"><span class="nav-number">1.1.8.</span> <span class="nav-text">注意， 带子模块的大型仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99%EF%BC%8C%E6%84%9F%E8%B0%A2%E4%BB%A5%E4%B8%8B%E6%96%87%E7%AB%A0"><span class="nav-number">1.1.9.</span> <span class="nav-text">参考资料，感谢以下文章</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">killer-p</p>
+  <div class="site-description" itemprop="description">share Linux, arm, and some skillful things</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdnjs.cloudflare.com/ajax/libs/creativecommons-vocabulary/2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="killer-p">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="killer-p blog">
+      <meta itemprop="description" content="share Linux, arm, and some skillful things">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="国内加速github访问、下载代码仓库的方法 | killer-p blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          国内加速github访问、下载代码仓库的方法
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-06-01 18:11:17" itemprop="dateCreated datePublished" datetime="2025-06-01T18:11:17+08:00">2025-06-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-06-02 10:06:20" itemprop="dateModified" datetime="2025-06-02T10:06:20+08:00">2025-06-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Git/" itemprop="url" rel="index"><span itemprop="name">Git</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="国内加速github访问、下载代码仓库的方法"><a href="#国内加速github访问、下载代码仓库的方法" class="headerlink" title="国内加速github访问、下载代码仓库的方法"></a>国内加速github访问、下载代码仓库的方法</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><strong>github上下载仓库或者克隆仓库，速度基本稳定在20k以下，这老哥是真的稳。当克隆一些大的仓库时，以这乌龟速度，很容易出现克隆超时的错误，等了几十分钟的下载一夜回到解放前，那种感觉我猜各位或多或少都经历过。本博客会整理几种亲测可用的方案，下载速度很大地提升，一个大的仓库一分钟左右就可以搞定，也会持续的更新一些可用新方法，希望对你有帮助</strong><br><strong>以下方案均来自网络的分享，我只是做整理推荐。感谢那些无私的程序员们</strong></p>
+<blockquote>
+<p>更新日志</p>
+<blockquote>
+<p>2020.9.5 增加了谷歌插件方法，github加速下载链接,使用github镜像下载三种方式。</p>
+</blockquote>
+</blockquote>
+<h3 id="一，谷歌浏览器插件加速"><a href="#一，谷歌浏览器插件加速" class="headerlink" title="一，谷歌浏览器插件加速"></a>一，谷歌浏览器插件加速</h3><p>功能最强大，完善的一种方式，需要使用谷歌浏览器，开启浏览器的插件功能，插件下载地址：<br><a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1qGiIUzqNlN1ZczTNFbPg0A">https://pan.baidu.com/s/1qGiIUzqNlN1ZczTNFbPg0A</a> <strong>提取码 stsv</strong><br>备用地址：<a target="_blank" rel="noopener" href="https://wws.lanzous.com/ia7V3gdmv8f">https://wws.lanzous.com/ia7V3gdmv8f</a><br>下载完成后添加到谷歌浏览器的插件中，再打开github，你会发现整个访问速度提升了不止一个档次，插件对github网站添加了加速和镜像功能：亲测加速通道的下载速度可达最少1M，但是镜像方面无法访问，会被浏览器拦截，但这无关紧要，推荐！（这是要我用回谷歌吗？）<br><img src="/killer-blog/Git/speed_github_in_cn/1.png" alt="在这里插入图片描述">使用加速通道下载测试：</p>
+<p><img src="/killer-blog/Git/speed_github_in_cn/2.png" alt="在这里插入图片描述"><br><img src="/killer-blog/Git/speed_github_in_cn/3.png" alt="在这里插入图片描述"></p>
+<h3 id="二，gitclone-com"><a href="#二，gitclone-com" class="headerlink" title="二，gitclone.com"></a>二，gitclone.com</h3><p>这是我用过最爽最实用功能最全面的一个方式了。gitclone.com是一个提供下载缓存的代码下载网站，使用方法十分简单，只需要<strong>在仓库地址前面加上 gitclone.com</strong>，就可以使速度提升几倍。</p>
+<p><strong>例如要克隆github上仓库地址<code>https://github.com/killer-p/ctool.git</code><br>只需将地址改为<code>https://gitclone.com/github.com/killer-p/ctool.git</code>，在命令行中执行<code>git clone https://gitclone.com/github.com/killer-p/ctool.git</code>，速度直接起飞！芜湖！</strong><br>官网首页：<a target="_blank" rel="noopener" href="https://gitclone.com/">https://gitclone.com/</a></p>
+<blockquote>
+<p>gitclone的工作机理是：当开发者第一次经gitclone.com代理clone项目时，gitclone.com异步镜像项目，以后有开发者clone该项目时，就会利用上gitclone.com的本地镜像，而不是从github.com上clone。gitclone.com会在每天夜间与github.com同步。为了解决不断增长的镜像对硬盘资源的需求，gitclone.com采用区块链集群方式扩展，每次的镜像操作都会广播到集群中所有服务器，各服务器可选择生成镜像并登记以便以响应后续的clone请求。同时，gitclone.com还对stackoverflow.com和go get等的加速访问进行了说明，做到“为开发者服务”。</p>
+</blockquote>
+<p><strong>这是我使用的最方便的一种方法，墙裂推荐，gitclone.com还提供了其他的加速方法，<a target="_blank" rel="noopener" href="https://www.gitclone.com/docs/howto/howto_github">查看其他方法</a></strong><br>速度非常快。<br><img src="/killer-blog/Git/speed_github_in_cn/4.png" alt="在这里插入图片描述"></p>
+<h3 id="三，码云下载"><a href="#三，码云下载" class="headerlink" title="三，码云下载"></a>三，码云下载</h3><p>这也算是大家很熟悉的了，给小白科普一下。码云是国内的代码管理网站，所以在国内的下载速度非常快，码云支持从github其他代码代管网站导入码云仓库。<br><strong>使用方法：</strong><br><strong>复制github上仓库地址，例如：<br><code>https://github.com/769484623/MahonyAHRSWithMPU6050_HMC5983.git</code><br>然后注册码云账号，在码云中创建新仓库，直接在底下选择<code>导入已有仓库</code></strong><br><img src="/killer-blog/Git/speed_github_in_cn/5.png" alt="在这里插入图片描述"><strong>在方框内粘贴github的仓库地址，系统会自动检测链接是哪个代码代管网站的。点击创建。</strong><br><img src="/killer-blog/Git/speed_github_in_cn/6.png" alt="在这里插入图片描述"><br><strong>等个几十秒，码云把github上的项目拉下来，放在了码云的服务器上，这时候我们就可以从码云下载仓库了，而且由于码云服务器在中国，下载速度很快，具体操作：</strong><br><strong>复制https或者直接下载zip</strong><br><img src="/killer-blog/Git/speed_github_in_cn/7.png" alt="在这里插入图片描述"></p>
+<h3 id="四，githubd"><a href="#四，githubd" class="headerlink" title="四，githubd"></a>四，githubd</h3><p>githud是一个代码代下载网站，只需要输入github仓库地址，网站就会下载GitHub仓库的压缩包，用户可以直接在网站下载。请收下地址：<a target="_blank" rel="noopener" href="https://githubd.com/#/">https://githubd.com/#/</a>，速度比直接在github上下载zip提升十倍！<code>注意！下载的zip是不包括子模块仓库的！注意检查!带子模块仓库的建议看第一点</code><br><img src="/killer-blog/Git/speed_github_in_cn/8.png" alt="在这里插入图片描述">另一个代码下载网站是：<a target="_blank" rel="noopener" href="https://d.serctl.com/?dl_start">https://d.serctl.com/?dl_start</a>，它也支持下载github仓库的压缩包，具体使用方法看上面的网址。</p>
+<h3 id="五，github文件下载加速"><a href="#五，github文件下载加速" class="headerlink" title="五，github文件下载加速"></a>五，github文件下载加速</h3><p>这个网站主要是用来下载github上一些正式版(release)的zip or war 等文件资源的，不支持下载仓库。<br>话不多说，直接上地址：<a target="_blank" rel="noopener" href="https://shrill-pond-3e81.hunsh.workers.dev/">https://shrill-pond-3e81.hunsh.workers.dev/</a><br>只需要输入github上的资源地址，最好是压缩包格式，其他格式的文件可能不支持。</p>
+<h3 id="六，github加速下载链接"><a href="#六，github加速下载链接" class="headerlink" title="六，github加速下载链接"></a>六，github加速下载链接</h3><p>网站地址：<a target="_blank" rel="noopener" href="https://github.zhlh6.cn/">https://github.zhlh6.cn/</a></p>
+<p>复制github仓库的地址，然后粘贴到第一栏，点击加速！生成加速地址，使用加速地址进行git clone 下载，下载速度最高能提升到1M（我的测试），平均也有600多k，实测效果见下图：<br><img src="/killer-blog/Git/speed_github_in_cn/9.png" alt="在这里插入图片描述"><br><img src="/killer-blog/Git/speed_github_in_cn/10.png" alt="在这里插入图片描述"></p>
+<h3 id="七，github镜像访问"><a href="#七，github镜像访问" class="headerlink" title="七，github镜像访问"></a>七，github镜像访问</h3><p>github镜像就是一个跟github一毛一样的网站，他会同步github上的资源，国内访问github镜像的速度较快，也可以在镜像下载仓库，平时逛逛gayhub也可以用这个镜像，反正比较快，缺点就是不能登录，镜像地址：<a target="_blank" rel="noopener" href="https://hub.fastgit.org/">https://hub.fastgit.org/</a><br><code>注意这个网站不能登录github账户，点击sign in会被浏览器拦截</code></p>
+<p>效果如下：可以看出下载地址的域名不是github.com,下载速度也达到700多k。</p>
+<p><img src="/killer-blog/Git/speed_github_in_cn/11.png" alt="在这里插入图片描述"><br><img src="/killer-blog/Git/speed_github_in_cn/12.png" alt="在这里插入图片描述"></p>
+<h3 id="注意，-带子模块的大型仓库"><a href="#注意，-带子模块的大型仓库" class="headerlink" title="注意， 带子模块的大型仓库"></a>注意， 带子模块的大型仓库</h3><p>以上的方法已经可以解决大部分仓库的下载问题，但是有一些大型仓库是带有子模块，由于在仓库根目录中的<code>.gitmodules</code>文件夹定义了子模块的地址仍然是github仓库的地址，所以用gitclone.com或者码云下载的仓库在下载子模块时会 直接越过gitclone.com和码云而从github上下载，这就又使得下载速度回到石器时代。<br><strong>一种解决办法是先下载主仓库，修改仓库中的<code>.gitmodules</code>文件夹中的仓库地址，加上gitclone.com，保存退出后，cmd执行</strong></p>
+<blockquote>
+<p>git submodule update –init </p>
+</blockquote>
+<p><strong>更新子模块或者直接在相应的文件夹下通过gitclone.com自行下载相应的模块，最后一定要记得执行 <code>git submodule update --init</code> 更新子模块。如果子模块中还有子模块，按上述方法重复进行就可以了。</strong></p>
+<h3 id="参考资料，感谢以下文章"><a href="#参考资料，感谢以下文章" class="headerlink" title="参考资料，感谢以下文章"></a>参考资料，感谢以下文章</h3><p><a target="_blank" rel="noopener" href="https://code.pingbook.top/blog/2020/How-To-Speed-Github.html#_2-github%E6%96%87%E4%BB%B6%E5%8A%A0%E9%80%9F">10种访问github方法</a><br><a target="_blank" rel="noopener" href="https://github.com/Sicmatr1x/Free-Resource/blob/master/Development.md">github下载解决方案</a><br><strong>觉得博客对你有帮助的话，点个赞收藏支持一下呗，持续更新！</strong><br><img src="/killer-blog/Git/speed_github_in_cn/13.png" alt="在这里插入图片描述"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>killer-p
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/" title="国内加速github访问、下载代码仓库的方法">https://killer-p.github.io/killer-blog/Git/speed_github_in_cn/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/killer-blog/ESP32/smart_control/" rel="prev" title="基于ESP32的智能遥控">
+                  <i class="fa fa-angle-left"></i> 基于ESP32的智能遥控
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/killer-blog/other/ringbuff_c_impl/" rel="next" title="C语言实现ringbuff">
+                  C语言实现ringbuff <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">killer-p</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"killer-p.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="ESP32 ADF音频流原理请参考adf&#x2F;compoments&#x2F;audio_pipeline目录下的源文件。 pipeline是adf实现音频处理的基础。可以将pipeline看出是流水线。音频数据从一头进，从另一头出。element是流水线上的工人，负责加工音频数据。event是监听流水线上所有工人的情况，可用户以通过msg得知。每个element都是一个任务。 一、elem">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ESP32 ADF音频流原理">
+<meta property="og:url" content="https://killer-p.github.io/killer-blog/ESP32/esp32adf_audio_pipeline/index.html">
+<meta property="og:site_name" content="killer-p blog">
+<meta property="og:description" content="ESP32 ADF音频流原理请参考adf&#x2F;compoments&#x2F;audio_pipeline目录下的源文件。 pipeline是adf实现音频处理的基础。可以将pipeline看出是流水线。音频数据从一头进，从另一头出。element是流水线上的工人，负责加工音频数据。event是监听流水线上所有工人的情况，可用户以通过msg得知。每个element都是一个任务。 一、elem">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/ESP32/esp32adf_audio_pipeline/20200814112839302.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/ESP32/esp32adf_audio_pipeline/2020081422233576.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/ESP32/esp32adf_audio_pipeline/20200815093218555.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/ESP32/esp32adf_audio_pipeline/2020081422441491.png">
+<meta property="article:published_time" content="2025-06-01T10:11:17.225Z">
+<meta property="article:modified_time" content="2025-06-02T02:11:28.654Z">
+<meta property="article:author" content="killer-p">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://killer-p.github.io/killer-blog/ESP32/esp32adf_audio_pipeline/20200814112839302.png">
+
+
+<link rel="canonical" href="https://killer-p.github.io/killer-blog/ESP32/esp32adf_audio_pipeline/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://killer-p.github.io/killer-blog/ESP32/esp32adf_audio_pipeline/","path":"killer-blog/ESP32/esp32adf_audio_pipeline/","title":"ESP32 ADF音频流原理"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ESP32 ADF音频流原理 | killer-p blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">killer-p blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <img class="custom-logo-image" src="/upload/killer-p.png" alt="killer-p blog">
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/home/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ESP32-ADF%E9%9F%B3%E9%A2%91%E6%B5%81%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">ESP32 ADF音频流原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81element"><span class="nav-number">1.1.</span> <span class="nav-text">一、element</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81event"><span class="nav-number">1.2.</span> <span class="nav-text">二、event</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81event-msg"><span class="nav-number">1.2.1.</span> <span class="nav-text">1、event msg</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81event"><span class="nav-number">1.2.2.</span> <span class="nav-text">2、event</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81pipeline"><span class="nav-number">1.3.</span> <span class="nav-text">三、pipeline</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3"><span class="nav-number">1.3.0.0.1.</span> <span class="nav-text">3</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">killer-p</p>
+  <div class="site-description" itemprop="description">share Linux, arm, and some skillful things</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdnjs.cloudflare.com/ajax/libs/creativecommons-vocabulary/2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://killer-p.github.io/killer-blog/ESP32/esp32adf_audio_pipeline/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="killer-p">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="killer-p blog">
+      <meta itemprop="description" content="share Linux, arm, and some skillful things">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="ESP32 ADF音频流原理 | killer-p blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ESP32 ADF音频流原理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-06-01 18:11:17" itemprop="dateCreated datePublished" datetime="2025-06-01T18:11:17+08:00">2025-06-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-06-02 10:11:28" itemprop="dateModified" datetime="2025-06-02T10:11:28+08:00">2025-06-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/ESP32/" itemprop="url" rel="index"><span itemprop="name">ESP32</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="ESP32-ADF音频流原理"><a href="#ESP32-ADF音频流原理" class="headerlink" title="ESP32 ADF音频流原理"></a>ESP32 ADF音频流原理</h1><p><strong>请参考adf&#x2F;compoments&#x2F;audio_pipeline目录下的源文件。</strong></p>
+<p><strong>pipeline是adf实现音频处理的基础。可以将pipeline看出是流水线。音频数据从一头进，从另一头出。element是流水线上的工人，负责加工音频数据。event是监听流水线上所有工人的情况，可用户以通过msg得知。每个element都是一个任务。</strong></p>
+<h2 id="一、element"><a href="#一、element" class="headerlink" title="一、element"></a>一、element</h2><p>首先看<code>audio_element.h</code>，主要是对element的很多参数的定义：<br><code>element</code>的状态定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief Audio element state</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">enum</span> &#123;</span></span><br><span class="line">    AEL_STATE_NONE = <span class="number">0</span>,</span><br><span class="line">    AEL_STATE_INIT,</span><br><span class="line">    AEL_STATE_RUNNING,</span><br><span class="line">    AEL_STATE_PAUSED,</span><br><span class="line">    AEL_STATE_STOPPED,</span><br><span class="line">    AEL_STATE_FINISHED,</span><br><span class="line">    AEL_STATE_ERROR</span><br><span class="line">&#125; <span class="type">audio_element_state_t</span>;</span><br></pre></td></tr></table></figure>
+<p><code>element动作指令</code>反映element当前执行的动作：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * Audio element action <span class="built_in">command</span>, process on dispatcher</span><br><span class="line"> */</span><br><span class="line">typedef enum &#123;</span><br><span class="line">    AEL_MSG_CMD_NONE                = 0,</span><br><span class="line">    AEL_MSG_CMD_ERROR               = 1,</span><br><span class="line">    AEL_MSG_CMD_FINISH              = 2,</span><br><span class="line">    AEL_MSG_CMD_STOP                = 3,</span><br><span class="line">    AEL_MSG_CMD_PAUSE               = 4,</span><br><span class="line">    AEL_MSG_CMD_RESUME              = 5,</span><br><span class="line">    AEL_MSG_CMD_DESTROY             = 6,</span><br><span class="line">    // AEL_MSG_CMD_CHANGE_STATE        = 7,</span><br><span class="line">    AEL_MSG_CMD_REPORT_STATUS       = 8,</span><br><span class="line">    AEL_MSG_CMD_REPORT_MUSIC_INFO   = 9,</span><br><span class="line">    AEL_MSG_CMD_REPORT_CODEC_FMT    = 10,</span><br><span class="line">    AEL_MSG_CMD_REPORT_POSITION     = 11,</span><br><span class="line">&#125; audio_element_msg_cmd_t;</span><br></pre></td></tr></table></figure>
+<p><strong>element当前动作的状态，注意要与element的状态区分</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * Audio element status report</span><br><span class="line"> */</span><br><span class="line">typedef enum &#123;</span><br><span class="line">    AEL_STATUS_NONE                     = 0,</span><br><span class="line">    AEL_STATUS_ERROR_OPEN               = 1,</span><br><span class="line">    AEL_STATUS_ERROR_INPUT              = 2,</span><br><span class="line">    AEL_STATUS_ERROR_PROCESS            = 3,</span><br><span class="line">    AEL_STATUS_ERROR_OUTPUT             = 4,</span><br><span class="line">    AEL_STATUS_ERROR_CLOSE              = 5,</span><br><span class="line">    AEL_STATUS_ERROR_TIMEOUT            = 6,</span><br><span class="line">    AEL_STATUS_ERROR_UNKNOWN            = 7,</span><br><span class="line">    AEL_STATUS_INPUT_DONE               = 8,</span><br><span class="line">    AEL_STATUS_INPUT_BUFFERING          = 9,</span><br><span class="line">    AEL_STATUS_OUTPUT_DONE              = 10,</span><br><span class="line">    AEL_STATUS_OUTPUT_BUFFERING         = 11,</span><br><span class="line">    AEL_STATUS_STATE_RUNNING            = 12,</span><br><span class="line">    AEL_STATUS_STATE_PAUSED             = 13,</span><br><span class="line">    AEL_STATUS_STATE_STOPPED            = 14,</span><br><span class="line">    AEL_STATUS_STATE_FINISHED           = 15,</span><br><span class="line">    AEL_STATUS_MOUNTED                  = 16,</span><br><span class="line">    AEL_STATUS_UNMOUNTED                = 17,</span><br><span class="line">&#125; audio_element_status_t;</span><br></pre></td></tr></table></figure>
+<p><em><strong>？两个状态state和status？百度下来意思都差不多，先不管了</strong></em><br><code>element informations</code>里包含的音频信息，就是采样率，通道，位宽，byte_pos：当前处理的字节位置，codec_fmt：音频的格式，<code>uri</code>：是音频数据的地址。默认配置如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief Audio Element informations</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> sample_rates;                           <span class="comment">/*!&lt; Sample rates in Hz */</span></span><br><span class="line">    <span class="type">int</span> channels;                               <span class="comment">/*!&lt; Number of audio channel, mono is 1, stereo is 2 */</span></span><br><span class="line">    <span class="type">int</span> bits;                                   <span class="comment">/*!&lt; Bit wide (8, 16, 24, 32 bits) */</span></span><br><span class="line">    <span class="type">int</span> bps;                                    <span class="comment">/*!&lt; Bit per second */</span></span><br><span class="line">    <span class="type">int64_t</span> byte_pos;                           <span class="comment">/*!&lt; The current position (in bytes) being processed for an element */</span></span><br><span class="line">    <span class="type">int64_t</span> total_bytes;                        <span class="comment">/*!&lt; The total bytes for an element */</span></span><br><span class="line">    <span class="type">int</span> duration;                               <span class="comment">/*!&lt; The duration for an element (optional) */</span></span><br><span class="line">    <span class="type">char</span> *uri;                                  <span class="comment">/*!&lt; URI (optional) */</span></span><br><span class="line">    <span class="type">esp_codec_type_t</span> codec_fmt;                 <span class="comment">/*!&lt; Music format (optional) */</span></span><br><span class="line">    <span class="type">audio_element_reserve_data_t</span> reserve_data;  <span class="comment">/*!&lt; This value is reserved for user use (optional) */</span></span><br><span class="line">&#125; <span class="type">audio_element_info_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> AUDIO_ELEMENT_INFO_DEFAULT()    &#123; \</span></span><br><span class="line"><span class="meta">    .sample_rates = 44100,                \</span></span><br><span class="line"><span class="meta">    .channels = 2,                        \</span></span><br><span class="line"><span class="meta">    .bits = 16,                           \</span></span><br><span class="line"><span class="meta">    .bps = 0,                             \</span></span><br><span class="line"><span class="meta">    .byte_pos = 0,                        \</span></span><br><span class="line"><span class="meta">    .total_bytes = 0,                     \</span></span><br><span class="line"><span class="meta">    .duration = 0,                        \</span></span><br><span class="line"><span class="meta">    .uri = NULL,                          \</span></span><br><span class="line"><span class="meta">    .codec_fmt = ESP_CODEC_TYPE_UNKNOW    \</span></span><br><span class="line"><span class="meta">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>element</code> 结构体在audio_element.c中定义<br><strong>可以看出 element包含一个任务来着</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">audio_element</span> &#123;</span></span><br><span class="line">    <span class="comment">/* Functions/RingBuffers */</span></span><br><span class="line">    el_io_func                  open;</span><br><span class="line">    ctrl_func                   seek;</span><br><span class="line">    process_func                process;</span><br><span class="line">    el_io_func                  close;</span><br><span class="line">    el_io_func                  destroy;</span><br><span class="line">    <span class="type">io_type_t</span>                   read_type;</span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="type">ringbuf_handle_t</span>        input_rb;</span><br><span class="line">        <span class="type">io_callback_t</span>           read_cb;</span><br><span class="line">    &#125; in;</span><br><span class="line">    <span class="type">io_type_t</span>                   write_type;</span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="type">ringbuf_handle_t</span>        output_rb;</span><br><span class="line">        <span class="type">io_callback_t</span>           write_cb;</span><br><span class="line">    &#125; out;</span><br><span class="line"></span><br><span class="line">    <span class="type">audio_multi_rb_t</span>            multi_in;</span><br><span class="line">    <span class="type">audio_multi_rb_t</span>            multi_out;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Properties */</span></span><br><span class="line">    <span class="keyword">volatile</span> <span class="type">bool</span>               is_open;</span><br><span class="line">    <span class="type">audio_element_state_t</span>       state;</span><br><span class="line"></span><br><span class="line">    <span class="type">events_type_t</span>               events_type;</span><br><span class="line">    <span class="type">audio_event_iface_handle_t</span>  iface_event;</span><br><span class="line">    <span class="type">audio_callback_t</span>            callback_event;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span>                         buf_size;</span><br><span class="line">    <span class="type">char</span>                        *buf;</span><br><span class="line"></span><br><span class="line">    <span class="type">char</span>                        *tag;</span><br><span class="line">    <span class="type">int</span>                         task_stack;</span><br><span class="line">    <span class="type">int</span>                         task_prio;</span><br><span class="line">    <span class="type">int</span>                         task_core;</span><br><span class="line">    xSemaphoreHandle            lock;</span><br><span class="line">    <span class="type">audio_element_info_t</span>        info;</span><br><span class="line">    <span class="type">audio_element_info_t</span>        *report_info;</span><br><span class="line"></span><br><span class="line">    <span class="type">bool</span>                        stack_in_ext;</span><br><span class="line">    <span class="type">audio_thread_t</span>              audio_thread;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* PrivateData */</span></span><br><span class="line">    <span class="type">void</span>                        *data;</span><br><span class="line">    EventGroupHandle_t          state_event;</span><br><span class="line">    <span class="type">int</span>                         input_wait_time;</span><br><span class="line">    <span class="type">int</span>                         output_wait_time;</span><br><span class="line">    <span class="type">int</span>                         out_buf_size_expect;</span><br><span class="line">    <span class="type">int</span>                         out_rb_size;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="type">bool</span>               is_running;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="type">bool</span>               task_run;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="type">bool</span>               stopping;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+<p><em><strong>配置element的结构体：用来创建一个element。</strong></em></p>
+<p><strong>从这个结构体可知，element其实是一个freertos的任务，拥有优先级等。每个任务都会执行<code>callback open -&gt; [loop: read -&gt; process -&gt; write] -&gt; close.</code>读取前一个element的数据，处理，再写入输出buff，传递给下一个element。</strong></p>
+<p><strong>前七个元素都是不同阶段的回调函数，tag是每个element的身份证，pipeline凭借tag来识别element，同时还定义了out_buff的长度。</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief Audio Element configurations.</span></span><br><span class="line"><span class="comment"> *        Each Element at startup will be a self-running task.</span></span><br><span class="line"><span class="comment"> *        These tasks will execute the callback open -&gt; [loop: read -&gt; process -&gt; write] -&gt; close.</span></span><br><span class="line"><span class="comment"> *        These callback functions are provided by the user corresponding to this configuration.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    el_io_func          open;             <span class="comment">/*!&lt; Open callback function */</span></span><br><span class="line">    ctrl_func           seek;             <span class="comment">/*!&lt; Seek callback function */</span></span><br><span class="line">    process_func        process;          <span class="comment">/*!&lt; Process callback function */</span></span><br><span class="line">    el_io_func          close;            <span class="comment">/*!&lt; Close callback function */</span></span><br><span class="line">    el_io_func          destroy;          <span class="comment">/*!&lt; Destroy callback function */</span></span><br><span class="line">    stream_func         read;             <span class="comment">/*!&lt; Read callback function */</span></span><br><span class="line">    stream_func         write;            <span class="comment">/*!&lt; Write callback function */</span></span><br><span class="line">    <span class="type">int</span>                 buffer_len;       <span class="comment">/*!&lt; Buffer length use for an Element */</span></span><br><span class="line">    <span class="type">int</span>                 task_stack;       <span class="comment">/*!&lt; Element task stack */</span></span><br><span class="line">    <span class="type">int</span>                 task_prio;        <span class="comment">/*!&lt; Element task priority (based on freeRTOS priority) */</span></span><br><span class="line">    <span class="type">int</span>                 task_core;        <span class="comment">/*!&lt; Element task running in core (0 or 1) */</span></span><br><span class="line">    <span class="type">int</span>                 out_rb_size;      <span class="comment">/*!&lt; Output ringbuffer size */</span></span><br><span class="line">    <span class="type">void</span>                *data;            <span class="comment">/*!&lt; User context */</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>          *tag;             <span class="comment">/*!&lt; Element tag */</span></span><br><span class="line">    <span class="type">bool</span>                stack_in_ext;     <span class="comment">/*!&lt; Try to allocate stack in external memory */</span></span><br><span class="line">    <span class="type">int</span>                 multi_in_rb_num;  <span class="comment">/*!&lt; The number of multiple input ringbuffer */</span></span><br><span class="line">    <span class="type">int</span>                 multi_out_rb_num; <span class="comment">/*!&lt; The number of multiple output ringbuffer */</span></span><br><span class="line">&#125; <span class="type">audio_element_cfg_t</span>;</span><br></pre></td></tr></table></figure>
+<p><strong>初始化函数</strong></p>
+<p>根据<code>audio_element_cfg_t </code>配置的参数来初始化一个element对象。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">audio_element_handle_t</span> <span class="title function_">audio_element_init</span><span class="params">(<span class="type">audio_element_cfg_t</span> *config)</span>;</span><br></pre></td></tr></table></figure>
+<p>其他的函数大都是设置或读取<code>element</code>的部分成员。</p>
+<h2 id="二、event"><a href="#二、event" class="headerlink" title="二、event"></a>二、event</h2><p><strong>事件是用来通知用户<code>element</code>和<code>pipeline</code>的运行状态的，基于freertos的队列实现。<br>event有<code>event</code>本身和<code>msg</code>消息</strong></p>
+<h3 id="1、event-msg"><a href="#1、event-msg" class="headerlink" title="1、event msg"></a>1、event msg</h3><p>cmd：是消息的命令类型；</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Event message</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> cmd;                <span class="comment">/*!&lt; Command id */</span></span><br><span class="line">    <span class="type">void</span> *data;             <span class="comment">/*!&lt; Data pointer */</span></span><br><span class="line">    <span class="type">int</span> data_len;           <span class="comment">/*!&lt; Data length */</span></span><br><span class="line">    <span class="type">void</span> *source;           <span class="comment">/*!&lt; Source event */</span></span><br><span class="line">    <span class="type">int</span> source_type;        <span class="comment">/*!&lt; Source type (To know where it came from) */</span></span><br><span class="line">    <span class="type">bool</span> need_free_data;    <span class="comment">/*!&lt; Need to free data pointer after the event has been processed */</span></span><br><span class="line">&#125; <span class="type">audio_event_iface_msg_t</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2、event"><a href="#2、event" class="headerlink" title="2、event"></a>2、event</h3><p><strong>事件结构体定义如下：<br>主要成员有两个队列，一个队列集与他们的尺寸，还有一个<code>audio_event_iface_list_t</code>类型的<code>listening_queues</code>。</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Audio event structure</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">audio_event_iface</span> &#123;</span></span><br><span class="line">    QueueHandle_t               internal_queue;</span><br><span class="line">    QueueHandle_t               external_queue;</span><br><span class="line">    QueueSetHandle_t            queue_set;</span><br><span class="line">    <span class="type">int</span>                         internal_queue_size;</span><br><span class="line">    <span class="type">int</span>                         external_queue_size;</span><br><span class="line">    <span class="type">int</span>                         queue_set_size;</span><br><span class="line">    <span class="type">audio_event_iface_list_t</span>    listening_queues;</span><br><span class="line">    <span class="type">void</span>                        *context;</span><br><span class="line">    on_event_iface_func         on_cmd;</span><br><span class="line">    <span class="type">int</span>                         wait_time;</span><br><span class="line">    <span class="type">int</span>                         type;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><code>audio_event_iface_list_t</code>是啥？看定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="title function_">STAILQ_HEAD</span><span class="params">(audio_event_iface_list, audio_event_iface_item)</span> <span class="type">audio_event_iface_list_t</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>而<code>STAILQ_HEAD()</code>是声明一个单链表，这个定义在<code>queue.h</code>中介绍，<code>queue.h</code>中还定义了其他对单链表的宏，比如插入链表尾等。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Singly-linked Tail queue declarations.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>	STAILQ_HEAD(name, type)						\</span></span><br><span class="line"><span class="meta">struct name &#123;								\</span></span><br><span class="line"><span class="meta">	struct type *stqh_first;<span class="comment">/* first element */</span>			\</span></span><br><span class="line"><span class="meta">	struct type **stqh_last;<span class="comment">/* addr of last next element */</span>		\</span></span><br><span class="line"><span class="meta">&#125;</span></span><br></pre></td></tr></table></figure>
+<p><strong>所以，<code>audio_event_iface_list_t</code>是以<code>event_item</code>为成员的单链表的数据类型，<code>listening_queues</code>是以<code>event_item</code>为成员的单链表。</strong></p>
+<p>再看看<code>event_item</code>包括啥：指向下一个item的指针，一个队列和队列尺寸。<br>重点是队列。到这里可以看出listening_queues其实就是一个队列单链表。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">audio_event_iface_item</span> &#123;</span></span><br><span class="line">    STAILQ_ENTRY(audio_event_iface_item)    next;</span><br><span class="line">    QueueHandle_t                           <span class="built_in">queue</span>;</span><br><span class="line">    <span class="type">int</span>                                     queue_size;</span><br><span class="line">    <span class="type">int</span>                                     mark_to_remove;</span><br><span class="line">&#125; <span class="type">audio_event_iface_item_t</span>;</span><br></pre></td></tr></table></figure>
+<p><strong>如何初始化一个<code>even</code>t呢，先初始化一个<code>even</code>t配置结构体，用它来初始化一个<code>event</code>对象。</strong></p>
+<p>默认只配置了队列的大小，on_cmd,context都是空的，type&#x3D;0；</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Event interface configurations</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">int</span>                 internal_queue_size;        <span class="comment">/*!&lt; It&#x27;s optional, Queue size for event `internal_queue` */</span></span><br><span class="line">    <span class="type">int</span>                 external_queue_size;        <span class="comment">/*!&lt; It&#x27;s optional, Queue size for event `external_queue` */</span></span><br><span class="line">    <span class="type">int</span>                 queue_set_size;             <span class="comment">/*!&lt; It&#x27;s optional, QueueSet size for event `queue_set`*/</span></span><br><span class="line">    on_event_iface_func on_cmd;                     <span class="comment">/*!&lt; Function callback for listener when any event arrived */</span></span><br><span class="line">    <span class="type">void</span>                *context;                   <span class="comment">/*!&lt; Context will pass to callback function */</span></span><br><span class="line">    TickType_t          wait_time;                  <span class="comment">/*!&lt; Timeout to check for event queue */</span></span><br><span class="line">    <span class="type">int</span>                 type;                       <span class="comment">/*!&lt; it will pass to audio_event_iface_msg_t source_type (To know where it came from) */</span></span><br><span class="line">&#125; <span class="type">audio_event_iface_cfg_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> AUDIO_EVENT_IFACE_DEFAULT_CFG() &#123;                   \</span></span><br><span class="line"><span class="meta">    .internal_queue_size = DEFAULT_AUDIO_EVENT_IFACE_SIZE,  \</span></span><br><span class="line"><span class="meta">    .external_queue_size = DEFAULT_AUDIO_EVENT_IFACE_SIZE,  \</span></span><br><span class="line"><span class="meta">    .queue_set_size = DEFAULT_AUDIO_EVENT_IFACE_SIZE,       \</span></span><br><span class="line"><span class="meta">    .on_cmd = NULL,                                         \</span></span><br><span class="line"><span class="meta">    .context = NULL,                                        \</span></span><br><span class="line"><span class="meta">    .wait_time = portMAX_DELAY,                             \</span></span><br><span class="line"><span class="meta">    .type = 0,                                              \</span></span><br><span class="line"><span class="meta">&#125;</span></span><br></pre></td></tr></table></figure>
+<p><strong>再来看看如何初始化一个<code>event</code>：初始化函数中创建了两个队列和一个队列集，大小是刚刚config配置的，然后初始化了一条<code>audio_event_iface_list_t</code>的单链表。此时的单链表是空的，也就是没有队列。后面这个<code>event</code>将作为<code>listener</code>，监听<code>pipeline</code>中所有<code>element</code>的通知。</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="type">audio_event_iface_handle_t</span> <span class="title function_">audio_event_iface_init</span><span class="params">(<span class="type">audio_event_iface_cfg_t</span> *config)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">audio_event_iface_handle_t</span> evt = audio_calloc(<span class="number">1</span>, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> audio_event_iface));</span><br><span class="line">    AUDIO_MEM_CHECK(TAG, evt, <span class="keyword">return</span> <span class="literal">NULL</span>);</span><br><span class="line">    evt-&gt;queue_set_size   = config-&gt;queue_set_size;</span><br><span class="line">    evt-&gt;internal_queue_size = config-&gt;internal_queue_size;</span><br><span class="line">    evt-&gt;external_queue_size = config-&gt;external_queue_size;</span><br><span class="line">    evt-&gt;context = config-&gt;context;</span><br><span class="line">    evt-&gt;on_cmd = config-&gt;on_cmd;</span><br><span class="line">    evt-&gt;type = config-&gt;type;</span><br><span class="line">    <span class="keyword">if</span> (evt-&gt;queue_set_size) &#123;</span><br><span class="line">        evt-&gt;queue_set = xQueueCreateSet(evt-&gt;queue_set_size);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (evt-&gt;internal_queue_size) &#123;</span><br><span class="line">        evt-&gt;internal_queue = xQueueCreate(evt-&gt;internal_queue_size, <span class="keyword">sizeof</span>(<span class="type">audio_event_iface_msg_t</span>));</span><br><span class="line">        AUDIO_MEM_CHECK(TAG, evt-&gt;internal_queue, <span class="keyword">goto</span> _event_iface_init_failed);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (evt-&gt;external_queue_size) &#123;</span><br><span class="line">        evt-&gt;external_queue = xQueueCreate(evt-&gt;external_queue_size, <span class="keyword">sizeof</span>(<span class="type">audio_event_iface_msg_t</span>));</span><br><span class="line">        AUDIO_MEM_CHECK(TAG, evt-&gt;external_queue, <span class="keyword">goto</span> _event_iface_init_failed);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        ESP_LOGD(TAG, <span class="string">&quot;This emiiter have no queue set,%p&quot;</span>, evt);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    STAILQ_INIT(&amp;evt-&gt;listening_queues);</span><br><span class="line">    <span class="keyword">return</span> evt;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="三、pipeline"><a href="#三、pipeline" class="headerlink" title="三、pipeline"></a>三、pipeline</h2><p><strong><code>pipeline</code>翻译成管道，但我觉得翻译成流水线好像也不错，它就是一条流水线，<code>element</code>就是流水线上的工人，流水线将工人的工作连接起来,而<code>event</code>就是流水线上的管理人员，负责收集流水线上员工的工作情况，并通过<code>msg</code>将情况向老板（用户）反馈,老板通过msg中的数据调整流水线。</strong></p>
+<p><strong>首先看pipeleine结构体，el_list，rb_list是两条单链表，具体接下来看</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">audio_pipeline</span> &#123;</span></span><br><span class="line">    <span class="type">audio_element_list_t</span>        el_list;</span><br><span class="line">    <span class="type">ringbuf_list_t</span>              rb_list;</span><br><span class="line">    <span class="type">audio_element_state_t</span>       state;</span><br><span class="line">    xSemaphoreHandle            lock;</span><br><span class="line">    <span class="type">bool</span>                        linked;</span><br><span class="line">    <span class="type">audio_event_iface_handle_t</span>  listener;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><strong><code>audio_element_list_t</code>和<code>ringbuf_list_t</code> 是一个类型定义：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="title function_">STAILQ_HEAD</span><span class="params">(ringbuf_list, ringbuf_item)</span> <span class="type">ringbuf_list_t</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">STAILQ_HEAD</span><span class="params">(audio_element_list, audio_element_item)</span> <span class="type">audio_element_list_t</span>;</span><br></pre></td></tr></table></figure>
+<p><strong>而STAILQ_HEAD()是一个宏定义，它的作用是创建一个名为name，数据类型为type的链表，所以以上ringbuf_list_t创建了一个名为ringbuf_list，数据类型为ringbuf_item的单链表，audio_element_list_t同理。</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Singly-linked Tail queue declarations.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>	STAILQ_HEAD(name, type)						\</span></span><br><span class="line"><span class="meta">struct name &#123;								\</span></span><br><span class="line"><span class="meta">	struct type *stqh_first;<span class="comment">/* first element */</span>			\</span></span><br><span class="line"><span class="meta">	struct type **stqh_last;<span class="comment">/* addr of last next element */</span>		\</span></span><br><span class="line"><span class="meta">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>audio_element_item_t 是个单链表成员的结构体 next指向下个element，el是当前的element，linked表示是否连接到pipeline。</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">audio_element_item</span> &#123;</span></span><br><span class="line">    STAILQ_ENTRY(audio_element_item) next;</span><br><span class="line">    <span class="type">audio_element_handle_t</span>           el;</span><br><span class="line">    <span class="type">bool</span>                             linked;</span><br><span class="line">    <span class="type">bool</span>                             kept_ctx;</span><br><span class="line">    <span class="type">audio_element_status_t</span>           el_state;</span><br><span class="line">&#125; <span class="type">audio_element_item_t</span>;</span><br></pre></td></tr></table></figure>
+<p><strong>ringbuf_item_t 也是单链表成员的结构体，将element对应的ringbuff连接起来，next指向下一个element的ringbuff，rb是当前的ringbuff，host_el是当前ringbuff所属的element</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">ringbuf_item</span> &#123;</span></span><br><span class="line">    STAILQ_ENTRY(ringbuf_item)  next;</span><br><span class="line">    <span class="type">ringbuf_handle_t</span>            rb;</span><br><span class="line">    <span class="type">audio_element_handle_t</span>      host_el;</span><br><span class="line">    <span class="type">bool</span>                        linked;</span><br><span class="line">    <span class="type">bool</span>                        kept_ctx;</span><br><span class="line">&#125; <span class="type">ringbuf_item_t</span>;</span><br></pre></td></tr></table></figure>
+<p>大致关系如下：<br><img src="/killer-blog/ESP32/esp32adf_audio_pipeline/20200814112839302.png" alt="在这里插入图片描述"><br><strong>再来看主要的函数：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">esp_err_t</span> <span class="title function_">audio_pipeline_register</span><span class="params">(<span class="type">audio_pipeline_handle_t</span> pipeline, <span class="type">audio_element_handle_t</span> el, <span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>这个函数将根据<code>element_handle</code>生成一个<code>element_item</code>，并将item插入element_list队尾，同时设置tag。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">esp_err_t</span> <span class="title function_">audio_pipeline_link</span><span class="params">(<span class="type">audio_pipeline_handle_t</span> pipeline, <span class="type">const</span> <span class="type">char</span> *link_tag[], <span class="type">int</span> link_num)</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>这个函数完成的主要内容是将<code>element</code>与<code>ringbuff_item</code>，<code>ringbuff</code>连接起来。<br>通过函数<code>_pipeline_rb_linked(pipeline, el, first, last);</code>实现。</p>
+<p>这个函数创建了一个<code>ringbuff</code>和<code>ringbufff_item</code>，将<code>ringbuff</code>传递给<code>ringbufff_item</code>并将<code>ringbufff_item</code>添加到<code>ringbuff_list</code>，设置ringbuff_item的host_el为el，并将ringbuff传递给el。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//判断el的位置并将rb传递给el</span></span><br><span class="line">audio_element_set_input_ringbuf(el, rb);</span><br><span class="line">audio_element_set_output_ringbuf(el, rb);</span><br><span class="line"></span><br><span class="line"><span class="comment">//将rb_item插入rb_list队尾</span></span><br><span class="line">STAILQ_INSERT_TAIL(&amp;pipeline-&gt;rb_list, rb_item, next);</span><br></pre></td></tr></table></figure>
+<h5 id="3"><a href="#3" class="headerlink" title="3"></a>3</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">esp_err_t</span> <span class="title function_">audio_pipeline_set_listener</span><span class="params">(<span class="type">audio_pipeline_handle_t</span> pipeline, <span class="type">audio_event_iface_handle_t</span> listener)</span></span><br></pre></td></tr></table></figure>
+<p>这个函数会将pipeline中element_list链表中从头到尾取出element_item并将其指向的element的event中的external_queue插入到listener的event_list中的event_item中的queue。这个过程有点难懂。简单说就是：</p>
+<p><em><strong>将pipeline中所有的element的事件消息队列插入listener中，这样listener就可接收element中的全部消息。</strong></em></p>
+<p>所以整个pipeline的详细逻辑可以大概如下所示：<br><img src="/killer-blog/ESP32/esp32adf_audio_pipeline/2020081422233576.png" alt="在这里插入图片描述"><br><strong>如果还是觉得复杂，这里有一个简化的逻辑图帮助你</strong><br><img src="/killer-blog/ESP32/esp32adf_audio_pipeline/20200815093218555.png" alt="在这里插入图片描述"></p>
+<p>辛苦打字来之不易，点个赞支持下呗。<br><img src="/killer-blog/ESP32/esp32adf_audio_pipeline/2020081422441491.png" alt="在这里插入图片描述"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>killer-p
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://killer-p.github.io/killer-blog/ESP32/esp32adf_audio_pipeline/" title="ESP32 ADF音频流原理">https://killer-p.github.io/killer-blog/ESP32/esp32adf_audio_pipeline/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/killer-blog/ESP32/ESP32_spiffs/" rel="prev" title="ESP32 spiffs文件系统">
+                  <i class="fa fa-angle-left"></i> ESP32 spiffs文件系统
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/killer-blog/ESP32/esp32_weather_report/" rel="next" title="ESP32 实现天气预报">
+                  ESP32 实现天气预报 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">killer-p</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

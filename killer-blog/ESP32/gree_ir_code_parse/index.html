@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"killer-p.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="格力红外编码解析（简单易懂） 使用红外遥控空调，就必须先了解红外遥控的原理，数据的定义等。本博客解析了空调的最基本的功能的红外编码，包括：开关，温度，定时，风速，扫风，校验码。其他的功能因为空调型号不同而差别较大，所以暂时不作解析。同时，空调大部分时间工作在制冷模式下，其他模式下的编码也暂时未解析。  一，红外遥控原理1，红外线红外线是波长在760nm到1mm的电磁波，根据波长的不同可分为可见光（">
+<meta property="og:type" content="article">
+<meta property="og:title" content="格力红外编码解析（简单易懂）">
+<meta property="og:url" content="https://killer-p.github.io/killer-blog/ESP32/gree_ir_code_parse/index.html">
+<meta property="og:site_name" content="killer-p blog">
+<meta property="og:description" content="格力红外编码解析（简单易懂） 使用红外遥控空调，就必须先了解红外遥控的原理，数据的定义等。本博客解析了空调的最基本的功能的红外编码，包括：开关，温度，定时，风速，扫风，校验码。其他的功能因为空调型号不同而差别较大，所以暂时不作解析。同时，空调大部分时间工作在制冷模式下，其他模式下的编码也暂时未解析。  一，红外遥控原理1，红外线红外线是波长在760nm到1mm的电磁波，根据波长的不同可分为可见光（">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/ESP32/gree_ir_code_parse/20200921205928763.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/ESP32/gree_ir_code_parse/20200921104951188.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/ESP32/gree_ir_code_parse/20200921215113779.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/ESP32/gree_ir_code_parse/20200921220014146.png">
+<meta property="og:image" content="https://killer-p.github.io/killer-blog/ESP32/gree_ir_code_parse/weixin.png">
+<meta property="article:published_time" content="2025-06-01T10:11:17.226Z">
+<meta property="article:modified_time" content="2025-06-02T02:20:53.290Z">
+<meta property="article:author" content="killer-p">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://killer-p.github.io/killer-blog/ESP32/gree_ir_code_parse/20200921205928763.png">
+
+
+<link rel="canonical" href="https://killer-p.github.io/killer-blog/ESP32/gree_ir_code_parse/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://killer-p.github.io/killer-blog/ESP32/gree_ir_code_parse/","path":"killer-blog/ESP32/gree_ir_code_parse/","title":"格力红外编码解析（简单易懂）"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>格力红外编码解析（简单易懂） | killer-p blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">killer-p blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <img class="custom-logo-image" src="/upload/killer-p.png" alt="killer-p blog">
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/home/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A0%BC%E5%8A%9B%E7%BA%A2%E5%A4%96%E7%BC%96%E7%A0%81%E8%A7%A3%E6%9E%90%EF%BC%88%E7%AE%80%E5%8D%95%E6%98%93%E6%87%82%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">格力红外编码解析（简单易懂）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%EF%BC%8C%E7%BA%A2%E5%A4%96%E9%81%A5%E6%8E%A7%E5%8E%9F%E7%90%86"><span class="nav-number">1.1.</span> <span class="nav-text">一，红外遥控原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%BC%8C%E7%BA%A2%E5%A4%96%E7%BA%BF"><span class="nav-number">1.1.1.</span> <span class="nav-text">1，红外线</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%BC%8C%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">1.1.2.</span> <span class="nav-text">2，工作原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%EF%BC%8C%E5%AE%9E%E9%AA%8C%E6%B3%A2%E5%BD%A2"><span class="nav-number">1.2.</span> <span class="nav-text">二，实验波形</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%EF%BC%8C%E7%BA%A2%E5%A4%96%E7%BC%96%E7%A0%81%E8%A7%A3%E6%9E%90"><span class="nav-number">1.3.</span> <span class="nav-text">三，红外编码解析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E6%AE%B5%E6%95%B0%E6%8D%AE%EF%BC%9A"><span class="nav-number">1.3.1.</span> <span class="nav-text">第一段数据：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E6%AE%B5%E6%95%B0%E6%8D%AE%EF%BC%9A"><span class="nav-number">1.3.2.</span> <span class="nav-text">第二段数据：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%EF%BC%8C%E5%B0%8F%E7%BB%93"><span class="nav-number">1.4.</span> <span class="nav-text">四，小结</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">killer-p</p>
+  <div class="site-description" itemprop="description">share Linux, arm, and some skillful things</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdnjs.cloudflare.com/ajax/libs/creativecommons-vocabulary/2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://killer-p.github.io/killer-blog/ESP32/gree_ir_code_parse/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="killer-p">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="killer-p blog">
+      <meta itemprop="description" content="share Linux, arm, and some skillful things">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="格力红外编码解析（简单易懂） | killer-p blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          格力红外编码解析（简单易懂）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-06-01 18:11:17" itemprop="dateCreated datePublished" datetime="2025-06-01T18:11:17+08:00">2025-06-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-06-02 10:20:53" itemprop="dateModified" datetime="2025-06-02T10:20:53+08:00">2025-06-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/ESP32/" itemprop="url" rel="index"><span itemprop="name">ESP32</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="格力红外编码解析（简单易懂）"><a href="#格力红外编码解析（简单易懂）" class="headerlink" title="格力红外编码解析（简单易懂）"></a>格力红外编码解析（简单易懂）</h1><blockquote>
+<p>使用红外遥控空调，就必须先了解红外遥控的原理，数据的定义等。本博客解析了空调的最基本的功能的红外编码，包括：开关，温度，定时，风速，扫风，校验码。其他的功能因为空调型号不同而差别较大，所以暂时不作解析。同时，空调大部分时间工作在制冷模式下，其他模式下的编码也暂时未解析。</p>
+</blockquote>
+<h2 id="一，红外遥控原理"><a href="#一，红外遥控原理" class="headerlink" title="一，红外遥控原理"></a>一，红外遥控原理</h2><h3 id="1，红外线"><a href="#1，红外线" class="headerlink" title="1，红外线"></a>1，红外线</h3><p>红外线是波长在760nm到1mm的电磁波，根据波长的不同可分为可见光（0.38um-0.76um）和不可见光。使用红外线作为遥控的话，由于红外发射管与红外接收管的响应波长一般为0.8um-0.94um，所以选择波长为0.76um-1.5um的红外光作为通讯的波长。</p>
+<p>红外通信广泛应用于家电控制，其优点是抗干扰能力强（频率低），功耗小，性价比高等。</p>
+<h3 id="2，工作原理"><a href="#2，工作原理" class="headerlink" title="2，工作原理"></a>2，工作原理</h3><p>发射器发射38khz方波为载波的红外光（占空比50），即红外光以38khz的频率闪烁着，接收器接收到以此频率闪烁的红外光时，会在其信号脚输出高电平信号，否则输出低电平。</p>
+<p>根据这个最基本的原理来，来实现编码解码数据。数据就是一组二进制的数据，0和1的区别就是高低电平时间的不同。比如，以下例子中，0与1的区别就是1的高电平时间较长。发射器首先需要编码，根据二进制数据每一位的内容，发射持续时间不一样的红外光（控制低高电平时间），而接收器则需要判断高低电平的时间来解码数据。</p>
+<h2 id="二，实验波形"><a href="#二，实验波形" class="headerlink" title="二，实验波形"></a>二，实验波形</h2><p>本实验是基于格力空调的红外数据<br>一帧红外编码数据的组成如下：<br><strong>起始码+35位数据+连接码+32位数据+结束码</strong><br><img src="/killer-blog/ESP32/gree_ir_code_parse/20200921205928763.png" alt="在这里插入图片描述">其中多次测量得出：</p>
+<p><strong>起始码：9000us 低电平 + 4500us高电平；<br>连接码：646us低电平 + 20000us高电平；<br>结束码：646us低电平 + 高电平；</strong></p>
+<p><strong>数据0：646us低电平 + 516us高电平；<br>数据1：646us低电平 + 1643us高电平；</strong></p>
+<p>数据码中的0和1，经过多次的测量，取众数作为依据，实验数据如下：</p>
+<p><img src="/killer-blog/ESP32/gree_ir_code_parse/20200921104951188.png" alt="在这里插入图片描述"></p>
+<h2 id="三，红外编码解析"><a href="#三，红外编码解析" class="headerlink" title="三，红外编码解析"></a>三，红外编码解析</h2><p>知道了一帧红外数据的0和1的表示，我们就可以自由的组成一帧数据。接下来需要了解的是在一帧数据中，数据位中的每一个bit代表的意思。<br>这里以<code>25℃，制冷模式，低风速，无扫风，打开，定时时间为0</code>的一帧数据为例子：</p>
+<h3 id="第一段数据："><a href="#第一段数据：" class="headerlink" title="第一段数据："></a>第一段数据：</h3><p><strong>开关：bit3；</strong></p>
+<blockquote>
+<p>0：关闭；1：开启</p>
+</blockquote>
+<p><strong>风速：bit4，bit5；</strong></p>
+<blockquote>
+<p>自动风速：00<br>一级风速：10<br>二级风速：01<br>三级风速：11</p>
+</blockquote>
+<p><strong>扫风开关：bit6，以及第二段bit0；</strong></p>
+<blockquote>
+<p>0：关闭；1：开启</p>
+</blockquote>
+<p><strong>温度：bit8，bit9，bit10，bit11；</strong></p>
+<blockquote>
+<p>16℃:	0000<br>17℃:	1000<br>18℃:	0100<br>19℃:	1100<br>20℃:	0010<br>21℃:	1010<br>22℃:	0110<br>23℃:	1110<br>24℃:	0001<br>25℃:	1001<br>26℃:	0101<br>27℃:	1101<br>28℃:	0011</p>
+</blockquote>
+<p><strong>定时分钟数：bit12，bit13，bit14；</strong></p>
+<p>由于我的手机只能发送定时半小时为最小单位的定时时间，所以只有定时30分钟的数据</p>
+<blockquote>
+<p>30min:	100</p>
+</blockquote>
+<p><strong>bit15	定时开关；</strong></p>
+<blockquote>
+<p>0：关闭；1：开启</p>
+</blockquote>
+<p><strong>定时小时数：bit16，bit17，bit18，bit19；</strong></p>
+<blockquote>
+<p>一小时：1000<br>两小时：0100<br>三小时：1100<br>…..</p>
+</blockquote>
+<p><img src="/killer-blog/ESP32/gree_ir_code_parse/20200921215113779.png" alt="在这里插入图片描述"></p>
+<h3 id="第二段数据："><a href="#第二段数据：" class="headerlink" title="第二段数据："></a>第二段数据：</h3><p>第二段数据比较简单，需要注意的就是<code>bit0</code>是扫风的开关，她与第一段数据中的<code>bit6</code>是一样的数值。另外是后四位<code>bit28,bit29,bit30,bit31</code>组成的校验码。<br>网上也有许多关于校验码的公式，但是我试了后发现并不适用，于是自己尝试出了一条公式：<br><code>校验码 = 温度 - 18 + 定时小时数 + 空调开关 × 8；</code><br>例如以上例子的校验码是：25 - 18 + 0 + 1× 8 &#x3D; 15 &#x3D; 0xf;<br><img src="/killer-blog/ESP32/gree_ir_code_parse/20200921220014146.png" alt="在这里插入图片描述"></p>
+<h2 id="四，小结"><a href="#四，小结" class="headerlink" title="四，小结"></a>四，小结</h2><p>红外遥控的实现大同小异，最好还是要自己有测试的设备进行代码的测试。红外接收管和逻辑分析仪是你的不二选择。</p>
+<p>友情连接：<br><a href="/killer-blog/ESP32/esp32_ir_control">esp32实现红外发射与接收</a></p>
+<p>作者才疏学浅，难免有错误，希望指正。如果文章对你有帮助，帮忙点个赞呗。</p>
+<p><img src="/killer-blog/ESP32/gree_ir_code_parse/weixin.png" alt="在这里插入图片描述"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>killer-p
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://killer-p.github.io/killer-blog/ESP32/gree_ir_code_parse/" title="格力红外编码解析（简单易懂）">https://killer-p.github.io/killer-blog/ESP32/gree_ir_code_parse/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/killer-blog/ESP32/esp32_ir_control/" rel="prev" title="ESP32实现红外遥控">
+                  <i class="fa fa-angle-left"></i> ESP32实现红外遥控
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/killer-blog/ESP32/esp32adfsetup_in_window/" rel="next" title="搭建ESP32A1S的ADF开发环境">
+                  搭建ESP32A1S的ADF开发环境 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">killer-p</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
